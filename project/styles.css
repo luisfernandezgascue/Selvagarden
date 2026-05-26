@@ -1,0 +1,184 @@
+/* SELVA GARDEN — Brand system */
+:root {
+  --c-green-dark: #1A3C2E;
+  --c-green: #2D6A4F;
+  --c-green-light: #D8EDE3;
+  --c-green-mid: #A8D5B5;
+  --c-gold: #B5873A;
+  --c-gold-light: #F5EDD8;
+  --c-bg: #F4F6F1;
+  --c-black: #1A1A1A;
+  --c-gray: #4A4A4A;
+  --c-gray-soft: #888;
+  --c-line: rgba(26,26,26,0.08);
+  --c-line-soft: rgba(26,26,26,0.04);
+
+  --font-serif: 'Cormorant Garamond', 'Times New Roman', serif;
+  --font-sans: 'DM Sans', -apple-system, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+
+  --r-card: 14px;
+  --r-btn: 22px;
+  --r-pill: 999px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { font-family: var(--font-sans); color: var(--c-black); }
+button { font-family: inherit; cursor: pointer; }
+
+/* ============ PHONE FRAME ============ */
+.phone {
+  width: 375px;
+  height: 780px;
+  background: var(--c-bg);
+  border-radius: 46px;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  box-shadow:
+    0 30px 70px rgba(10,30,18,0.18),
+    0 0 0 8px #11231a,
+    0 0 0 9px rgba(255,255,255,0.04);
+  font-family: var(--font-sans);
+}
+.phone-screen { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+
+.status-bar {
+  height: 44px; flex-shrink: 0;
+  display: flex; align-items: flex-end; justify-content: space-between;
+  padding: 0 22px 7px; position: relative; z-index: 10;
+}
+.status-bar.dark { color: #fff; }
+.notch {
+  position: absolute; top: 8px; left: 50%; transform: translateX(-50%);
+  width: 112px; height: 30px; background: #000; border-radius: 18px; z-index: 11;
+}
+.s-time { font-size: 14px; font-weight: 600; letter-spacing: -0.01em; }
+.s-right { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; }
+
+.home-indicator {
+  position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%);
+  width: 134px; height: 5px; border-radius: 99px; background: rgba(0,0,0,0.28); z-index: 100; pointer-events: none;
+}
+.home-indicator.light { background: rgba(255,255,255,0.55); }
+
+/* ============ SCROLL ============ */
+.scroll {
+  flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.scroll::-webkit-scrollbar { display: none; }
+
+/* ============ TAB BAR ============ */
+.tab-bar {
+  height: 78px; flex-shrink: 0; position: relative;
+  background: rgba(244,246,241,0.94);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-top: 1px solid var(--c-line);
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+  padding: 10px 0 18px;
+}
+.tab-btn {
+  background: none; border: none;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 0; color: var(--c-gray-soft);
+  transition: color .15s;
+}
+.tab-btn.active { color: var(--c-green-dark); }
+.tab-btn.active .tab-lbl { font-weight: 600; }
+.tab-lbl { font-size: 10px; letter-spacing: 0.02em; }
+.tab-icon-wrap { width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; }
+.tab-btn.center { position: relative; }
+.tab-center-circle {
+  width: 54px; height: 54px; border-radius: 50%;
+  background: linear-gradient(160deg, #2D6A4F 0%, #1A3C2E 100%);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow:
+    0 8px 22px rgba(26,60,46,0.45),
+    inset 0 1px 0 rgba(255,255,255,0.12);
+  border: 3px solid var(--c-bg);
+  margin-top: -28px;
+  position: relative;
+  transition: transform .2s;
+}
+.tab-btn.center:active .tab-center-circle { transform: scale(0.94); }
+.tab-center-leaf { width: 22px; height: 22px; }
+
+/* ============ COMMON UI ============ */
+.eyebrow {
+  font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase;
+  font-weight: 600; color: var(--c-gold);
+}
+.h-serif {
+  font-family: var(--font-serif); font-weight: 600;
+  letter-spacing: -0.01em; line-height: 1.05;
+}
+.divider-rule {
+  display: flex; align-items: center; gap: 10px; color: var(--c-gold);
+  font-family: var(--font-serif); font-style: italic; font-size: 12px;
+}
+.divider-rule::before, .divider-rule::after {
+  content: ''; flex: 1; height: 1px; background: currentColor; opacity: 0.4;
+}
+
+/* striped photo placeholder */
+.photo-placeholder {
+  background:
+    repeating-linear-gradient(
+      135deg,
+      #E8E5DE 0 8px,
+      #DDD9D0 8px 16px
+    );
+  display: flex; align-items: center; justify-content: center;
+  color: rgba(26,26,26,0.42);
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* shimmer for loading */
+@keyframes shimmer { 0% { background-position: -200px 0 } 100% { background-position: 200px 0 } }
+.img-loading {
+  background: linear-gradient(90deg,#e8ede8 25%,#d8e8d8 50%,#e8ede8 75%);
+  background-size: 200px 100%;
+  animation: shimmer 1.2s infinite;
+}
+
+/* keyframes */
+@keyframes fadeUp { from { opacity:0; transform: translateY(12px) } to { opacity:1; transform: none } }
+@keyframes pulseDot { 0%,100% { opacity:1; transform: scale(1) } 50% { opacity:0.4; transform: scale(1.4) } }
+@keyframes breathe { 0%,100% { transform: scale(1) } 50% { transform: scale(1.06) } }
+@keyframes spinSlow { from { transform: rotate(0) } to { transform: rotate(360deg) } }
+@keyframes barGrow { from { width:0 } }
+
+/* artboard wrapper for design canvas */
+.artboard-host {
+  width: 375px; height: 780px;
+  display: flex; align-items: center; justify-content: center;
+  background: transparent;
+}
+
+/* Selva avatar (the leaf brand mark) */
+.selva-avatar {
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 25%, #2D6A4F 0%, #1A3C2E 75%);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 14px rgba(26,60,46,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
+  position: relative;
+  flex-shrink: 0;
+}
+.selva-avatar svg { display: block; }
+.selva-avatar.breathing { animation: breathe 4s ease-in-out infinite; }
+
+/* generic chip */
+.chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 10px; border-radius: var(--r-pill);
+  font-size: 10px; font-weight: 600; letter-spacing: 0.02em;
+}
+.chip-gold { background: rgba(181,135,58,0.14); color: var(--c-gold); border: 1px solid rgba(181,135,58,0.25); }
+.chip-green { background: var(--c-green-light); color: var(--c-green-dark); }
+.chip-dark { background: var(--c-green-dark); color: white; }
+.chip-white { background: white; color: var(--c-green-dark); }
