@@ -1,33 +1,5 @@
-import { Icon, SelvaLeaf, AppleA } from './icons';
+import { Icon, SelvaLeaf } from './icons';
 
-export function StatusBar({ dark = false, time = '9:41' }) {
-  const c = dark ? '#fff' : '#1A1A1A';
-  return (
-    <div className={`status-bar ${dark ? 'dark' : ''}`} style={{ color: c }}>
-      <span className="s-time">{time}</span>
-      <div className="notch" />
-      <div className="s-right">
-        <svg width="17" height="11" viewBox="0 0 17 11" fill={c}>
-          <rect x="0" y="6" width="3" height="5" rx="1"/>
-          <rect x="4" y="4" width="3" height="7" rx="1"/>
-          <rect x="8" y="2" width="3" height="9" rx="1"/>
-          <rect x="12" y="0" width="3" height="11" rx="1"/>
-        </svg>
-        <svg width="16" height="11" viewBox="0 0 16 11" fill="none" stroke={c} strokeWidth="1.4">
-          <path d="M1 4.5 a 9 9 0 0 1 14 0"/>
-          <path d="M3 6.5 a 6 6 0 0 1 10 0"/>
-          <path d="M5 8.5 a 3 3 0 0 1 6 0"/>
-          <circle cx="8" cy="10" r="0.7" fill={c}/>
-        </svg>
-        <svg width="26" height="12" viewBox="0 0 26 12">
-          <rect x="0.5" y="0.5" width="22" height="11" rx="3" fill="none" stroke={c} strokeOpacity="0.4"/>
-          <rect x="2" y="2" width="19" height="8" rx="1.5" fill={c}/>
-          <path d="M24 4v4c0.7-0.3 1.2-1 1.2-2s-0.5-1.7-1.2-2z" fill={c} fillOpacity="0.4"/>
-        </svg>
-      </div>
-    </div>
-  );
-}
 
 export function TabBar({ active = 'home', onChange = () => {} }) {
   const Tab = ({ id, icon, label }) => (
@@ -52,16 +24,8 @@ export function TabBar({ active = 'home', onChange = () => {} }) {
   );
 }
 
-export function Phone({ children, statusBarDark = false, homeLight = false }) {
-  return (
-    <div className="phone">
-      <div className="phone-screen">
-        <StatusBar dark={statusBarDark}/>
-        {children}
-      </div>
-      <div className={`home-indicator ${homeLight ? 'light' : ''}`}/>
-    </div>
-  );
+export function Phone({ children }) {
+  return <div className="screen-root">{children}</div>;
 }
 
 export function PhotoFrame({ label, height = 200, src, style = {}, children, radius = 14 }) {

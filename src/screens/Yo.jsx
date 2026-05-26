@@ -1,5 +1,6 @@
 import { Phone, TabBar, SectionHeader, iconBtn } from '../components';
 import { Icon } from '../icons';
+import { signOut } from '../lib/auth';
 
 function Stat({ n, lbl, gold }) {
   return (
@@ -23,7 +24,12 @@ function MenuRow({ icon, text, sub, onClick }) {
   );
 }
 
-export default function Yo({ onTab, onCalc }) {
+export default function Yo({ onTab, onCalc, customer }) {
+  const nombre = customer?.nombre || 'Mi perfil';
+  const nivel = customer?.nivel_lealtad || 'semilla';
+  const puntos = customer?.puntos || 0;
+  const nivelLabel = { sin_nivel: '', semilla: '🌱 Semilla', versailles: '🥈 Versailles', babilonia: '🥇 Babilonia' }[nivel] || '🌱 Semilla';
+
   return (
     <Phone>
       <div className="scroll">
@@ -35,12 +41,15 @@ export default function Yo({ onTab, onCalc }) {
 
         {/* Profile */}
         <div style={{ padding: '18px 18px 8px', display: 'flex', alignItems: 'center', gap: 14 }}>
-          <div style={{ width: 64, height: 64, borderRadius: '50%', overflow: 'hidden', background: '#D8EDE3', border: '2px solid #fff', boxShadow: '0 4px 14px rgba(26,60,46,0.15)' }}>
-            <img src="https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&w=200" style={{ width: '100%', height: '100%', objectFit: 'cover' }}/>
+          <div style={{ width: 64, height: 64, borderRadius: '50%', overflow: 'hidden', background: '#D8EDE3', border: '2px solid #fff', boxShadow: '0 4px 14px rgba(26,60,46,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            {customer?.avatar_url
+              ? <img src={customer.avatar_url} style={{ width: '100%', height: '100%', objectFit: 'cover' }}/>
+              : <span style={{ fontFamily: 'var(--font-serif)', fontSize: 26, fontWeight: 600, color: '#1A3C2E' }}>{nombre[0]}</span>
+            }
           </div>
           <div style={{ flex: 1 }}>
-            <h2 className="h-serif" style={{ fontSize: 22, fontWeight: 600 }}>Carlos Mendoza</h2>
-            <p style={{ fontSize: 12, color: '#888', marginTop: 1 }}>🥈 Versailles · 842 pts</p>
+            <h2 className="h-serif" style={{ fontSize: 22, fontWeight: 600 }}>{nombre}</h2>
+            <p style={{ fontSize: 12, color: '#888', marginTop: 1 }}>{nivelLabel} · {puntos} pts</p>
           </div>
           <button style={{ ...iconBtn, color: '#1A1A1A' }}><Icon.Chevron size={14}/></button>
         </div>
@@ -107,7 +116,7 @@ export default function Yo({ onTab, onCalc }) {
         </div>
 
         <div style={{ padding: '22px 18px 24px', textAlign: 'center' }}>
-          <button style={{ background: 'none', border: 'none', color: '#B5873A', fontSize: 12, fontWeight: 600 }}>Cerrar sesión</button>
+          <button onClick={signOut} style={{ background: 'none', border: 'none', color: '#B5873A', fontSize: 12, fontWeight: 600 }}>Cerrar sesión</button>
           <p style={{ fontSize: 10, color: '#BBB', marginTop: 14 }}>Selva Garden · v2.4.0</p>
         </div>
       </div>

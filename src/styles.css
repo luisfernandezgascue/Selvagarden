@@ -23,46 +23,45 @@
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-body { font-family: var(--font-sans); color: var(--c-black); background: #0E1F14; }
+html, body { height: 100%; }
+body { font-family: var(--font-sans); color: var(--c-black); background: var(--c-bg); }
 button { font-family: inherit; cursor: pointer; }
 a { text-decoration: none; }
 
 /* ============ APP SHELL ============ */
 .app-shell {
-  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--c-bg);
+}
+
+/* ============ SCREEN ROOT (replaces phone frame) ============ */
+.screen-root {
+  height: 100dvh;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(160deg, #0a1810 0%, #1A3C2E 60%, #0f2318 100%);
-  padding: 40px 20px;
+  flex-direction: column;
   position: relative;
+  background: var(--c-bg);
   overflow: hidden;
+  font-family: var(--font-sans);
 }
 
-.app-shell::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image:
-    radial-gradient(circle at 20% 20%, rgba(168,213,181,0.06) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(181,135,58,0.06) 0%, transparent 50%);
-  pointer-events: none;
-}
-
-.app-shell-label {
-  position: absolute;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: rgba(255,255,255,0.5);
-  font-size: 12px;
-  letter-spacing: 0.18em;
-  font-weight: 600;
-  text-transform: uppercase;
-  white-space: nowrap;
+/* Desktop: center the app in a dark surround */
+@media (min-width: 600px) {
+  body { background: #0E1F14; }
+  .app-shell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(160deg, #0a1810 0%, #1A3C2E 60%, #0f2318 100%);
+    min-height: 100dvh;
+  }
+  .screen-root {
+    width: 390px;
+    height: min(844px, 100dvh);
+    border-radius: 46px;
+    overflow: hidden;
+    box-shadow: 0 30px 70px rgba(10,30,18,0.5), 0 0 0 8px #11231a, 0 0 0 9px rgba(255,255,255,0.04);
+  }
 }
 
 .calc-shell {
@@ -93,42 +92,6 @@ a { text-decoration: none; }
   z-index: 10;
 }
 
-/* ============ PHONE FRAME ============ */
-.phone {
-  width: 375px;
-  height: 780px;
-  background: var(--c-bg);
-  border-radius: 46px;
-  overflow: hidden;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  box-shadow:
-    0 30px 70px rgba(10,30,18,0.4),
-    0 0 0 8px #11231a,
-    0 0 0 9px rgba(255,255,255,0.04);
-  font-family: var(--font-sans);
-}
-.phone-screen { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
-
-.status-bar {
-  height: 44px; flex-shrink: 0;
-  display: flex; align-items: flex-end; justify-content: space-between;
-  padding: 0 22px 7px; position: relative; z-index: 10;
-}
-.status-bar.dark { color: #fff; }
-.notch {
-  position: absolute; top: 8px; left: 50%; transform: translateX(-50%);
-  width: 112px; height: 30px; background: #000; border-radius: 18px; z-index: 11;
-}
-.s-time { font-size: 14px; font-weight: 600; letter-spacing: -0.01em; }
-.s-right { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; }
-
-.home-indicator {
-  position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%);
-  width: 134px; height: 5px; border-radius: 99px; background: rgba(0,0,0,0.28); z-index: 100; pointer-events: none;
-}
-.home-indicator.light { background: rgba(255,255,255,0.55); }
 
 /* ============ SCROLL ============ */
 .scroll {
@@ -139,14 +102,14 @@ a { text-decoration: none; }
 
 /* ============ TAB BAR ============ */
 .tab-bar {
-  height: 78px; flex-shrink: 0; position: relative;
+  flex-shrink: 0; position: relative;
   background: rgba(244,246,241,0.94);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   border-top: 1px solid var(--c-line);
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
-  padding: 10px 0 18px;
+  padding: 10px 0 calc(14px + env(safe-area-inset-bottom, 0px));
 }
 .tab-btn {
   background: none; border: none;
@@ -231,19 +194,3 @@ a { text-decoration: none; }
 .chip-dark { background: var(--c-green-dark); color: white; }
 .chip-white { background: white; color: var(--c-green-dark); }
 
-@media (max-width: 420px) {
-  body { background: var(--c-bg); }
-  .app-shell {
-    padding: 0;
-    min-height: 100dvh;
-    background: var(--c-bg);
-    align-items: flex-start;
-  }
-  .phone {
-    width: 100%;
-    height: 100dvh;
-    border-radius: 0;
-    box-shadow: none;
-  }
-  .app-shell-label { display: none; }
-}

@@ -38,7 +38,17 @@ function Tx({ date, desc, pts, gold }) {
   );
 }
 
-export default function MiTarjeta({ storeMode = false, onTab }) {
+export default function MiTarjeta({ storeMode = false, onTab, customer }) {
+  const nombre = customer?.nombre || 'Mi Tarjeta';
+  const nivel = customer?.nivel_lealtad || 'semilla';
+  const puntos = customer?.puntos || 0;
+  const numeroSocio = customer?.numero_socio || '—';
+  const nivelLabel = { sin_nivel: 'Sin nivel', semilla: 'Semilla', versailles: 'Versailles', babilonia: 'Babilonia' }[nivel] || 'Semilla';
+  const nivelEmoji = { semilla: '🌱', versailles: '🥈', babilonia: '🥇' }[nivel] || '🌱';
+  const joinDate = customer?.created_at
+    ? new Date(customer.created_at).toLocaleDateString('es-VE', { month: 'short', year: 'numeric' })
+    : 'Nov 2024';
+
   return (
     <Phone>
       <div className="scroll" style={{ padding: '8px 0 0' }}>
@@ -56,12 +66,12 @@ export default function MiTarjeta({ storeMode = false, onTab }) {
         )}
 
         <div style={{ padding: '18px 18px 14px', textAlign: 'center' }}>
-          <p className="eyebrow" style={{ marginBottom: 8 }}>Carlos Mendoza</p>
+          <p className="eyebrow" style={{ marginBottom: 8 }}>{nombre}</p>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-            <span style={{ fontSize: 20 }}>🥈</span>
-            <h2 className="h-serif" style={{ fontSize: 30, fontWeight: 500 }}><span style={{ fontStyle: 'italic' }}>Versailles</span></h2>
+            <span style={{ fontSize: 20 }}>{nivelEmoji}</span>
+            <h2 className="h-serif" style={{ fontSize: 30, fontWeight: 500 }}><span style={{ fontStyle: 'italic' }}>{nivelLabel}</span></h2>
           </div>
-          <p style={{ fontSize: 11, color: '#888', marginTop: 4 }}>Miembro desde Nov 2024</p>
+          <p style={{ fontSize: 11, color: '#888', marginTop: 4 }}>Miembro desde {joinDate}</p>
         </div>
 
         {/* QR card */}
@@ -70,7 +80,8 @@ export default function MiTarjeta({ storeMode = false, onTab }) {
             <QRCode size={storeMode ? 260 : 220}/>
             <CornerCuts/>
           </div>
-          <p style={{ textAlign: 'center', marginTop: 14, fontSize: 11, color: '#888', letterSpacing: '0.04em' }}>
+          <p style={{ textAlign: 'center', marginTop: 10, fontSize: 10, color: '#888', letterSpacing: '0.08em' }}>{numeroSocio}</p>
+          <p style={{ textAlign: 'center', marginTop: 6, fontSize: 11, color: '#888', letterSpacing: '0.04em' }}>
             {storeMode ? 'Muestra este código al cajero' : 'Escanéalo en caja para acumular'}
           </p>
         </div>
@@ -79,12 +90,12 @@ export default function MiTarjeta({ storeMode = false, onTab }) {
           <div style={{ margin: '18px 14px 0', padding: '16px 18px', background: 'linear-gradient(135deg, #1A3C2E, #2D6A4F)', borderRadius: 16, color: '#fff' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
               <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.55)', letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 600 }}>Puntos</p>
-              <p style={{ fontFamily: 'var(--font-serif)', fontSize: 28, fontWeight: 600 }}>842</p>
+              <p style={{ fontFamily: 'var(--font-serif)', fontSize: 28, fontWeight: 600 }}>{puntos}</p>
             </div>
             <div style={{ height: 5, background: 'rgba(255,255,255,0.15)', borderRadius: 99, marginTop: 10, overflow: 'hidden' }}>
-              <div style={{ height: '100%', width: '56%', background: 'linear-gradient(90deg,#A8D5B5,#B5873A)', borderRadius: 99 }}/>
+              <div style={{ height: '100%', width: `${Math.min(100, (puntos / 1500) * 100)}%`, background: 'linear-gradient(90deg,#A8D5B5,#B5873A)', borderRadius: 99 }}/>
             </div>
-            <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.6)', marginTop: 6 }}>$658 más para llegar a <b style={{ color: '#D4AA6B' }}>🥇 Babilonia</b></p>
+            <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.6)', marginTop: 6 }}>{nivel === 'babilonia' ? '¡Nivel máximo!' : `Acumula más para subir de nivel`}</p>
           </div>
         )}
 

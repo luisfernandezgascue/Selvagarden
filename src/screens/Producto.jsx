@@ -62,7 +62,7 @@ export default function Producto({ onBack }) {
   return (
     <Phone>
       {/* Floating back/action bar */}
-      <div style={{ position: 'absolute', top: 44, left: 0, right: 0, zIndex: 20, padding: '8px 14px', display: 'flex', justifyContent: 'space-between', pointerEvents: 'none' }}>
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 20, padding: 'calc(env(safe-area-inset-top, 0px) + 8px) 14px 8px', display: 'flex', justifyContent: 'space-between', pointerEvents: 'none' }}>
         <button onClick={onBack} style={{ ...floatBtn, pointerEvents: 'auto' }}>
           <Icon.ArrowLeft size={18}/>
         </button>

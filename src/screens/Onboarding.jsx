@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import { Phone } from '../components';
 import { Icon, SelvaLeaf, GoogleG, AppleA } from '../icons';
 import { QRCode } from '../components';
+import { signInWithGoogle } from '../lib/auth';
 
 const socialBtn = {
   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
@@ -75,7 +77,19 @@ export function OnboardWelcome({ onNext }) {
   );
 }
 
-export function OnboardSignup({ onBack, onNext }) {
+export function OnboardSignup({ onBack }) {
+  const [loading, setLoading] = useState(false);
+
+  async function handleGoogle() {
+    setLoading(true);
+    try {
+      await signInWithGoogle();
+    } catch (e) {
+      console.error(e);
+      setLoading(false);
+    }
+  }
+
   return (
     <Phone>
       <div className="scroll" style={{ padding: '10px 24px 24px' }}>
@@ -84,40 +98,33 @@ export function OnboardSignup({ onBack, onNext }) {
         </button>
 
         <div style={{ marginBottom: 28 }}>
-          <p className="eyebrow" style={{ marginBottom: 8 }}>Crear cuenta · Paso 1 de 2</p>
+          <p className="eyebrow" style={{ marginBottom: 8 }}>Crear cuenta</p>
           <h1 className="h-serif" style={{ fontSize: 34, fontWeight: 500 }}>
             Empieza tu <span style={{ fontStyle: 'italic' }}>Selva</span>
           </h1>
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 22 }}>
-          <button style={socialBtn}><GoogleG/> <span>Continuar con Google</span></button>
-          <button style={socialBtn}><AppleA/> <span>Continuar con Apple</span></button>
+          <button onClick={handleGoogle} disabled={loading} style={{ ...socialBtn, opacity: loading ? 0.6 : 1 }}>
+            <GoogleG/> <span>{loading ? 'Conectando…' : 'Continuar con Google'}</span>
+          </button>
         </div>
-
-        <div className="divider-rule" style={{ marginBottom: 22 }}>o con email</div>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-          <Field label="Nombre" value="Carlos Mendoza"/>
-          <Field label="Email" value="carlos@mendoza.ve" type="email"/>
-          <Field label="Teléfono" value="+58 414 555 8821" type="tel"/>
-        </div>
-
-        <button onClick={onNext} style={{
-          marginTop: 24, background: '#1A3C2E', color: '#fff', border: 'none',
-          borderRadius: 'var(--r-btn)', padding: '15px', width: '100%',
-          fontSize: 14, fontWeight: 600, letterSpacing: '0.02em'
-        }}>Continuar</button>
 
         <p style={{ marginTop: 18, fontSize: 11, color: '#888', textAlign: 'center', lineHeight: 1.5 }}>
-          Sin spam. Sin contraseñas. Te enviamos un código mágico cuando quieras entrar.
+          Al continuar aceptas nuestros Términos y Política de Privacidad.
         </p>
       </div>
     </Phone>
   );
 }
 
-export function OnboardCardReady({ onNext }) {
+export function OnboardCardReady({ onNext, customer }) {
+  const nombre = customer?.nombre || 'Bienvenido';
+  const numeroSocio = customer?.numero_socio || '—';
+  const joinDate = customer?.created_at
+    ? new Date(customer.created_at).toLocaleDateString('es-VE', { month: 'short', year: 'numeric' })
+    : 'Hoy';
+
   return (
     <Phone>
       <div className="scroll" style={{ padding: '10px 24px 30px', display: 'flex', flexDirection: 'column' }}>
@@ -137,19 +144,20 @@ export function OnboardCardReady({ onNext }) {
           <div style={{ position: 'absolute', right: -30, top: -30, width: 140, height: 140, borderRadius: '50%', background: 'radial-gradient(circle, rgba(181,135,58,0.35), transparent 70%)' }}/>
           <p className="eyebrow" style={{ color: '#D4AA6B', marginBottom: 10, position: 'relative' }}>Tarjeta Selva Garden</p>
           <h2 className="h-serif" style={{ fontSize: 22, fontWeight: 500, marginBottom: 18, position: 'relative' }}>
-            <span style={{ fontStyle: 'italic' }}>Carlos</span> Mendoza
+            <span style={{ fontStyle: 'italic' }}>{nombre}</span>
           </h2>
           <div style={{ background: '#fff', borderRadius: 14, padding: 14, display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'relative' }}>
             <QRCode size={180} dark="#1A3C2E" light="#fff"/>
           </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 16, alignItems: 'flex-end' }}>
+          <p style={{ textAlign: 'center', marginTop: 8, fontSize: 10, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.08em', position: 'relative' }}>{numeroSocio}</p>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 12, alignItems: 'flex-end' }}>
             <div>
               <p style={{ fontSize: 9, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 3 }}>Nivel</p>
               <p style={{ fontFamily: 'var(--font-serif)', fontSize: 18, fontWeight: 600 }}>🌱 Semilla</p>
             </div>
             <div style={{ textAlign: 'right' }}>
               <p style={{ fontSize: 9, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 3 }}>Miembro desde</p>
-              <p style={{ fontFamily: 'var(--font-serif)', fontSize: 16 }}>Nov 2025</p>
+              <p style={{ fontFamily: 'var(--font-serif)', fontSize: 16 }}>{joinDate}</p>
             </div>
           </div>
         </div>
