@@ -1,8 +1,30 @@
-import { useState, useEffect } from 'react';
-import { Phone, TabBar, SectionHeader, QRCode } from '../components';
+import { useState, useEffect, useRef } from 'react';
+import QRCodeLib from 'qrcode';
+import { Phone, TabBar, SectionHeader } from '../components';
 import { Icon, AppleA } from '../icons';
 import { useCustomer, nivelInfo, levelProgress } from '../context/CustomerContext';
 import { fetchLoyaltyTransactions } from '../lib/db';
+
+function RealQR({ value, size = 220 }) {
+  const canvasRef = useRef(null);
+
+  useEffect(() => {
+    if (!value || !canvasRef.current) return;
+    QRCodeLib.toCanvas(canvasRef.current, value, {
+      width: size,
+      margin: 2,
+      color: { dark: '#1A3C2E', light: '#ffffff' },
+    }).catch(console.error);
+  }, [value, size]);
+
+  if (!value) return (
+    <div style={{ width: size, height: size, background: '#F0FAF5', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <p style={{ fontSize: 11, color: '#888' }}>Sin número de socio</p>
+    </div>
+  );
+
+  return <canvas ref={canvasRef} style={{ borderRadius: 8, display: 'block' }}/>;
+}
 
 function CornerCuts() {
   const s = 18;
@@ -29,14 +51,14 @@ function Benefit({ text }) {
   );
 }
 
-function Tx({ date, desc, pts, gold }) {
+function Tx({ date, desc, pts, positive }) {
   return (
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '9px 0', borderBottom: '1px solid var(--c-line-soft)' }}>
       <div>
         <p style={{ fontSize: 11, color: '#888', marginBottom: 2 }}>{date}</p>
         <p style={{ fontSize: 12, color: '#1A1A1A' }}>{desc}</p>
       </div>
-      <span style={{ fontFamily: 'var(--font-serif)', fontSize: 16, fontWeight: 600, color: gold ? '#B5873A' : '#1A3C2E' }}>{pts}</span>
+      <span style={{ fontFamily: 'var(--font-serif)', fontSize: 16, fontWeight: 600, color: positive ? '#1A3C2E' : '#B5873A' }}>{pts}</span>
     </div>
   );
 }
@@ -61,10 +83,10 @@ function WalletModal({ onClose }) {
 }
 
 const BENEFITS = {
-  sin_nivel: ['Acumula puntos en cada compra', 'Acceso a eventos Selva Garden'],
-  alhambra:  ['5% OFF en toda la tienda', 'Acumula puntos en cada compra', 'Invitaciones a eventos especiales'],
-  versailles:['10% OFF en toda la tienda', 'Suculenta gratis cada 3 meses', 'Acceso a talleres con $5 OFF', 'Línea directa de cuidados Selva'],
-  babilonia: ['15% OFF en toda la tienda', 'Suculenta gratis cada mes', 'Talleres gratuitos', 'Asesoría botánica ilimitada', 'Envíos gratis en Caracas'],
+  sin_nivel:  [`10% en tu primer pedido online con código BIENV-[socio]`, 'Acumula puntos en cada compra'],
+  alhambra:   ['5% descuento en toda la tienda', 'Acceso anticipado a nuevas plantas', '1 taller al año incluido'],
+  versailles: ['10% descuento en toda la tienda', 'Envío gratis en Caracas', 'Invitación a cenas botánicas'],
+  babilonia:  ['15% descuento en toda la tienda', 'Asesoría personalizada', 'Acceso VIP a eventos', 'Regalo de cumpleaños'],
 };
 
 export default function MiTarjeta({ onTab }) {
@@ -76,7 +98,7 @@ export default function MiTarjeta({ onTab }) {
   const nivel = customer?.nivel_lealtad || 'sin_nivel';
   const puntos = customer?.puntos || 0;
   const consumo = customer?.consumo_anual || 0;
-  const numeroSocio = customer?.numero_socio || '—';
+  const numeroSocio = customer?.numero_socio || customer?.qr_code || null;
   const info = nivelInfo(nivel);
   const prog = levelProgress(consumo);
   const joinDate = customer?.created_at
@@ -84,12 +106,12 @@ export default function MiTarjeta({ onTab }) {
     : 'Recientemente';
 
   useEffect(() => {
-    if (customer?.id) {
-      fetchLoyaltyTransactions(customer.id).then(setTransactions);
-    }
+    if (customer?.id) fetchLoyaltyTransactions(customer.id).then(setTransactions);
   }, [customer?.id]);
 
-  const benefits = BENEFITS[nivel] || BENEFITS.sin_nivel;
+  const benefits = (BENEFITS[nivel] || BENEFITS.sin_nivel).map(b =>
+    b.replace('[socio]', numeroSocio || '—')
+  );
 
   return (
     <Phone>
@@ -112,26 +134,33 @@ export default function MiTarjeta({ onTab }) {
         {/* QR card */}
         <div style={{ margin: '0 14px', padding: '20px 18px', background: '#fff', borderRadius: 20, border: '1px solid var(--c-line)', boxShadow: '0 6px 30px rgba(26,60,46,0.08)' }}>
           <div style={{ display: 'flex', justifyContent: 'center', position: 'relative' }}>
-            <QRCode size={220}/>
+            <RealQR value={numeroSocio} size={220}/>
             <CornerCuts/>
           </div>
-          <p style={{ textAlign: 'center', marginTop: 10, fontSize: 10, color: '#888', letterSpacing: '0.08em' }}>{numeroSocio}</p>
-          <p style={{ textAlign: 'center', marginTop: 6, fontSize: 11, color: '#888', letterSpacing: '0.04em' }}>Escanéalo en caja para acumular</p>
+          <p style={{ textAlign: 'center', marginTop: 10, fontSize: 10, color: '#888', letterSpacing: '0.1em', fontWeight: 600 }}>{numeroSocio || '—'}</p>
+          <p style={{ textAlign: 'center', marginTop: 4, fontSize: 11, color: '#888' }}>Escanéalo en caja para acumular puntos</p>
         </div>
 
         {/* Points & progress */}
         <div style={{ margin: '18px 14px 0', padding: '16px 18px', background: 'linear-gradient(135deg, #1A3C2E, #2D6A4F)', borderRadius: 16, color: '#fff' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-            <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.55)', letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 600 }}>Puntos</p>
-            <p style={{ fontFamily: 'var(--font-serif)', fontSize: 28, fontWeight: 600 }}>{puntos}</p>
+            <div>
+              <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.55)', letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 600, marginBottom: 4 }}>Puntos acumulados</p>
+              <p style={{ fontFamily: 'var(--font-serif)', fontSize: 28, fontWeight: 600 }}>{puntos}</p>
+              <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>= ${(puntos / 10).toFixed(2)} en crédito</p>
+            </div>
+            <div style={{ textAlign: 'right' }}>
+              <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.55)', letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 600, marginBottom: 4 }}>Consumo</p>
+              <p style={{ fontFamily: 'var(--font-serif)', fontSize: 22, fontWeight: 600 }}>${consumo.toFixed(0)}</p>
+            </div>
           </div>
-          <div style={{ height: 5, background: 'rgba(255,255,255,0.15)', borderRadius: 99, marginTop: 10, overflow: 'hidden' }}>
-            <div style={{ height: '100%', width: `${Math.round(prog.pct * 100)}%`, background: 'linear-gradient(90deg, #A8D5B5, #B5873A)', borderRadius: 99 }}/>
+          <div style={{ height: 5, background: 'rgba(255,255,255,0.15)', borderRadius: 99, marginTop: 14, overflow: 'hidden' }}>
+            <div style={{ height: '100%', width: `${Math.round(prog.pct * 100)}%`, background: 'linear-gradient(90deg, #A8D5B5, #B5873A)', borderRadius: 99, transition: 'width 1s ease' }}/>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6 }}>
-            <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)' }}>${consumo.toFixed(0)} gastados</span>
+            <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)' }}>{Math.round(prog.pct * 100)}% del camino</span>
             {prog.next
-              ? <span style={{ fontSize: 10, color: '#D4AA6B', fontWeight: 600 }}>Faltan ${prog.remaining.toFixed(0)} para {nivelInfo(prog.next).label}</span>
+              ? <span style={{ fontSize: 10, color: '#D4AA6B', fontWeight: 600 }}>Faltan ${prog.remaining.toFixed(0)} para {nivelInfo(prog.next).emoji} {nivelInfo(prog.next).label}</span>
               : <span style={{ fontSize: 10, color: '#D4AA6B', fontWeight: 600 }}>¡Nivel máximo!</span>
             }
           </div>
@@ -150,18 +179,25 @@ export default function MiTarjeta({ onTab }) {
         </button>
 
         <SectionHeader title="Movimientos recientes"/>
-        <div style={{ padding: '0 18px 24px', display: 'flex', flexDirection: 'column', gap: 6 }}>
-          {transactions.length > 0 ? transactions.map((tx, i) => (
-            <Tx
-              key={tx.id || i}
-              date={new Date(tx.created_at).toLocaleDateString('es-VE', { day: 'numeric', month: 'short' })}
-              desc={tx.descripcion || 'Transacción'}
-              pts={tx.tipo === 'ganado' ? `+${tx.puntos}` : `-${tx.puntos}`}
-              gold={tx.tipo === 'bonus'}
-            />
-          )) : (
+        <div style={{ padding: '0 18px 24px', display: 'flex', flexDirection: 'column' }}>
+          {transactions.length > 0 ? transactions.map((tx, i) => {
+            const pts = tx.puntos_ganados > 0 ? `+${tx.puntos_ganados}` : `-${tx.puntos_usados || 0}`;
+            const desc = tx.origen === 'compra' ? 'Compra en tienda'
+              : tx.origen === 'bienvenida' ? 'Bono de bienvenida'
+              : tx.origen === 'referido' ? 'Referido convertido'
+              : tx.origen || 'Movimiento';
+            return (
+              <Tx
+                key={tx.id || i}
+                date={new Date(tx.created_at).toLocaleDateString('es-VE', { day: 'numeric', month: 'short' })}
+                desc={desc}
+                pts={pts}
+                positive={tx.puntos_ganados > 0}
+              />
+            );
+          }) : (
             <>
-              <Tx date="—" desc="Aún no tienes movimientos" pts="0"/>
+              <Tx date="—" desc="Aún no tienes movimientos" pts="0" positive/>
               <p style={{ fontSize: 11, color: '#888', textAlign: 'center', padding: '8px 0' }}>Realiza tu primera compra para acumular puntos</p>
             </>
           )}

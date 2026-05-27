@@ -51,11 +51,11 @@ function EventModal({ event, onClose }) {
       <div onClick={e => e.stopPropagation()} style={{ background: '#F4F6F1', borderRadius: '20px 20px 0 0', padding: '24px 22px 36px', width: '100%', maxWidth: 430 }}>
         <div style={{ width: 36, height: 4, borderRadius: 99, background: '#D0D0D0', margin: '0 auto 20px' }}/>
         <p style={{ fontSize: 10, color: '#B5873A', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 8 }}>Evento</p>
-        <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 26, fontWeight: 600, marginBottom: 10 }}>{event.nombre || event.titulo}</h2>
+        <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 26, fontWeight: 600, marginBottom: 10 }}>{event.titulo}</h2>
         {event.descripcion && <p style={{ fontSize: 13, color: '#4A4A4A', lineHeight: 1.6, marginBottom: 14 }}>{event.descripcion}</p>}
         <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 20 }}>
           {fecha && <span style={{ fontSize: 12, color: '#B5873A', fontWeight: 600, background: 'rgba(181,135,58,0.1)', padding: '5px 12px', borderRadius: 20 }}>{fecha}</span>}
-          {event.cupos_restantes != null && <span style={{ fontSize: 12, color: '#1A3C2E', fontWeight: 600, background: '#D8EDE3', padding: '5px 12px', borderRadius: 20 }}>{event.cupos_restantes} cupos</span>}
+          {event.lugares_disponibles != null && <span style={{ fontSize: 12, color: '#1A3C2E', fontWeight: 600, background: '#D8EDE3', padding: '5px 12px', borderRadius: 20 }}>{event.lugares_disponibles} lugares</span>}
           {event.precio != null && <span style={{ fontSize: 12, color: '#1A1A1A', fontWeight: 700, background: '#fff', padding: '5px 12px', borderRadius: 20, border: '1px solid var(--c-line)' }}>${event.precio}</span>}
         </div>
         <button
@@ -202,11 +202,11 @@ export default function Home({ onTab, onProduct }) {
               <div style={{ flex: 1, padding: '14px 14px', display: 'flex', justifyContent: 'space-between', gap: 10 }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <p className="eyebrow" style={{ color: '#B5873A', marginBottom: 4 }}>Próximo evento</p>
-                  <h3 className="h-serif" style={{ fontSize: 18, fontWeight: 600, marginBottom: 5 }}>{nextEvent.nombre || nextEvent.titulo || 'Evento especial'}</h3>
+                  <h3 className="h-serif" style={{ fontSize: 18, fontWeight: 600, marginBottom: 5 }}>{nextEvent.titulo || 'Evento especial'}</h3>
                   {nextEvent.descripcion && <p style={{ fontSize: 11, color: '#6B5A3A', lineHeight: 1.45, marginBottom: 9 }}>{nextEvent.descripcion.slice(0, 80)}{nextEvent.descripcion.length > 80 ? '…' : ''}</p>}
                   <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                     {eventFecha && <span style={{ fontSize: 11, color: '#B5873A', fontWeight: 600 }}>{eventFecha}</span>}
-                    {nextEvent.cupos_restantes != null && <span style={{ fontSize: 10, background: 'rgba(181,135,58,0.14)', color: '#B5873A', padding: '2px 8px', borderRadius: 8, fontWeight: 600 }}>{nextEvent.cupos_restantes} cupos</span>}
+                    {nextEvent.lugares_disponibles != null && <span style={{ fontSize: 10, background: 'rgba(181,135,58,0.14)', color: '#B5873A', padding: '2px 8px', borderRadius: 8, fontWeight: 600 }}>{nextEvent.lugares_disponibles} lugares</span>}
                   </div>
                 </div>
                 <div style={{ textAlign: 'right' }}>

@@ -7,7 +7,7 @@ export function nivelInfo(nivel) {
   const map = {
     sin_nivel:  { label: 'Sin nivel',  emoji: '',    descuento: 0,  color: '#888' },
     alhambra:   { label: 'Alhambra',   emoji: '🥉',  descuento: 5,  color: '#A0785A' },
-    versailles: { label: 'Versailles', emoji: '🥈',  descuento: 10, color: '#888' },
+    versailles: { label: 'Versailles', emoji: '🥈',  descuento: 10, color: '#8A8A8A' },
     babilonia:  { label: 'Babilonia',  emoji: '🥇',  descuento: 15, color: '#B5873A' },
   };
   return map[nivel] || map.sin_nivel;
@@ -15,10 +15,18 @@ export function nivelInfo(nivel) {
 
 export function levelProgress(consumo) {
   const c = consumo || 0;
-  if (c < 200)  return { pct: c / 200,            current: 'sin_nivel',  next: 'alhambra',   nextAt: 200,  remaining: 200 - c };
-  if (c < 600)  return { pct: (c-200) / 400,      current: 'alhambra',   next: 'versailles', nextAt: 600,  remaining: 600 - c };
-  if (c < 1500) return { pct: (c-600) / 900,      current: 'versailles', next: 'babilonia',  nextAt: 1500, remaining: 1500 - c };
-  return         { pct: 1,                         current: 'babilonia',  next: null,         nextAt: null, remaining: 0 };
+  if (c < 200)  return { pct: c / 200,       current: 'sin_nivel',  next: 'alhambra',   nextAt: 200,  remaining: 200 - c };
+  if (c < 600)  return { pct: (c-200) / 400, current: 'alhambra',   next: 'versailles', nextAt: 600,  remaining: 600 - c };
+  if (c < 1500) return { pct: (c-600) / 900, current: 'versailles', next: 'babilonia',  nextAt: 1500, remaining: 1500 - c };
+  return         { pct: 1,                   current: 'babilonia',  next: null,         nextAt: null, remaining: 0 };
+}
+
+export function calcNivel(consumo) {
+  const c = consumo || 0;
+  if (c >= 1500) return 'babilonia';
+  if (c >= 600)  return 'versailles';
+  if (c >= 200)  return 'alhambra';
+  return 'sin_nivel';
 }
 
 export function CustomerProvider({ children }) {
@@ -48,38 +56,52 @@ export function CustomerProvider({ children }) {
   }, []);
 
   const discount = nivelInfo(customer?.nivel_lealtad).descuento;
-  const cartItems = cart;
   const cartCount = cart.reduce((s, i) => s + i.quantity, 0);
-  const cartTotal = cart.reduce((s, i) => s + i.product.precio * (1 - discount / 100) * i.quantity, 0);
+  const cartTotal = cart.reduce((s, i) => s + (i.product.precio_venta || 0) * (1 - discount / 100) * i.quantity, 0);
 
   const checkout = useCallback(async () => {
     if (!supabase || !customer || cart.length === 0) return null;
     const disc = nivelInfo(customer.nivel_lealtad).descuento;
+
     const items = cart.map(i => ({
       product_id: i.product.id,
       nombre: i.product.nombre,
-      precio_unit: i.product.precio,
-      precio_final: parseFloat((i.product.precio * (1 - disc / 100)).toFixed(2)),
+      precio_unit: i.product.precio_venta || 0,
+      precio_final: parseFloat(((i.product.precio_venta || 0) * (1 - disc / 100)).toFixed(2)),
       cantidad: i.quantity,
     }));
     const total = parseFloat(items.reduce((s, i) => s + i.precio_final * i.cantidad, 0).toFixed(2));
-    const points = Math.floor(total / 100) * 10;
+    const puntos_ganados = Math.floor(total / 100) * 10;
 
     const { data: order, error } = await supabase
-      .from('ordenes').insert({ customer_id: customer.id, items, total, estado: 'confirmado' }).select().single();
+      .from('ordenes')
+      .insert({ customer_id: customer.id, items, total, estado: 'confirmado' })
+      .select().single();
     if (error) throw error;
 
     const newConsumo = parseFloat(((customer.consumo_anual || 0) + total).toFixed(2));
-    const newPuntos = (customer.puntos || 0) + points;
-    await supabase.from('customers').update({ consumo_anual: newConsumo, puntos: newPuntos }).eq('id', customer.id);
+    const newPuntos = (customer.puntos || 0) + puntos_ganados;
+    const newNivel = calcNivel(newConsumo);
+    const descuento_activo = nivelInfo(newNivel).descuento;
 
-    if (points > 0) {
+    await supabase.from('customers').update({
+      consumo_anual: newConsumo,
+      puntos: newPuntos,
+      nivel_lealtad: newNivel,
+      descuento_activo,
+    }).eq('id', customer.id);
+
+    if (puntos_ganados > 0) {
       await supabase.from('loyalty_transactions').insert({
-        customer_id: customer.id, orden_id: order.id,
-        tipo: 'ganado', puntos: points,
-        descripcion: `Compra · ${items.length} producto${items.length > 1 ? 's' : ''}`,
+        customer_id: customer.id,
+        orden_id: order.id,
+        puntos_ganados,
+        puntos_usados: 0,
+        balance_resultante: newPuntos,
+        origen: 'compra',
       });
     }
+
     await refreshCustomer();
     setCart([]);
     return order;
@@ -88,7 +110,7 @@ export function CustomerProvider({ children }) {
   return (
     <CustomerContext.Provider value={{
       customer, setCustomer,
-      cart: cartItems, cartCount, cartTotal,
+      cart, cartCount, cartTotal,
       cartOpen, setCartOpen,
       addToCart, removeFromCart, updateCartQty,
       checkout, refreshCustomer,

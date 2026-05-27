@@ -82,7 +82,7 @@ export default function Cart({ onClose }) {
             {/* Cart items */}
             <div style={{ padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: 10 }}>
               {cart.map(({ product, quantity }) => {
-                const finalPrice = product.precio * (1 - discount / 100);
+                const finalPrice = (product.precio_venta || 0) * (1 - discount / 100);
                 return (
                   <div key={product.id} style={{ background: '#fff', borderRadius: 14, padding: 12, display: 'flex', gap: 12, border: '1px solid var(--c-line-soft)' }}>
                     <div style={{ width: 70, height: 70, borderRadius: 10, background: '#EDEBE3', overflow: 'hidden', flexShrink: 0 }}>
@@ -95,7 +95,7 @@ export default function Cart({ onClose }) {
                       <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', lineHeight: 1.3, marginBottom: 4 }}>{product.nombre}</p>
                       <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 8 }}>
                         <span style={{ fontFamily: 'var(--font-serif)', fontSize: 16, fontWeight: 600, color: '#1A3C2E' }}>${finalPrice.toFixed(2)}</span>
-                        {discount > 0 && <span style={{ fontSize: 10, color: '#C0C0C0', textDecoration: 'line-through' }}>${product.precio}</span>}
+                        {discount > 0 && <span style={{ fontSize: 10, color: '#C0C0C0', textDecoration: 'line-through' }}>${product.precio_venta}</span>}
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 0, background: '#F0F0F0', borderRadius: 20, overflow: 'hidden' }}>

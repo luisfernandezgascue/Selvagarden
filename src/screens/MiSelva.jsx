@@ -244,7 +244,7 @@ function InspiracionTab() {
     try {
       const base64 = preview.src.split(',')[1];
       const mimeType = preview.file.type || 'image/jpeg';
-      const res = await fetch('/api/floral', {
+      const res = await fetch('/api/ramo-inspiration', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ imageBase64: base64, mimeType }),

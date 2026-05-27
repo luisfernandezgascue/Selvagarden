@@ -5,7 +5,7 @@ import { fetchProducts } from '../lib/db';
 import { useCustomer } from '../context/CustomerContext';
 
 function ProductCardLarge({ product, discount, onProduct, onAddToCart }) {
-  const finalPrice = product.precio * (1 - discount / 100);
+  const finalPrice = (product.precio_venta || 0) * (1 - discount / 100);
   const familyName = product.subfamily?.family?.nombre || '';
   const subfamilyName = product.subfamily?.nombre || '';
 
@@ -27,7 +27,7 @@ function ProductCardLarge({ product, discount, onProduct, onAddToCart }) {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}>
             <span style={{ fontFamily: 'var(--font-serif)', fontSize: 17, fontWeight: 600, color: '#1A3C2E' }}>${finalPrice.toFixed(2)}</span>
-            {discount > 0 && <span style={{ fontSize: 10, color: '#C0C0C0', textDecoration: 'line-through' }}>${product.precio}</span>}
+            {discount > 0 && <span style={{ fontSize: 10, color: '#C0C0C0', textDecoration: 'line-through' }}>${product.precio_venta}</span>}
           </div>
           <button
             onClick={(e) => { e.stopPropagation(); onAddToCart(product); }}
@@ -162,25 +162,6 @@ export default function Tienda({ onTab, onProduct }) {
           </div>
         )}
 
-        {/* Fallback static products if no data */}
-        {!loading && products.length === 0 && (
-          <div style={{ padding: '0 14px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-            {[
-              { id: 's1', nombre: 'Orquídea Phalaenopsis blanca', precio: 54, imagen_url: 'https://images.pexels.com/photos/931177/pexels-photo-931177.jpeg?auto=compress&w=500', destacado: true },
-              { id: 's2', nombre: 'Cymbidium amarillo en vara', precio: 72, imagen_url: 'https://images.pexels.com/photos/931158/pexels-photo-931158.jpeg?auto=compress&w=500', destacado: false },
-              { id: 's3', nombre: 'Vanda azul rara', precio: 135, imagen_url: 'https://images.pexels.com/photos/1407310/pexels-photo-1407310.jpeg?auto=compress&w=500', destacado: false },
-              { id: 's4', nombre: 'Dendrobium nobile', precio: 58, imagen_url: 'https://images.pexels.com/photos/2693644/pexels-photo-2693644.jpeg?auto=compress&w=500', destacado: false },
-            ].map(product => (
-              <ProductCardLarge
-                key={product.id}
-                product={product}
-                discount={discount}
-                onProduct={onProduct}
-                onAddToCart={handleAddToCart}
-              />
-            ))}
-          </div>
-        )}
 
         <div style={{ height: 24 }}/>
       </div>

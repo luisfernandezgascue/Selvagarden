@@ -3,7 +3,7 @@ import { Phone, TabBar, SectionHeader, iconBtn } from '../components';
 import { Icon } from '../icons';
 import { signOut } from '../lib/auth';
 import { useCustomer, nivelInfo } from '../context/CustomerContext';
-import { fetchOrders, fetchAffiliateLink } from '../lib/db';
+import { fetchOrders } from '../lib/db';
 
 function Stat({ n, lbl, gold }) {
   return (
@@ -58,7 +58,6 @@ function OrdersModal({ orders, onClose }) {
 export default function Yo({ onTab }) {
   const { customer } = useCustomer();
   const [orders, setOrders] = useState([]);
-  const [affiliateLink, setAffiliateLink] = useState(null);
   const [ordersOpen, setOrdersOpen] = useState(false);
 
   const nombre = customer?.nombre || 'Mi perfil';
@@ -68,15 +67,11 @@ export default function Yo({ onTab }) {
   const nivelLabel = info.emoji ? `${info.emoji} ${info.label}` : info.label;
 
   useEffect(() => {
-    if (customer?.id) {
-      fetchOrders(customer.id).then(setOrders);
-      fetchAffiliateLink(customer.id).then(setAffiliateLink);
-    }
+    if (customer?.id) fetchOrders(customer.id).then(setOrders);
   }, [customer?.id]);
 
-  const shareLink = affiliateLink
-    ? `selva.garden/r/${affiliateLink.codigo}`
-    : `selva.garden/r/${customer?.id?.slice(0, 8) || '—'}`;
+  const refCode = customer?.numero_socio || customer?.id?.slice(0, 8) || '—';
+  const shareLink = `selvagarden.vercel.app/ref/${refCode}`;
 
   function handleShare() {
     const url = `https://${shareLink}`;
@@ -88,9 +83,9 @@ export default function Yo({ onTab }) {
     }
   }
 
-  const referidosCount = affiliateLink?.total_referidos || 0;
-  const conversionCount = affiliateLink?.total_conversiones || 0;
-  const comision = affiliateLink?.comision_total || 0;
+  const referidosCount = 0;
+  const conversionCount = 0;
+  const comision = 0;
 
   return (
     <Phone>

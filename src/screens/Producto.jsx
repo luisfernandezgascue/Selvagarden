@@ -63,7 +63,7 @@ export default function Producto({ product: productProp, onBack }) {
     : ['https://images.pexels.com/photos/3097770/pexels-photo-3097770.jpeg?auto=compress&w=800'];
 
   const care = product.plant_care;
-  const finalPrice = product.precio * (1 - discount / 100);
+  const finalPrice = (product.precio_venta || 0) * (1 - discount / 100);
   const subfamily = product.subfamily?.nombre || '';
   const family = product.subfamily?.family?.nombre || '';
 
@@ -107,7 +107,7 @@ export default function Producto({ product: productProp, onBack }) {
               <h1 className="h-serif" style={{ fontSize: 28, fontWeight: 500, lineHeight: 1.1 }}>{product.nombre}</h1>
             </div>
             <div style={{ textAlign: 'right', marginLeft: 10 }}>
-              {discount > 0 && <p style={{ fontSize: 11, color: '#C0C0C0', textDecoration: 'line-through' }}>${product.precio}</p>}
+              {discount > 0 && <p style={{ fontSize: 11, color: '#C0C0C0', textDecoration: 'line-through' }}>${product.precio_venta}</p>}
               <p style={{ fontFamily: 'var(--font-serif)', fontSize: 26, fontWeight: 600, color: '#1A3C2E', lineHeight: 1 }}>${finalPrice.toFixed(2)}</p>
               {discount > 0 && <p style={{ fontSize: 10, color: '#B5873A', fontWeight: 600, marginTop: 3 }}>−{discount}% {nivelInfo(customer?.nivel_lealtad).label}</p>}
             </div>
@@ -118,9 +118,9 @@ export default function Producto({ product: productProp, onBack }) {
               <div className="divider-rule" style={{ margin: '12px 0 16px' }}>cuidados</div>
               <div style={{ background: '#fff', borderRadius: 14, padding: '16px 14px', border: '1px solid var(--c-line)', display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 6 }}>
                 <CareTile icon={<Icon.Sun/>} label="Luz" val={care.luz}/>
-                <CareTile icon={<Icon.Droplet/>} label="Riego" val={care.riego_dias ? `${care.riego_dias}d` : null}/>
+                <CareTile icon={<Icon.Droplet/>} label="Riego" val={care.riego}/>
                 <CareTile icon={<Icon.Thermo/>} label="Temp" val={care.temperatura}/>
-                <CareTile icon={<Icon.Leaf/>} label="Tipo" val={family || care.tipo}/>
+                <CareTile icon={<Icon.Leaf/>} label="Tipo" val={family}/>
                 <CareTile icon={<Icon.Sparkle/>} label="Cuido" val={care.dificultad}/>
               </div>
             </>
@@ -145,10 +145,9 @@ export default function Producto({ product: productProp, onBack }) {
             </>
           )}
 
-          {(care?.altura_cm || care?.origen) && (
+          {care?.abono && (
             <div style={{ background: '#fff', borderRadius: 14, border: '1px solid var(--c-line)', padding: '4px 14px', marginBottom: 16 }}>
-              {care.altura_cm && <SpecRow l="Altura" r={`${care.altura_cm} cm`}/>}
-              {care.origen && <SpecRow l="Origen" r={care.origen}/>}
+              <SpecRow l="Abono" r={care.abono}/>
               <SpecRow l="Entrega" r="2–3 días en Caracas" last/>
             </div>
           )}
