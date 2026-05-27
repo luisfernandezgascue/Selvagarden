@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Phone } from '../components';
-import { Icon, SelvaLeaf, GoogleG, AppleA } from '../icons';
+import { Icon, SelvaLeaf, GoogleG } from '../icons';
 import { QRCode } from '../components';
-import { signInWithGoogle } from '../lib/auth';
+import { supabase } from '../lib/supabase';
 
 const socialBtn = {
   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
@@ -25,7 +25,7 @@ function Field({ label, value, type = 'text' }) {
 
 export function OnboardWelcome({ onNext }) {
   return (
-    <Phone statusBarDark homeLight>
+    <Phone>
       <div style={{ position: 'absolute', inset: 0, zIndex: 1 }}>
         <img
           src="https://images.pexels.com/photos/1407305/pexels-photo-1407305.jpeg?auto=compress&cs=tinysrgb&w=800"
@@ -45,7 +45,7 @@ export function OnboardWelcome({ onNext }) {
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
           <div>
-            <p className="eyebrow" style={{ color: '#D4AA6B', marginBottom: 14 }}>Caracas · Est. 2018</p>
+            <p className="eyebrow" style={{ color: '#D4AA6B', marginBottom: 14 }}>Caracas · Est. 2025</p>
             <h1 className="h-serif" style={{ fontSize: 46, lineHeight: 1, fontWeight: 500, marginBottom: 14 }}>
               Bienvenido a<br/>
               <span style={{ fontStyle: 'italic', fontWeight: 400 }}>Selva</span> Garden
@@ -79,15 +79,21 @@ export function OnboardWelcome({ onNext }) {
 
 export function OnboardSignup({ onBack }) {
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   async function handleGoogle() {
     setLoading(true);
-    try {
-      await signInWithGoogle();
-    } catch (e) {
-      console.error(e);
+    setError(null);
+    const { error: err } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: 'https://selvagarden.vercel.app' },
+    });
+    if (err) {
+      console.error('[Google OAuth error]', err);
+      setError(err.message);
       setLoading(false);
     }
+    // On success: browser redirects to Google — no further action needed
   }
 
   return (
@@ -105,12 +111,21 @@ export function OnboardSignup({ onBack }) {
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 22 }}>
-          <button onClick={handleGoogle} disabled={loading} style={{ ...socialBtn, opacity: loading ? 0.6 : 1 }}>
-            <GoogleG/> <span>{loading ? 'Conectando…' : 'Continuar con Google'}</span>
+          <button
+            type="button"
+            onClick={handleGoogle}
+            style={{ ...socialBtn, opacity: loading ? 0.7 : 1, cursor: loading ? 'wait' : 'pointer' }}
+          >
+            <GoogleG/>
+            <span>{loading ? 'Conectando con Google…' : 'Continuar con Google'}</span>
           </button>
         </div>
 
-        <p style={{ marginTop: 18, fontSize: 11, color: '#888', textAlign: 'center', lineHeight: 1.5 }}>
+        {error && (
+          <p style={{ fontSize: 12, color: '#c0392b', textAlign: 'center', marginBottom: 12 }}>{error}</p>
+        )}
+
+        <p style={{ marginTop: 8, fontSize: 11, color: '#888', textAlign: 'center', lineHeight: 1.5 }}>
           Al continuar aceptas nuestros Términos y Política de Privacidad.
         </p>
       </div>
