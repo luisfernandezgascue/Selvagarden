@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import QRCodeLib from 'qrcode';
 import { Phone, TabBar, SectionHeader } from '../components';
-import { Icon, AppleA } from '../icons';
+import { Icon } from '../icons';
 import { useCustomer, nivelInfo, levelProgress } from '../context/CustomerContext';
 import { fetchLoyaltyTransactions } from '../lib/db';
 
@@ -72,19 +72,73 @@ function Tx({ date, desc, pts, positive }) {
 }
 
 function WalletModal({ onClose }) {
+  const [deferredPrompt, setDeferredPrompt] = useState(null);
+  const [installed, setInstalled] = useState(false);
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+
+  useEffect(() => {
+    const handler = e => { e.preventDefault(); setDeferredPrompt(e); };
+    window.addEventListener('beforeinstallprompt', handler);
+    return () => window.removeEventListener('beforeinstallprompt', handler);
+  }, []);
+
+  async function handleAndroidInstall() {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') setInstalled(true);
+    setDeferredPrompt(null);
+  }
+
   return (
     <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', zIndex: 100, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
       <div onClick={e => e.stopPropagation()} style={{ background: '#F4F6F1', borderRadius: '20px 20px 0 0', padding: '24px 22px 36px', width: '100%', maxWidth: 430 }}>
         <div style={{ width: 36, height: 4, borderRadius: 99, background: '#D0D0D0', margin: '0 auto 20px' }}/>
-        <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: 22, fontWeight: 600, marginBottom: 8 }}>Wallet digital</h3>
-        <p style={{ fontSize: 13, color: '#666', lineHeight: 1.6, marginBottom: 20 }}>Añade tu tarjeta Selva Garden a tu wallet para tenerla siempre a mano en caja.</p>
-        <button style={{ width: '100%', background: '#1A1A1A', color: '#fff', border: 'none', borderRadius: 'var(--r-btn)', padding: '14px', fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 10 }}>
-          <AppleA/> Añadir a Apple Wallet
-        </button>
-        <button style={{ width: '100%', background: '#4285F4', color: '#fff', border: 'none', borderRadius: 'var(--r-btn)', padding: '14px', fontSize: 13, fontWeight: 600, marginBottom: 16 }}>
-          Añadir a Google Wallet
-        </button>
-        <button onClick={onClose} style={{ width: '100%', background: 'none', border: 'none', color: '#888', fontSize: 13 }}>Cancelar</button>
+
+        <div style={{ width: 52, height: 52, borderRadius: 14, background: '#1A3C2E', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 14 }}>
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+            <path d="M12 3.2 C 9.2 5.6, 7.8 8.8, 7.8 12.4 L 12 13 L 16.2 12.4 C 16.2 8.8, 14.8 5.6, 12 3.2 Z" fill="#A8D5B5"/>
+            <path d="M12 13 L 12 21" stroke="#A8D5B5" strokeWidth="1.4" strokeLinecap="round"/>
+          </svg>
+        </div>
+
+        <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: 22, fontWeight: 600, marginBottom: 8 }}>Lleva tu tarjeta siempre contigo</h3>
+        <p style={{ fontSize: 13, color: '#666', lineHeight: 1.6, marginBottom: 20 }}>Añade Selva Garden a tu pantalla de inicio para acceder a tu tarjeta y QR sin internet.</p>
+
+        {installed ? (
+          <div style={{ background: '#D8EDE3', borderRadius: 12, padding: '14px 16px', marginBottom: 16, textAlign: 'center' }}>
+            <p style={{ fontSize: 14, fontWeight: 600, color: '#1A3C2E' }}>¡Listo! Ya está en tu pantalla de inicio</p>
+          </div>
+        ) : isIOS ? (
+          <div style={{ background: '#fff', border: '1px solid var(--c-line)', borderRadius: 14, padding: '16px', marginBottom: 16 }}>
+            <p style={{ fontSize: 12, fontWeight: 700, color: '#1A1A1A', marginBottom: 12 }}>En Safari:</p>
+            {[
+              ['1.', 'Toca el botón compartir (□↑) en la barra inferior'],
+              ['2.', "Selecciona 'Añadir a pantalla de inicio'"],
+              ['3.', "Toca 'Añadir'"],
+            ].map(([n, t]) => (
+              <div key={n} style={{ display: 'flex', gap: 10, marginBottom: 10, alignItems: 'flex-start' }}>
+                <span style={{ fontSize: 12, fontWeight: 700, color: '#1A3C2E', minWidth: 18 }}>{n}</span>
+                <span style={{ fontSize: 12, color: '#4A4A4A', lineHeight: 1.5 }}>{t}</span>
+              </div>
+            ))}
+            <p style={{ fontSize: 11, color: '#888', marginTop: 8, lineHeight: 1.5 }}>Tu tarjeta Selva Garden estará siempre a un toque en tu iPhone</p>
+          </div>
+        ) : deferredPrompt ? (
+          <button
+            onClick={handleAndroidInstall}
+            style={{ width: '100%', background: '#1A3C2E', color: '#fff', border: 'none', borderRadius: 'var(--r-btn)', padding: '14px', fontSize: 14, fontWeight: 600, marginBottom: 16 }}
+          >
+            Añadir a pantalla de inicio
+          </button>
+        ) : (
+          <div style={{ background: '#fff', border: '1px solid var(--c-line)', borderRadius: 14, padding: '16px', marginBottom: 16 }}>
+            <p style={{ fontSize: 12, fontWeight: 700, color: '#1A1A1A', marginBottom: 10 }}>Desde el menú de tu navegador:</p>
+            <p style={{ fontSize: 12, color: '#4A4A4A', lineHeight: 1.6 }}>Busca la opción <strong>"Añadir a pantalla de inicio"</strong> o <strong>"Instalar aplicación"</strong> en el menú (⋮) de tu navegador.</p>
+          </div>
+        )}
+
+        <button onClick={onClose} style={{ width: '100%', background: 'none', border: 'none', color: '#888', fontSize: 13 }}>Cerrar</button>
       </div>
     </div>
   );
@@ -181,9 +235,9 @@ export default function MiTarjeta({ onTab }) {
 
         <button
           onClick={() => setWalletOpen(true)}
-          style={{ margin: '18px 18px 0', background: '#1A1A1A', color: '#fff', border: 'none', borderRadius: 'var(--r-btn)', padding: '13px', fontSize: 13, fontWeight: 600, width: 'calc(100% - 36px)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+          style={{ margin: '18px 18px 0', background: '#1A3C2E', color: '#fff', border: 'none', borderRadius: 'var(--r-btn)', padding: '13px', fontSize: 13, fontWeight: 600, width: 'calc(100% - 36px)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
         >
-          <AppleA/> Añadir a Wallet
+          <Icon.Share size={16}/> Añadir a pantalla de inicio
         </button>
 
         <SectionHeader title="Movimientos recientes"/>

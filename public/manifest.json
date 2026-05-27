@@ -1,0 +1,18 @@
+{
+  "name": "Selva Garden",
+  "short_name": "Selva",
+  "description": "Tu tienda de plantas en Caracas",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#1A3C2E",
+  "background_color": "#F4F6F1",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
