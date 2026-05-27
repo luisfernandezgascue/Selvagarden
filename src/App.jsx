@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Component } from 'react';
 import { supabase } from './lib/supabase';
 import { getOrCreateCustomer } from './lib/auth';
 import { OnboardWelcome, OnboardSignup, OnboardCardReady } from './screens/Onboarding';
@@ -10,27 +10,72 @@ import Yo from './screens/Yo';
 import Producto from './screens/Producto';
 import Calculadora from './screens/Calculadora';
 
+class ErrorBoundary extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { error: null };
+  }
+  static getDerivedStateFromError(error) {
+    return { error };
+  }
+  componentDidCatch(error, info) {
+    console.error('[ErrorBoundary]', error, info);
+  }
+  render() {
+    if (this.state.error) {
+      return (
+        <div style={{
+          minHeight: '100dvh', display: 'flex', flexDirection: 'column',
+          alignItems: 'center', justifyContent: 'center',
+          background: '#F4F6F1', padding: 32, textAlign: 'center',
+        }}>
+          <p style={{ fontFamily: 'serif', fontSize: 22, color: '#1A3C2E', marginBottom: 12 }}>Selva Garden</p>
+          <p style={{ fontSize: 14, color: '#888', marginBottom: 20 }}>
+            Algo salió mal. Por favor recarga la página.
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            style={{
+              background: '#1A3C2E', color: '#fff', border: 'none',
+              borderRadius: 22, padding: '12px 24px', fontSize: 14, cursor: 'pointer',
+            }}
+          >
+            Recargar
+          </button>
+          <details style={{ marginTop: 24, fontSize: 11, color: '#aaa', maxWidth: 320 }}>
+            <summary style={{ cursor: 'pointer' }}>Detalles del error</summary>
+            <pre style={{ marginTop: 8, textAlign: 'left', whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
+              {this.state.error.message}
+            </pre>
+          </details>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 function LoadingScreen() {
   return (
     <div style={{
       minHeight: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center',
-      background: 'var(--c-bg)',
+      background: '#F4F6F1',
     }}>
       <div style={{ textAlign: 'center' }}>
         <div style={{
           width: 48, height: 48, borderRadius: '50%',
-          border: '3px solid var(--c-green-light)',
+          border: '3px solid #D8EDE3',
           borderTopColor: '#1A3C2E',
           animation: 'spinSlow 0.8s linear infinite',
           margin: '0 auto 16px',
         }}/>
-        <p style={{ fontFamily: 'var(--font-serif)', fontSize: 16, color: '#1A3C2E', letterSpacing: '0.12em' }}>SELVA GARDEN</p>
+        <p style={{ fontFamily: 'serif', fontSize: 16, color: '#1A3C2E', letterSpacing: '0.12em' }}>SELVA GARDEN</p>
       </div>
     </div>
   );
 }
 
-export default function App() {
+function AppInner() {
   const [authChecked, setAuthChecked] = useState(false);
   const [customer, setCustomer] = useState(null);
   const [view, setView] = useState('onboard1');
@@ -38,15 +83,25 @@ export default function App() {
   const [storeMode] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    // If Supabase is not configured (missing env var), skip auth and show onboarding
+    if (!supabase) {
+      setAuthChecked(true);
+      return;
+    }
+
+    supabase.auth.getSession().then(({ data }) => {
+      const session = data?.session;
       if (session?.user) {
         handleUser(session.user);
       } else {
         setAuthChecked(true);
       }
+    }).catch((err) => {
+      console.error('[getSession error]', err);
+      setAuthChecked(true);
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user) {
         handleUser(session.user);
       } else {
@@ -56,7 +111,7 @@ export default function App() {
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => data?.subscription?.unsubscribe();
   }, []);
 
   async function handleUser(user) {
@@ -106,4 +161,12 @@ export default function App() {
   }
 
   return <div className="app-shell">{content}</div>;
+}
+
+export default function App() {
+  return (
+    <ErrorBoundary>
+      <AppInner/>
+    </ErrorBoundary>
+  );
 }

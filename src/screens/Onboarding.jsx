@@ -82,6 +82,10 @@ export function OnboardSignup({ onBack }) {
   const [error, setError] = useState(null);
 
   async function handleGoogle() {
+    if (!supabase) {
+      setError('Configuración de auth pendiente. Contacta al administrador.');
+      return;
+    }
     setLoading(true);
     setError(null);
     const { error: err } = await supabase.auth.signInWithOAuth({

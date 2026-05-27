@@ -9,10 +9,12 @@ export async function signInWithGoogle() {
 }
 
 export async function signOut() {
+  if (!supabase) return;
   await supabase.auth.signOut();
 }
 
 export async function getOrCreateCustomer(user) {
+  if (!supabase) throw new Error('Supabase not configured');
   const { data: existing } = await supabase
     .from('customers')
     .select('*')
