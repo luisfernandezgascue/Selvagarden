@@ -23,8 +23,12 @@
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-html, body { height: 100%; }
-body { font-family: var(--font-sans); color: var(--c-black); background: var(--c-bg); }
+html, body, #root {
+  min-height: 100%;
+  min-height: 100dvh;
+  background-color: #1A3C2E;
+}
+body { font-family: var(--font-sans); color: var(--c-black); }
 button { font-family: inherit; cursor: pointer; }
 a { text-decoration: none; }
 
@@ -37,10 +41,12 @@ a { text-decoration: none; }
 /* ============ SCREEN ROOT (replaces phone frame) ============ */
 .screen-root {
   height: 100dvh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   position: relative;
   background: var(--c-bg);
+  background-color: #1A3C2E; /* fills safe-area gutters on iPhone */
   overflow: hidden;
   font-family: var(--font-sans);
   padding-top: env(safe-area-inset-top);

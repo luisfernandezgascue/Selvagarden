@@ -62,16 +62,16 @@ function ErrorMsg({ msg }) {
 export function OnboardWelcome({ onNext, onLogin }) {
   return (
     <Phone>
-      <div style={{ position: 'absolute', inset: 0, zIndex: 1 }}>
+      <div style={{ position: 'absolute', inset: 0, zIndex: 1, minHeight: '100dvh' }}>
         <img
           src="https://images.pexels.com/photos/1407305/pexels-photo-1407305.jpeg?auto=compress&cs=tinysrgb&w=800"
-          style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="Plantas"/>
+          style={{ width: '100%', height: '100%', objectFit: 'cover', minHeight: '100dvh' }} alt="Plantas"/>
         <div style={{
           position: 'absolute', inset: 0,
           background: 'linear-gradient(180deg, rgba(10,30,18,0.35) 0%, rgba(10,30,18,0.2) 35%, rgba(10,30,18,0.85) 75%, rgba(10,30,18,0.95) 100%)'
         }}/>
       </div>
-      <div style={{ position: 'relative', zIndex: 2, flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '24px 28px 100px', color: '#fff' }}>
+      <div style={{ position: 'relative', zIndex: 2, flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '24px 28px max(40px, env(safe-area-inset-bottom))', color: '#fff', minHeight: '100dvh' }}>
         <div style={{ marginTop: 18, display: 'flex', alignItems: 'center', gap: 10 }}>
           <div className="selva-avatar" style={{ width: 34, height: 34 }}>
             <SelvaLeaf size={18}/>
