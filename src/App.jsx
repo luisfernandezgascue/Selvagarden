@@ -1,7 +1,7 @@
 import { useState, useEffect, Component } from 'react';
 import { supabase } from './lib/supabase';
 import { getOrCreateCustomer } from './lib/auth';
-import { OnboardWelcome, OnboardSignup, OnboardCardReady } from './screens/Onboarding';
+import { OnboardWelcome, OnboardSignup, OnboardLogin, OnboardCardReady } from './screens/Onboarding';
 import Home from './screens/Home';
 import Tienda from './screens/Tienda';
 import MiSelva from './screens/MiSelva';
@@ -145,9 +145,11 @@ function AppInner() {
 
   let content;
   if (view === 'onboard1') {
-    content = <OnboardWelcome onNext={() => setView('onboard2')}/>;
+    content = <OnboardWelcome onNext={() => setView('onboard2')} onLogin={() => setView('onboard-login')}/>;
   } else if (view === 'onboard2') {
     content = <OnboardSignup onBack={() => setView('onboard1')}/>;
+  } else if (view === 'onboard-login') {
+    content = <OnboardLogin onBack={() => setView('onboard1')}/>;
   } else if (view === 'onboard3') {
     content = <OnboardCardReady customer={customer} onNext={() => setView('main')}/>;
   } else if (view === 'product') {

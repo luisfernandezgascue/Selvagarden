@@ -1,11 +1,58 @@
 import { supabase } from './supabase';
 
 export async function signInWithGoogle() {
+  if (!supabase) throw new Error('Supabase not configured');
   const { error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
-    options: { redirectTo: 'https://selvagarden.vercel.app' },
+    options: {
+      redirectTo: 'https://selvagarden.vercel.app',
+      queryParams: {
+        access_type: 'offline',
+        prompt: 'consent',
+      },
+    },
+  });
+  if (error) {
+    console.error('Google auth error:', error.message);
+    throw error;
+  }
+}
+
+export async function signUpWithEmail(nombre, email, telefono, password) {
+  if (!supabase) throw new Error('Supabase not configured');
+
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: { data: { full_name: nombre } },
   });
   if (error) throw error;
+
+  const user = data.user;
+  const affiliateCode = user.id.replace(/-/g, '').substring(0, 8);
+
+  const { data: customer, error: custError } = await supabase
+    .from('customers')
+    .insert({ auth_id: user.id, nombre, email, telefono })
+    .select()
+    .single();
+
+  if (custError) throw custError;
+
+  await supabase.from('affiliate_links').insert({
+    customer_id: customer.id,
+    codigo: affiliateCode,
+    tipo: 'cliente',
+  });
+
+  return { customer, needsConfirmation: !data.session };
+}
+
+export async function signInWithEmail(email, password) {
+  if (!supabase) throw new Error('Supabase not configured');
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error) throw error;
+  // onAuthStateChange in App.jsx handles the rest
 }
 
 export async function signOut() {
@@ -23,6 +70,7 @@ export async function getOrCreateCustomer(user) {
 
   if (existing) return { customer: existing, isNew: false };
 
+  // Fallback: create customer if somehow they auth'd without going through signUpWithEmail
   const { data: customer, error } = await supabase
     .from('customers')
     .insert({
