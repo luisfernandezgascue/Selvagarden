@@ -63,20 +63,31 @@ export async function getOrCreateCustomer(user) {
 
   if (existing) return { customer: existing, isNew: false };
 
-  // Fallback: create customer if somehow they auth'd without going through signUpWithEmail
-  const { data: customer, error } = await supabase
+  const { error: insertError } = await supabase
     .from('customers')
     .insert({
       auth_id: user.id,
       nombre: user.user_metadata?.full_name || user.email?.split('@')[0] || 'Cliente',
       email: user.email,
-    })
-    .select()
+    });
+
+  if (insertError) throw insertError;
+
+  const { data: newCustomer, error: selectError } = await supabase
+    .from('customers')
+    .select('*')
+    .eq('auth_id', user.id)
     .single();
 
-  if (error) throw error;
+  if (selectError) throw selectError;
 
-  return { customer, isNew: true };
+  await supabase.from('affiliate_links').insert({
+    customer_id: newCustomer.id,
+    codigo: newCustomer.numero_socio,
+    tipo: 'cliente',
+  });
+
+  return { customer: newCustomer, isNew: true };
 }
 
 export function nivelInfo(nivel = 'sin_nivel') {
