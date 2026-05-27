@@ -1,4 +1,7 @@
 export const Icon = {
+  Close: (p = {}) => (
+    <svg width={p.size||18} height={p.size||18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={p.weight||1.8} strokeLinecap="round"><path d="M6 6l12 12M18 6l-12 12"/></svg>
+  ),
   Home: (p = {}) => (
     <svg width={p.size||22} height={p.size||22} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={p.weight||1.6} strokeLinecap="round" strokeLinejoin="round">
       <path d="M3 11l9-7 9 7v9a1 1 0 01-1 1h-5v-7h-6v7H4a1 1 0 01-1-1v-9z"/>

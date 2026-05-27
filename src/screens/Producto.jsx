@@ -89,7 +89,7 @@ export default function Producto({ product: productProp, onBack }) {
       <div className="scroll">
         {/* Hero image */}
         <div style={{ position: 'relative', height: 430, background: '#EDEBE3' }}>
-          <img src={images[galleryIdx]} alt={product.nombre} style={{ width: '100%', height: '100%', objectFit: 'cover' }}/>
+          <img src={images[galleryIdx]} alt={product.nombre} onError={e => { e.target.src = 'https://picsum.photos/seed/plant/800/800'; }} style={{ width: '100%', height: '100%', objectFit: 'cover' }}/>
           {images.length > 1 && (
             <div style={{ position: 'absolute', bottom: 16, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 6 }}>
               {images.map((_, i) => (

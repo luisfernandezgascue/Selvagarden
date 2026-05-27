@@ -5,24 +5,92 @@ import { useCustomer } from '../context/CustomerContext';
 import { fetchOrders } from '../lib/db';
 import { fetchProductWithCare } from '../lib/db';
 
+const REMINDERS_KEY = 'selva_reminders';
+
+function loadReminders() {
+  try { return JSON.parse(localStorage.getItem(REMINDERS_KEY) || '{}'); } catch { return {}; }
+}
+
+function saveReminder(plantId, days) {
+  const all = loadReminders();
+  all[plantId] = { days, next: Date.now() + days * 86400000 };
+  localStorage.setItem(REMINDERS_KEY, JSON.stringify(all));
+}
+
+async function requestAndDemo(plant) {
+  if (!('Notification' in window)) return alert('Tu navegador no soporta notificaciones');
+  const perm = await Notification.requestPermission();
+  if (perm !== 'granted') return;
+  setTimeout(() => {
+    new Notification(`🌿 ${plant.nombre}`, {
+      body: `Recordatorio: es hora de revisar tu ${plant.nombre}`,
+      icon: plant.imagen_url || 'https://picsum.photos/seed/plant/64/64',
+    });
+  }, 5000);
+}
+
+function ReminderSheet({ plant, onClose }) {
+  const existing = loadReminders()[plant.nombre];
+  const [days, setDays] = useState(existing?.days || 7);
+
+  async function handleSave() {
+    saveReminder(plant.nombre, days);
+    await requestAndDemo(plant);
+    onClose();
+  }
+
+  return (
+    <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', zIndex: 200, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
+      <div onClick={e => e.stopPropagation()} style={{ background: '#F4F6F1', borderRadius: '20px 20px 0 0', padding: '24px 22px 36px', width: '100%', maxWidth: 430 }}>
+        <div style={{ width: 36, height: 4, borderRadius: 99, background: '#D0D0D0', margin: '0 auto 20px' }}/>
+        <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: 20, fontWeight: 600, marginBottom: 6 }}>Recordatorio de riego</h3>
+        <p style={{ fontSize: 13, color: '#666', marginBottom: 20 }}>{plant.nombre}</p>
+        <div style={{ display: 'flex', gap: 10, marginBottom: 20 }}>
+          {[7, 14, 21].map(d => (
+            <button key={d} onClick={() => setDays(d)} style={{ flex: 1, padding: '12px', borderRadius: 12, border: `2px solid ${days === d ? '#1A3C2E' : 'var(--c-line)'}`, background: days === d ? '#D8EDE3' : '#fff', fontWeight: 600, fontSize: 13, color: days === d ? '#1A3C2E' : '#888' }}>
+              {d} días
+            </button>
+          ))}
+        </div>
+        <p style={{ fontSize: 11, color: '#888', marginBottom: 16, textAlign: 'center' }}>Recibirás una notificación de prueba en 5 segundos</p>
+        <button onClick={handleSave} style={{ width: '100%', background: '#1A3C2E', color: '#fff', border: 'none', borderRadius: 'var(--r-btn)', padding: '14px', fontSize: 14, fontWeight: 600, marginBottom: 10 }}>
+          Activar recordatorio
+        </button>
+        <button onClick={onClose} style={{ width: '100%', background: 'none', border: 'none', color: '#888', fontSize: 13 }}>Cancelar</button>
+      </div>
+    </div>
+  );
+}
+
 // ─── Mis Plantas tab ────────────────────────────────────────────────────────
 
-function PlantRow({ item, onViewCare }) {
+function PlantRow({ item, onViewCare, onReminder }) {
+  const reminders = loadReminders();
+  const hasReminder = !!reminders[item.nombre];
+
   return (
     <div style={{ background: '#fff', border: '1px solid var(--c-line)', borderRadius: 14, padding: 10, display: 'flex', gap: 11, alignItems: 'center' }}>
       <div style={{ width: 54, height: 54, borderRadius: 10, overflow: 'hidden', flexShrink: 0, background: '#EDEBE3' }}>
-        {item.imagen_url && <img src={item.imagen_url} style={{ width: '100%', height: '100%', objectFit: 'cover' }}/>}
+        {item.imagen_url && <img src={item.imagen_url} alt={item.nombre} style={{ width: '100%', height: '100%', objectFit: 'cover' }}/>}
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
         <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A' }}>{item.nombre}</p>
         <p style={{ fontSize: 10, color: '#888', marginTop: 1 }}>Comprada · {item.fecha}</p>
       </div>
-      <button
-        onClick={() => onViewCare(item)}
-        style={{ background: '#1A3C2E', color: '#fff', border: 'none', borderRadius: 18, padding: '6px 12px', fontSize: 10, fontWeight: 600, flexShrink: 0 }}
-      >
-        Cuidados
-      </button>
+      <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
+        <button
+          onClick={() => onReminder(item)}
+          style={{ width: 32, height: 32, borderRadius: '50%', background: hasReminder ? '#D8EDE3' : '#F0F0F0', border: 'none', color: hasReminder ? '#1A3C2E' : '#888', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+        >
+          <Icon.Bell size={14}/>
+        </button>
+        <button
+          onClick={() => onViewCare(item)}
+          style={{ background: '#1A3C2E', color: '#fff', border: 'none', borderRadius: 18, padding: '6px 12px', fontSize: 10, fontWeight: 600 }}
+        >
+          Cuidados
+        </button>
+      </div>
     </div>
   );
 }
@@ -85,6 +153,7 @@ function MisPlantasTab() {
   const [plants, setPlants] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedPlant, setSelectedPlant] = useState(null);
+  const [reminderPlant, setReminderPlant] = useState(null);
 
   useEffect(() => {
     if (!customer?.id) { setLoading(false); return; }
@@ -120,9 +189,10 @@ function MisPlantasTab() {
   return (
     <>
       <div style={{ padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-        {plants.map((p, i) => <PlantRow key={i} item={p} onViewCare={setSelectedPlant}/>)}
+        {plants.map((p, i) => <PlantRow key={i} item={p} onViewCare={setSelectedPlant} onReminder={setReminderPlant}/>)}
       </div>
       {selectedPlant && <CareModal plant={selectedPlant} onClose={() => setSelectedPlant(null)}/>}
+      {reminderPlant && <ReminderSheet plant={reminderPlant} onClose={() => setReminderPlant(null)}/>}
     </>
   );
 }

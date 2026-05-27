@@ -86,10 +86,12 @@ export default function Cart({ onClose }) {
                 return (
                   <div key={product.id} style={{ background: '#fff', borderRadius: 14, padding: 12, display: 'flex', gap: 12, border: '1px solid var(--c-line-soft)' }}>
                     <div style={{ width: 70, height: 70, borderRadius: 10, background: '#EDEBE3', overflow: 'hidden', flexShrink: 0 }}>
-                      {product.imagen_url
-                        ? <img src={product.imagen_url} alt={product.nombre} style={{ width: '100%', height: '100%', objectFit: 'cover' }}/>
-                        : <div className="photo-placeholder" style={{ width: '100%', height: '100%' }}>plant</div>
-                      }
+                      <img
+                        src={product.imagen_url || 'https://picsum.photos/seed/plant/200/200'}
+                        alt={product.nombre}
+                        onError={e => { e.target.src = 'https://picsum.photos/seed/plant/200/200'; }}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      />
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', lineHeight: 1.3, marginBottom: 4 }}>{product.nombre}</p>

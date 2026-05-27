@@ -4,6 +4,58 @@ import { Icon, SelvaLeaf } from '../icons';
 import { useCustomer, nivelInfo, levelProgress } from '../context/CustomerContext';
 import { fetchEvents } from '../lib/db';
 
+const NOTIF_SEEN_KEY = 'selva_notif_seen';
+
+function NotifPanel({ events, customer, onClose }) {
+  const consumo = customer?.consumo_anual || 0;
+  const prog = levelProgress(consumo);
+  const reminders = JSON.parse(localStorage.getItem('selva_reminders') || '[]');
+  const nextEvent = events[0] || null;
+  const closeToLevel = prog.next && prog.remaining <= 100;
+
+  const items = [];
+  if (reminders.length > 0) {
+    reminders.slice(0, 3).forEach(r => items.push({ icon: '💧', text: r.text, sub: r.time, color: '#D8EDE3' }));
+  }
+  if (nextEvent) {
+    const fecha = new Date(nextEvent.fecha).toLocaleDateString('es-VE', { day: 'numeric', month: 'short' });
+    items.push({ icon: '🌿', text: nextEvent.titulo, sub: `Evento · ${fecha}`, color: '#F5EDD8' });
+  }
+  if (closeToLevel) {
+    items.push({ icon: nivelInfo(prog.next).emoji || '⭐', text: `Estás cerca de ${nivelInfo(prog.next).label}`, sub: `Solo faltan $${prog.remaining.toFixed(0)} más`, color: '#D8EDE3' });
+  }
+
+  return (
+    <div onClick={onClose} style={{ position: 'fixed', inset: 0, zIndex: 50, background: 'rgba(0,0,0,0.3)' }}>
+      <div onClick={e => e.stopPropagation()} style={{ position: 'absolute', top: 0, left: 0, right: 0, background: '#F4F6F1', borderRadius: '0 0 20px 20px', boxShadow: '0 8px 32px rgba(0,0,0,0.18)', padding: '16px 18px 20px', animation: 'slideDown 0.2s ease' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+          <p style={{ fontFamily: 'var(--font-serif)', fontSize: 18, fontWeight: 600 }}>Notificaciones</p>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#888' }}><Icon.Close size={18}/></button>
+        </div>
+        {items.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '16px 0 8px' }}>
+            <p style={{ fontSize: 22, marginBottom: 8 }}>✅</p>
+            <p style={{ fontSize: 14, fontWeight: 600, color: '#1A3C2E', marginBottom: 4 }}>Todo al día</p>
+            <p style={{ fontSize: 12, color: '#888' }}>No hay recordatorios pendientes</p>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {items.map((item, i) => (
+              <div key={i} style={{ background: item.color, borderRadius: 12, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
+                <span style={{ fontSize: 20, flexShrink: 0 }}>{item.icon}</span>
+                <div>
+                  <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A' }}>{item.text}</p>
+                  <p style={{ fontSize: 11, color: '#666', marginTop: 2 }}>{item.sub}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function QA({ icon, label, highlight, onClick }) {
   return (
     <button onClick={onClick} style={{ background: 'none', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, padding: '0 4px' }}>
@@ -74,6 +126,8 @@ export default function Home({ onTab, onProduct }) {
   const [events, setEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [videoOpen, setVideoOpen] = useState(false);
+  const [notifOpen, setNotifOpen] = useState(false);
+  const [notifSeen, setNotifSeen] = useState(() => localStorage.getItem(NOTIF_SEEN_KEY) === 'true');
 
   const nombre = customer?.nombre?.split(' ')[0] || 'Hola';
   const nivel = customer?.nivel_lealtad || 'sin_nivel';
@@ -82,9 +136,13 @@ export default function Home({ onTab, onProduct }) {
   const info = nivelInfo(nivel);
   const prog = levelProgress(consumo);
 
-  useEffect(() => {
-    fetchEvents().then(setEvents);
-  }, []);
+  useEffect(() => { fetchEvents().then(setEvents); }, []);
+
+  function openNotif() {
+    setNotifOpen(true);
+    setNotifSeen(true);
+    localStorage.setItem(NOTIF_SEEN_KEY, 'true');
+  }
 
   const nextEvent = events[0] || null;
   const eventFecha = nextEvent?.fecha
@@ -101,10 +159,10 @@ export default function Home({ onTab, onProduct }) {
           <span style={{ fontFamily: 'var(--font-serif)', fontSize: 15, letterSpacing: '0.18em', fontWeight: 600, color: '#1A1A1A' }}>SELVA GARDEN</span>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
-          <button style={iconBtn}><Icon.Search/></button>
-          <button style={{ ...iconBtn, position: 'relative' }}>
+          <button onClick={() => onTab?.('shop')} style={iconBtn}><Icon.Search/></button>
+          <button onClick={openNotif} style={{ ...iconBtn, position: 'relative' }}>
             <Icon.Bell/>
-            <span style={{ position: 'absolute', top: 6, right: 6, width: 7, height: 7, background: '#B5873A', borderRadius: '50%', border: '1.5px solid #F4F6F1' }}/>
+            {!notifSeen && <span style={{ position: 'absolute', top: 6, right: 6, width: 7, height: 7, background: '#B5873A', borderRadius: '50%', border: '1.5px solid #F4F6F1' }}/>}
           </button>
         </div>
       </div>
@@ -268,6 +326,7 @@ export default function Home({ onTab, onProduct }) {
       <TabBar active="home" onChange={onTab}/>
 
       {selectedEvent && <EventModal event={selectedEvent} onClose={() => setSelectedEvent(null)}/>}
+      {notifOpen && <NotifPanel events={events} customer={customer} onClose={() => setNotifOpen(false)}/>}
     </Phone>
   );
 }

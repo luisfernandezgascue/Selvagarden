@@ -1,29 +1,37 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import QRCodeLib from 'qrcode';
 import { Phone, TabBar, SectionHeader } from '../components';
 import { Icon, AppleA } from '../icons';
 import { useCustomer, nivelInfo, levelProgress } from '../context/CustomerContext';
 import { fetchLoyaltyTransactions } from '../lib/db';
 
-function RealQR({ value, size = 220 }) {
-  const canvasRef = useRef(null);
+function RealQR({ value, size = 200 }) {
+  const [dataUrl, setDataUrl] = useState(null);
 
   useEffect(() => {
-    if (!value || !canvasRef.current) return;
-    QRCodeLib.toCanvas(canvasRef.current, value, {
+    if (!value) return;
+    QRCodeLib.toDataURL(value, {
       width: size,
       margin: 2,
       color: { dark: '#1A3C2E', light: '#ffffff' },
-    }).catch(console.error);
+      errorCorrectionLevel: 'M',
+    }).then(setDataUrl).catch(console.error);
   }, [value, size]);
 
   if (!value) return (
-    <div style={{ width: size, height: size, background: '#F0FAF5', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <p style={{ fontSize: 11, color: '#888' }}>Sin número de socio</p>
+    <div style={{ width: size, height: size, background: '#F0FAF5', borderRadius: 12, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+      <Icon.QR size={40}/>
+      <p style={{ fontSize: 11, color: '#888', textAlign: 'center', padding: '0 16px' }}>Número de socio no asignado aún</p>
     </div>
   );
 
-  return <canvas ref={canvasRef} style={{ borderRadius: 8, display: 'block' }}/>;
+  if (!dataUrl) return (
+    <div style={{ width: size, height: size, background: '#F0FAF5', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ width: 24, height: 24, borderRadius: '50%', border: '3px solid #D8EDE3', borderTopColor: '#1A3C2E', animation: 'spinSlow 0.8s linear infinite' }}/>
+    </div>
+  );
+
+  return <img src={dataUrl} width={size} height={size} alt="QR Selva Garden" style={{ borderRadius: 12, display: 'block' }}/>;
 }
 
 function CornerCuts() {
