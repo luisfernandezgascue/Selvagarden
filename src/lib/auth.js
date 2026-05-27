@@ -29,7 +29,6 @@ export async function signUpWithEmail(nombre, email, telefono, password) {
   if (error) throw error;
 
   const user = data.user;
-  const affiliateCode = user.id.replace(/-/g, '').substring(0, 8);
 
   const { data: customer, error: custError } = await supabase
     .from('customers')
@@ -38,12 +37,6 @@ export async function signUpWithEmail(nombre, email, telefono, password) {
     .single();
 
   if (custError) throw custError;
-
-  await supabase.from('affiliate_links').insert({
-    customer_id: customer.id,
-    codigo: affiliateCode,
-    tipo: 'cliente',
-  });
 
   return { customer, needsConfirmation: !data.session };
 }
@@ -82,13 +75,6 @@ export async function getOrCreateCustomer(user) {
     .single();
 
   if (error) throw error;
-
-  const affiliateCode = customer.id.replace(/-/g, '').substring(0, 8);
-  await supabase.from('affiliate_links').insert({
-    customer_id: customer.id,
-    codigo: affiliateCode,
-    tipo: 'cliente',
-  });
 
   return { customer, isNew: true };
 }
