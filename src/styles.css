@@ -66,7 +66,7 @@ a { text-decoration: none; }
   }
   .tab-bar {
     height: 58px;
-    padding-bottom: 8px;
+    padding-bottom: 0;
   }
 }
 
@@ -115,8 +115,8 @@ a { text-decoration: none; }
   border-top: 1px solid var(--c-line);
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
-  padding: 10px 0 env(safe-area-inset-bottom);
-  height: calc(58px + env(safe-area-inset-bottom));
+  padding: 10px 0 0;
+  height: 58px;
 }
 .tab-btn {
   background: none; border: none;
