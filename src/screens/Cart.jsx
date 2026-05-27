@@ -142,7 +142,7 @@ export default function Cart({ onClose }) {
           </div>
 
           {/* Sticky CTA */}
-          <div style={{ flexShrink: 0, padding: '12px 18px 22px', background: '#F4F6F1', borderTop: '1px solid var(--c-line-soft)' }}>
+          <div style={{ flexShrink: 0, padding: '12px 18px max(22px, env(safe-area-inset-bottom))', background: '#F4F6F1', borderTop: '1px solid var(--c-line-soft)' }}>
             {error && <p style={{ fontSize: 12, color: '#E53935', marginBottom: 10, textAlign: 'center' }}>{error}</p>}
             <button
               onClick={handleCheckout}

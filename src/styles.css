@@ -43,6 +43,7 @@ a { text-decoration: none; }
   background: var(--c-bg);
   overflow: hidden;
   font-family: var(--font-sans);
+  padding-top: env(safe-area-inset-top);
 }
 
 /* Desktop: center the app in a dark surround */
@@ -61,6 +62,11 @@ a { text-decoration: none; }
     border-radius: 46px;
     overflow: hidden;
     box-shadow: 0 30px 70px rgba(10,30,18,0.5), 0 0 0 8px #11231a, 0 0 0 9px rgba(255,255,255,0.04);
+    padding-top: 0;
+  }
+  .tab-bar {
+    height: 64px;
+    padding-bottom: 14px;
   }
 }
 
@@ -109,7 +115,8 @@ a { text-decoration: none; }
   border-top: 1px solid var(--c-line);
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
-  padding: 10px 0 calc(14px + env(safe-area-inset-bottom, 0px));
+  padding: 10px 0 max(14px, env(safe-area-inset-bottom));
+  height: calc(64px + env(safe-area-inset-bottom));
 }
 .tab-btn {
   background: none; border: none;

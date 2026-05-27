@@ -157,7 +157,7 @@ export default function Producto({ product: productProp, onBack }) {
       </div>
 
       {/* Sticky CTA */}
-      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '14px 18px 22px', background: 'linear-gradient(180deg, transparent 0%, rgba(244,246,241,0.95) 30%, #F4F6F1 100%)' }}>
+      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '14px 18px max(22px, env(safe-area-inset-bottom))', background: 'linear-gradient(180deg, transparent 0%, rgba(244,246,241,0.95) 30%, #F4F6F1 100%)' }}>
         <button
           onClick={handleAddToCart}
           style={{ background: added ? '#2D6A4F' : '#1A3C2E', color: '#fff', border: 'none', borderRadius: 'var(--r-btn)', padding: '15px', fontSize: 14, fontWeight: 600, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, boxShadow: '0 8px 22px rgba(26,60,46,0.25)', transition: 'background .2s' }}
