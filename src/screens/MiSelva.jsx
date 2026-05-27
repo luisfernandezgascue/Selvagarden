@@ -1,116 +1,427 @@
-import { Phone, TabBar, SectionHeader } from '../components';
+import { useState, useEffect, useRef } from 'react';
+import { Phone, TabBar } from '../components';
 import { Icon, SelvaLeaf } from '../icons';
+import { useCustomer } from '../context/CustomerContext';
+import { fetchOrders } from '../lib/db';
+import { fetchProductWithCare } from '../lib/db';
 
-function ActionCard({ icon, title, sub, color, badge }) {
-  return (
-    <button style={{ background: '#fff', border: '1px solid var(--c-line)', borderRadius: 16, padding: '14px 14px', display: 'flex', alignItems: 'center', gap: 13, textAlign: 'left', width: '100%' }}>
-      <div style={{ width: 46, height: 46, borderRadius: 13, background: color, color: '#F5EDD8', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, position: 'relative' }}>
-        {icon}
-        {badge && (
-          <span style={{ position: 'absolute', top: -4, right: -4, background: '#B5873A', color: '#fff', fontSize: 9, fontWeight: 700, borderRadius: 99, padding: '2px 6px', minWidth: 16, border: '2px solid #F4F6F1' }}>{badge}</span>
-        )}
-      </div>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{ fontSize: 14, fontWeight: 600, color: '#1A1A1A', marginBottom: 2 }}>{title}</p>
-        <p style={{ fontSize: 11, color: '#888' }}>{sub}</p>
-      </div>
-      <Icon.Chevron size={16}/>
-    </button>
-  );
-}
+// ─── Mis Plantas tab ────────────────────────────────────────────────────────
 
-function PlantRow({ name, sub, img, status, statusColor, alert }) {
+function PlantRow({ item, onViewCare }) {
   return (
     <div style={{ background: '#fff', border: '1px solid var(--c-line)', borderRadius: 14, padding: 10, display: 'flex', gap: 11, alignItems: 'center' }}>
       <div style={{ width: 54, height: 54, borderRadius: 10, overflow: 'hidden', flexShrink: 0, background: '#EDEBE3' }}>
-        {img && <img src={img} style={{ width: '100%', height: '100%', objectFit: 'cover' }}/>}
+        {item.imagen_url && <img src={item.imagen_url} style={{ width: '100%', height: '100%', objectFit: 'cover' }}/>}
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A' }}>{name}</p>
-        <p style={{ fontSize: 10, color: '#888', marginTop: 1 }}>{sub}</p>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 6 }}>
-          {alert && <span style={{ width: 6, height: 6, borderRadius: '50%', background: statusColor, animation: 'pulseDot 1.6s infinite' }}/>}
-          <span style={{ fontSize: 10, color: statusColor, fontWeight: 600 }}>{status}</span>
-        </div>
+        <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A' }}>{item.nombre}</p>
+        <p style={{ fontSize: 10, color: '#888', marginTop: 1 }}>Comprada · {item.fecha}</p>
       </div>
-      <Icon.Chevron size={14}/>
+      <button
+        onClick={() => onViewCare(item)}
+        style={{ background: '#1A3C2E', color: '#fff', border: 'none', borderRadius: 18, padding: '6px 12px', fontSize: 10, fontWeight: 600, flexShrink: 0 }}
+      >
+        Cuidados
+      </button>
     </div>
   );
 }
 
-function ReminderRow({ icon, text, time, on }) {
+function CareModal({ plant, onClose }) {
+  const [care, setCare] = useState(null);
+  const [videoOpen, setVideoOpen] = useState(false);
+
+  useEffect(() => {
+    if (plant?.product_id) {
+      fetchProductWithCare(plant.product_id).then(data => setCare(data?.plant_care));
+    }
+  }, [plant?.product_id]);
+
+  if (!plant) return null;
+
   return (
-    <div style={{ background: '#fff', border: '1px solid var(--c-line)', borderRadius: 12, padding: '10px 12px', display: 'flex', alignItems: 'center', gap: 11 }}>
-      <div style={{ width: 34, height: 34, borderRadius: 10, background: '#D8EDE3', color: '#1A3C2E', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{icon}</div>
-      <div style={{ flex: 1 }}>
-        <p style={{ fontSize: 12, fontWeight: 600 }}>{text}</p>
-        <p style={{ fontSize: 10, color: '#888' }}>{time}</p>
-      </div>
-      <div style={{ width: 34, height: 20, borderRadius: 99, background: on ? '#2D6A4F' : '#D8D8D8', position: 'relative', transition: 'background .2s' }}>
-        <div style={{ position: 'absolute', top: 2, left: on ? 16 : 2, width: 16, height: 16, borderRadius: '50%', background: '#fff', transition: 'left .2s', boxShadow: '0 1px 3px rgba(0,0,0,0.2)' }}/>
+    <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', zIndex: 100, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
+      <div onClick={e => e.stopPropagation()} style={{ background: '#F4F6F1', borderRadius: '20px 20px 0 0', padding: '24px 22px 36px', width: '100%', maxWidth: 430, maxHeight: '80vh', overflowY: 'auto' }}>
+        <div style={{ width: 36, height: 4, borderRadius: 99, background: '#D0D0D0', margin: '0 auto 20px' }}/>
+        <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: 22, fontWeight: 600, marginBottom: 6 }}>{plant.nombre}</h3>
+        {care ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {care.luz && <div style={{ background: '#fff', borderRadius: 12, padding: '10px 14px', display: 'flex', gap: 10, alignItems: 'center' }}>
+              <Icon.Sun size={18}/><div><p style={{ fontSize: 12, fontWeight: 600 }}>Luz</p><p style={{ fontSize: 11, color: '#888' }}>{care.luz}</p></div>
+            </div>}
+            {care.riego && <div style={{ background: '#fff', borderRadius: 12, padding: '10px 14px', display: 'flex', gap: 10, alignItems: 'center' }}>
+              <Icon.Droplet size={18}/><div><p style={{ fontSize: 12, fontWeight: 600 }}>Riego</p><p style={{ fontSize: 11, color: '#888' }}>{care.riego}</p></div>
+            </div>}
+            {care.temperatura && <div style={{ background: '#fff', borderRadius: 12, padding: '10px 14px', display: 'flex', gap: 10, alignItems: 'center' }}>
+              <Icon.Thermo size={18}/><div><p style={{ fontSize: 12, fontWeight: 600 }}>Temperatura</p><p style={{ fontSize: 11, color: '#888' }}>{care.temperatura}</p></div>
+            </div>}
+            {care.notas && <div style={{ background: '#D8EDE3', borderRadius: 12, padding: '10px 14px' }}>
+              <p style={{ fontSize: 12, fontWeight: 600, marginBottom: 4 }}>Notas</p>
+              <p style={{ fontSize: 11, color: '#4A4A4A', lineHeight: 1.5 }}>{care.notas}</p>
+            </div>}
+            {care.video_url && (
+              videoOpen ? (
+                <div style={{ borderRadius: 12, overflow: 'hidden', aspectRatio: '16/9' }}>
+                  <iframe width="100%" height="100%" src={care.video_url.replace('watch?v=', 'embed/')} frameBorder="0" allowFullScreen style={{ display: 'block' }}/>
+                </div>
+              ) : (
+                <button onClick={() => setVideoOpen(true)} style={{ background: '#1A3C2E', color: '#fff', border: 'none', borderRadius: 'var(--r-btn)', padding: '12px', fontSize: 12, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                  <Icon.Play size={14}/> Ver video de cuidados
+                </button>
+              )
+            )}
+          </div>
+        ) : (
+          <p style={{ fontSize: 13, color: '#888', padding: '16px 0' }}>No hay información de cuidados disponible para esta planta.</p>
+        )}
+        <button onClick={onClose} style={{ width: '100%', marginTop: 16, background: 'none', border: '1px solid var(--c-line)', borderRadius: 'var(--r-btn)', padding: '12px', fontSize: 13, color: '#888' }}>Cerrar</button>
       </div>
     </div>
   );
 }
+
+function MisPlantasTab() {
+  const { customer } = useCustomer();
+  const [plants, setPlants] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedPlant, setSelectedPlant] = useState(null);
+
+  useEffect(() => {
+    if (!customer?.id) { setLoading(false); return; }
+    fetchOrders(customer.id).then(orders => {
+      const items = [];
+      orders.forEach(order => {
+        if (Array.isArray(order.items)) {
+          order.items.forEach(item => {
+            items.push({
+              product_id: item.product_id,
+              nombre: item.nombre,
+              imagen_url: item.imagen_url || null,
+              fecha: new Date(order.created_at).toLocaleDateString('es-VE', { day: 'numeric', month: 'short', year: 'numeric' }),
+            });
+          });
+        }
+      });
+      setPlants(items);
+      setLoading(false);
+    });
+  }, [customer?.id]);
+
+  if (loading) return <div style={{ padding: 40, display: 'flex', justifyContent: 'center' }}><div style={{ width: 28, height: 28, borderRadius: '50%', border: '3px solid #D8EDE3', borderTopColor: '#1A3C2E', animation: 'spinSlow 0.8s linear infinite' }}/></div>;
+
+  if (plants.length === 0) return (
+    <div style={{ padding: '40px 18px', textAlign: 'center' }}>
+      <div className="selva-avatar breathing" style={{ width: 64, height: 64, margin: '0 auto 16px' }}><SelvaLeaf size={32}/></div>
+      <p style={{ fontFamily: 'var(--font-serif)', fontSize: 18, color: '#1A1A1A', marginBottom: 8 }}>Tu selva está vacía</p>
+      <p style={{ fontSize: 13, color: '#888', lineHeight: 1.5 }}>Las plantas de tus pedidos aparecerán aquí</p>
+    </div>
+  );
+
+  return (
+    <>
+      <div style={{ padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+        {plants.map((p, i) => <PlantRow key={i} item={p} onViewCare={setSelectedPlant}/>)}
+      </div>
+      {selectedPlant && <CareModal plant={selectedPlant} onClose={() => setSelectedPlant(null)}/>}
+    </>
+  );
+}
+
+// ─── Diagnosticar tab ────────────────────────────────────────────────────────
+
+function DiagnosticarTab() {
+  const { customer } = useCustomer();
+  const fileRef = useRef();
+  const [preview, setPreview] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState(null);
+  const [error, setError] = useState(null);
+
+  function handleFile(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => setPreview({ src: ev.target.result, file });
+    reader.readAsDataURL(file);
+    setResult(null);
+    setError(null);
+  }
+
+  async function handleDiagnose() {
+    if (!preview) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const base64 = preview.src.split(',')[1];
+      const imageType = preview.file.type || 'image/jpeg';
+      const res = await fetch('/api/diagnose', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ imageBase64: base64, imageType }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Error en el diagnóstico');
+      setResult(data.result || data.diagnosis);
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div style={{ padding: '12px 14px 24px' }}>
+      <div style={{ margin: '0 0 16px', padding: '20px 18px', background: '#fff', border: '1px solid var(--c-line)', borderRadius: 16, textAlign: 'center' }}>
+        <div style={{ width: 56, height: 56, borderRadius: 16, background: '#1A3C2E', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px', color: '#F5EDD8' }}>
+          <Icon.Camera size={24}/>
+        </div>
+        <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: 20, fontWeight: 600, marginBottom: 6 }}>Diagnosticar planta</h3>
+        <p style={{ fontSize: 13, color: '#666', lineHeight: 1.5, marginBottom: 16 }}>Sube una foto y nuestro experto botánico virtual analiza tu planta al instante.</p>
+        <input ref={fileRef} type="file" accept="image/*" onChange={handleFile} style={{ display: 'none' }}/>
+        <button
+          onClick={() => fileRef.current?.click()}
+          style={{ background: '#F0FAF5', color: '#1A3C2E', border: '1.5px dashed #A8D5B5', borderRadius: 12, padding: '14px 24px', fontSize: 13, fontWeight: 600, width: '100%' }}
+        >
+          {preview ? 'Cambiar foto' : 'Subir foto de tu planta'}
+        </button>
+      </div>
+
+      {preview && (
+        <div style={{ marginBottom: 14 }}>
+          <div style={{ borderRadius: 14, overflow: 'hidden', height: 220, marginBottom: 12 }}>
+            <img src={preview.src} style={{ width: '100%', height: '100%', objectFit: 'cover' }}/>
+          </div>
+          <button
+            onClick={handleDiagnose}
+            disabled={loading}
+            style={{ width: '100%', background: loading ? '#A8D5B5' : '#1A3C2E', color: '#fff', border: 'none', borderRadius: 'var(--r-btn)', padding: '14px', fontSize: 14, fontWeight: 600 }}
+          >
+            {loading ? 'Analizando…' : 'Analizar esta planta'}
+          </button>
+        </div>
+      )}
+
+      {error && <div style={{ background: '#FFF0F0', border: '1px solid #FFCDD2', borderRadius: 12, padding: '12px 14px', marginBottom: 14 }}>
+        <p style={{ fontSize: 13, color: '#C62828' }}>{error}</p>
+      </div>}
+
+      {result && (
+        <div style={{ background: '#fff', border: '1px solid var(--c-line)', borderRadius: 16, padding: '18px 16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+            <div className="selva-avatar" style={{ width: 36, height: 36, flexShrink: 0 }}><SelvaLeaf size={18}/></div>
+            <p style={{ fontSize: 12, fontWeight: 700, color: '#1A3C2E' }}>Diagnóstico de Selva Garden</p>
+          </div>
+          <p style={{ fontSize: 13, color: '#333', lineHeight: 1.65, whiteSpace: 'pre-line' }}>{result}</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Inspiración tab ─────────────────────────────────────────────────────────
+
+function InspiracionTab() {
+  const fileRef = useRef();
+  const [preview, setPreview] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState(null);
+  const [error, setError] = useState(null);
+
+  function handleFile(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => setPreview({ src: ev.target.result, file });
+    reader.readAsDataURL(file);
+    setResult(null);
+    setError(null);
+  }
+
+  async function handleAnalyze() {
+    if (!preview) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const base64 = preview.src.split(',')[1];
+      const imageType = preview.file.type || 'image/jpeg';
+      const res = await fetch('/api/floral', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ imageBase64: base64, imageType }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Error en el análisis');
+      setResult(data.analysis);
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const whatsappMsg = result ? encodeURIComponent(`Hola Selva Garden! Me gustaría un ramo similar a este. Análisis: ${result.slice(0, 200)}`) : '';
+
+  return (
+    <div style={{ padding: '12px 14px 24px' }}>
+      <div style={{ margin: '0 0 16px', padding: '20px 18px', background: '#fff', border: '1px solid var(--c-line)', borderRadius: 16, textAlign: 'center' }}>
+        <div style={{ width: 56, height: 56, borderRadius: 16, background: '#B5873A', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px', color: '#fff' }}>
+          <Icon.Sparkle size={24}/>
+        </div>
+        <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: 20, fontWeight: 600, marginBottom: 6 }}>Inspiración floral</h3>
+        <p style={{ fontSize: 13, color: '#666', lineHeight: 1.5, marginBottom: 16 }}>Sube la foto de un ramo que te gustó y te decimos cómo recrearlo.</p>
+        <input ref={fileRef} type="file" accept="image/*" onChange={handleFile} style={{ display: 'none' }}/>
+        <button
+          onClick={() => fileRef.current?.click()}
+          style={{ background: '#FBF6ED', color: '#B5873A', border: '1.5px dashed rgba(181,135,58,0.4)', borderRadius: 12, padding: '14px 24px', fontSize: 13, fontWeight: 600, width: '100%' }}
+        >
+          {preview ? 'Cambiar foto' : 'Subir foto de inspiración'}
+        </button>
+      </div>
+
+      {preview && (
+        <div style={{ marginBottom: 14 }}>
+          <div style={{ borderRadius: 14, overflow: 'hidden', height: 220, marginBottom: 12 }}>
+            <img src={preview.src} style={{ width: '100%', height: '100%', objectFit: 'cover' }}/>
+          </div>
+          <button
+            onClick={handleAnalyze}
+            disabled={loading}
+            style={{ width: '100%', background: loading ? '#D4AA6B' : '#B5873A', color: '#fff', border: 'none', borderRadius: 'var(--r-btn)', padding: '14px', fontSize: 14, fontWeight: 600 }}
+          >
+            {loading ? 'Analizando…' : 'Analizar este ramo'}
+          </button>
+        </div>
+      )}
+
+      {error && <div style={{ background: '#FFF0F0', border: '1px solid #FFCDD2', borderRadius: 12, padding: '12px 14px', marginBottom: 14 }}>
+        <p style={{ fontSize: 13, color: '#C62828' }}>{error}</p>
+      </div>}
+
+      {result && (
+        <div style={{ background: '#fff', border: '1px solid var(--c-line)', borderRadius: 16, padding: '18px 16px' }}>
+          <p style={{ fontSize: 12, fontWeight: 700, color: '#B5873A', marginBottom: 10 }}>Análisis floral</p>
+          <p style={{ fontSize: 13, color: '#333', lineHeight: 1.65, whiteSpace: 'pre-line', marginBottom: 16 }}>{result}</p>
+          <a
+            href={`https://wa.me/584000000000?text=${whatsappMsg}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: '#25D366', color: '#fff', border: 'none', borderRadius: 'var(--r-btn)', padding: '13px', fontSize: 13, fontWeight: 600, textDecoration: 'none' }}
+          >
+            Pedir por WhatsApp
+          </a>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Cuidados tab ─────────────────────────────────────────────────────────────
+
+const CARE_DATA = [
+  { nombre: 'Monstera Deliciosa', emoji: '🌿', luz: 'Indirecta', riego: '7 días', temp: '18–28°', img: 'https://images.pexels.com/photos/3097770/pexels-photo-3097770.jpeg?auto=compress&w=300' },
+  { nombre: 'Sansevieria Zeylanica', emoji: '🗡️', luz: 'Indirecta/Sombra', riego: '14 días', temp: '15–30°', img: 'https://images.pexels.com/photos/2123482/pexels-photo-2123482.jpeg?auto=compress&w=300' },
+  { nombre: 'Pothos Marble Queen', emoji: '🍃', luz: 'Indirecta', riego: '10 días', temp: '15–25°', img: 'https://images.pexels.com/photos/6913404/pexels-photo-6913404.jpeg?auto=compress&w=300' },
+  { nombre: 'Orquídea Phalaenopsis', emoji: '🌸', luz: 'Indirecta', riego: '10 días', temp: '18–25°', img: 'https://images.pexels.com/photos/931177/pexels-photo-931177.jpeg?auto=compress&w=300' },
+  { nombre: 'Cactus variado', emoji: '🌵', luz: 'Sol directo', riego: '21 días', temp: '10–35°', img: 'https://images.pexels.com/photos/1048036/pexels-photo-1048036.jpeg?auto=compress&w=300' },
+  { nombre: 'Ficus Lyrata', emoji: '🌳', luz: 'Directa suave', riego: '7 días', temp: '18–24°', img: 'https://images.pexels.com/photos/6297517/pexels-photo-6297517.jpeg?auto=compress&w=300' },
+];
+
+function CuidadosTab() {
+  const [search, setSearch] = useState('');
+  const [selected, setSelected] = useState(null);
+
+  const filtered = CARE_DATA.filter(p => p.nombre.toLowerCase().includes(search.toLowerCase()));
+
+  return (
+    <div style={{ padding: '12px 14px 24px' }}>
+      <div style={{ background: '#fff', borderRadius: 14, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10, border: '1px solid var(--c-line)', marginBottom: 14 }}>
+        <Icon.Search size={14}/>
+        <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar planta…" style={{ flex: 1, border: 'none', outline: 'none', background: 'transparent', fontSize: 13, fontFamily: 'var(--font-sans)' }}/>
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+        {filtered.map((plant, i) => (
+          <div key={i} onClick={() => setSelected(plant)} style={{ background: '#fff', borderRadius: 14, overflow: 'hidden', border: '1px solid var(--c-line-soft)', cursor: 'pointer' }}>
+            <div style={{ height: 90, overflow: 'hidden' }}>
+              <img src={plant.img} alt={plant.nombre} style={{ width: '100%', height: '100%', objectFit: 'cover' }}/>
+            </div>
+            <div style={{ padding: '10px 10px 12px' }}>
+              <p style={{ fontSize: 11, fontWeight: 600, color: '#1A1A1A', lineHeight: 1.3, marginBottom: 6 }}>{plant.nombre}</p>
+              <div style={{ display: 'flex', gap: 4 }}>
+                <span style={{ fontSize: 9, background: '#D8EDE3', color: '#1A3C2E', borderRadius: 6, padding: '2px 6px', fontWeight: 600 }}>{plant.riego}</span>
+                <span style={{ fontSize: 9, background: '#FBF6ED', color: '#B5873A', borderRadius: 6, padding: '2px 6px', fontWeight: 600 }}>{plant.luz}</span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {selected && (
+        <div onClick={() => setSelected(null)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', zIndex: 100, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
+          <div onClick={e => e.stopPropagation()} style={{ background: '#F4F6F1', borderRadius: '20px 20px 0 0', padding: '24px 22px 36px', width: '100%', maxWidth: 430 }}>
+            <div style={{ width: 36, height: 4, borderRadius: 99, background: '#D0D0D0', margin: '0 auto 20px' }}/>
+            <div style={{ height: 160, borderRadius: 14, overflow: 'hidden', marginBottom: 16 }}>
+              <img src={selected.img} style={{ width: '100%', height: '100%', objectFit: 'cover' }}/>
+            </div>
+            <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: 22, fontWeight: 600, marginBottom: 14 }}>{selected.nombre}</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 16 }}>
+              {[['Luz', selected.luz], ['Riego', selected.riego], ['Temperatura', selected.temp]].map(([k, v]) => (
+                <div key={k} style={{ background: '#fff', borderRadius: 10, padding: '10px 12px' }}>
+                  <p style={{ fontSize: 10, color: '#888', marginBottom: 2 }}>{k}</p>
+                  <p style={{ fontSize: 12, fontWeight: 700, color: '#1A3C2E' }}>{v}</p>
+                </div>
+              ))}
+            </div>
+            <button onClick={() => setSelected(null)} style={{ width: '100%', background: 'none', border: '1px solid var(--c-line)', borderRadius: 'var(--r-btn)', padding: '12px', fontSize: 13, color: '#888' }}>Cerrar</button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Main component ───────────────────────────────────────────────────────────
+
+const TABS = [
+  { id: 'plantas', label: 'Mis Plantas' },
+  { id: 'diagnosticar', label: 'Diagnosticar' },
+  { id: 'inspiracion', label: 'Inspiración' },
+  { id: 'cuidados', label: 'Cuidados' },
+];
 
 export default function MiSelva({ onTab }) {
+  const [activeTab, setActiveTab] = useState('plantas');
+
   return (
     <Phone>
-      <div className="scroll">
-        <div style={{ padding: '8px 18px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div style={{ flexShrink: 0 }}>
+        <div style={{ padding: '8px 18px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
           <button style={{ background: 'none', border: 'none', color: '#1A1A1A' }}><Icon.Settings size={20}/></button>
           <span style={{ fontSize: 11, color: '#888', letterSpacing: '0.14em', fontWeight: 600 }}>MI SELVA</span>
           <button style={{ background: 'none', border: 'none', color: '#1A1A1A' }}><Icon.Bell size={20}/></button>
         </div>
-
-        {/* Avatar hero */}
-        <div style={{ margin: '18px 14px 0', padding: '28px 22px 22px', background: 'linear-gradient(160deg, #F5EDD8 0%, #FBF6ED 80%)', borderRadius: 20, textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
-          <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle at 50% 0%, rgba(168,213,181,0.25), transparent 60%)' }}/>
-          <div className="selva-avatar breathing" style={{ width: 84, height: 84, margin: '0 auto 14px', position: 'relative' }}>
-            <SelvaLeaf size={44}/>
-            <span style={{ position: 'absolute', inset: -8, borderRadius: '50%', border: '1px dashed rgba(26,60,46,0.18)', animation: 'spinSlow 30s linear infinite' }}/>
-          </div>
-          <p className="eyebrow" style={{ marginBottom: 6 }}>Selva · tu asistente</p>
-          <h2 className="h-serif" style={{ fontSize: 26, fontWeight: 500, lineHeight: 1.15, marginBottom: 6, position: 'relative' }}>
-            Hola Carlos,<br/>
-            <span style={{ fontStyle: 'italic' }}>¿cómo están tus plantas hoy?</span>
-          </h2>
-          <p style={{ fontSize: 12, color: '#6B5A3A', position: 'relative' }}>Tienes <b>2 plantas</b> esperando agua esta semana</p>
+        {/* Tab bar */}
+        <div style={{ display: 'flex', gap: 0, overflowX: 'auto', padding: '0 14px 0', borderBottom: '1px solid var(--c-line-soft)', scrollbarWidth: 'none' }}>
+          {TABS.map(t => (
+            <button
+              key={t.id}
+              onClick={() => setActiveTab(t.id)}
+              style={{
+                background: 'none', border: 'none', padding: '10px 12px',
+                fontSize: 12, fontWeight: activeTab === t.id ? 700 : 500,
+                color: activeTab === t.id ? '#1A1A1A' : '#888',
+                borderBottom: activeTab === t.id ? '2px solid #1A3C2E' : '2px solid transparent',
+                whiteSpace: 'nowrap', flexShrink: 0,
+              }}
+            >{t.label}</button>
+          ))}
         </div>
+      </div>
 
-        {/* 3 main actions */}
-        <div style={{ padding: '18px 14px 0', display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <ActionCard icon={<Icon.Camera/>} title="Diagnosticar mi planta" sub="Sube una foto y te digo qué tiene" color="#1A3C2E"/>
-          <ActionCard icon={<Icon.Leaf/>} title="Mis plantas" sub="4 plantas activas · 2 necesitan agua" color="#2D6A4F" badge="2"/>
-          <ActionCard icon={<Icon.Play size={20}/>} title="Cuidados y videos" sub="Esta semana: poda de monstera" color="#B5873A"/>
-        </div>
-
-        {/* Mis plantas */}
-        <SectionHeader title="Mis plantas" cta="Ver todas"/>
-        <div style={{ padding: '0 18px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <PlantRow name="Monstera Deliciosa" sub="Comprada Nov 14 · Riego cada 7 días" img="https://images.pexels.com/photos/3097770/pexels-photo-3097770.jpeg?auto=compress&w=200" status="Próximo riego en 2 días" statusColor="#2D6A4F"/>
-          <PlantRow name="Sansevieria Zeylanica" sub="Comprada Oct 28 · Riego cada 14 días" img="https://images.pexels.com/photos/2123482/pexels-photo-2123482.jpeg?auto=compress&w=200" status="Riego pendiente · ayer" statusColor="#B5873A" alert/>
-          <PlantRow name="Pothos Marble Queen" sub="Comprada Sep 04 · Riego cada 10 días" img="https://images.pexels.com/photos/6913404/pexels-photo-6913404.jpeg?auto=compress&w=200" status="Próximo riego en 5 días" statusColor="#2D6A4F"/>
-        </div>
-
-        {/* Inspiración de ramos */}
-        <div style={{ margin: '22px 14px 0', padding: '18px 18px', background: '#fff', border: '1px solid var(--c-line)', borderRadius: 16, position: 'relative', overflow: 'hidden' }}>
-          <div style={{ position: 'absolute', right: -20, top: -20, width: 120, height: 120, borderRadius: '50%', background: 'radial-gradient(circle, rgba(168,213,181,0.3), transparent 70%)' }}/>
-          <p className="eyebrow" style={{ marginBottom: 6, position: 'relative' }}>Nueva función</p>
-          <h3 className="h-serif" style={{ fontSize: 20, fontWeight: 600, marginBottom: 6, position: 'relative' }}>¿Viste un ramo que te gustó?</h3>
-          <p style={{ fontSize: 12, color: '#666', lineHeight: 1.5, marginBottom: 14, position: 'relative' }}>Sube la foto y te lo hacemos, o te recomendamos algo similar.</p>
-          <button style={{ background: '#1A3C2E', color: '#F5EDD8', border: 'none', borderRadius: 'var(--r-btn)', padding: '10px 16px', fontSize: 12, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8, position: 'relative' }}>
-            <Icon.Camera size={16}/> Inspirar un ramo
-          </button>
-        </div>
-
-        {/* Recordatorios */}
-        <SectionHeader title="Recordatorios"/>
-        <div style={{ padding: '0 18px 24px', display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <ReminderRow icon={<Icon.Droplet/>} text="Regar Monstera" time="Miércoles 9am" on/>
-          <ReminderRow icon={<Icon.Sparkle/>} text="Abonar Sansevieria" time="Domingo 8am" on/>
-          <ReminderRow icon={<Icon.Sun/>} text="Rotar Pothos" time="Cada 14 días"/>
-        </div>
+      <div className="scroll">
+        {activeTab === 'plantas'      && <MisPlantasTab/>}
+        {activeTab === 'diagnosticar' && <DiagnosticarTab/>}
+        {activeTab === 'inspiracion'  && <InspiracionTab/>}
+        {activeTab === 'cuidados'     && <CuidadosTab/>}
       </div>
 
       <TabBar active="selva" onChange={onTab}/>

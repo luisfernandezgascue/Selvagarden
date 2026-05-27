@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Phone, TabBar, SectionHeader, iconBtn } from '../components';
 import { Icon, SelvaLeaf } from '../icons';
-import { weekProducts } from '../data';
+import { useCustomer, nivelInfo, levelProgress } from '../context/CustomerContext';
+import { fetchEvents } from '../lib/db';
 
 function QA({ icon, label, highlight, onClick }) {
   return (
@@ -42,8 +43,53 @@ function ProductCardSmall({ name, img, price, old, tag, onClick }) {
   );
 }
 
-export default function Home({ storeMode = false, onTab, onProduct }) {
-  const [, setPulse] = useState(0);
+function EventModal({ event, onClose }) {
+  if (!event) return null;
+  const fecha = event.fecha ? new Date(event.fecha).toLocaleDateString('es-VE', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '';
+  return (
+    <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', zIndex: 100, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
+      <div onClick={e => e.stopPropagation()} style={{ background: '#F4F6F1', borderRadius: '20px 20px 0 0', padding: '24px 22px 36px', width: '100%', maxWidth: 430 }}>
+        <div style={{ width: 36, height: 4, borderRadius: 99, background: '#D0D0D0', margin: '0 auto 20px' }}/>
+        <p style={{ fontSize: 10, color: '#B5873A', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 8 }}>Evento</p>
+        <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 26, fontWeight: 600, marginBottom: 10 }}>{event.nombre || event.titulo}</h2>
+        {event.descripcion && <p style={{ fontSize: 13, color: '#4A4A4A', lineHeight: 1.6, marginBottom: 14 }}>{event.descripcion}</p>}
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 20 }}>
+          {fecha && <span style={{ fontSize: 12, color: '#B5873A', fontWeight: 600, background: 'rgba(181,135,58,0.1)', padding: '5px 12px', borderRadius: 20 }}>{fecha}</span>}
+          {event.cupos_restantes != null && <span style={{ fontSize: 12, color: '#1A3C2E', fontWeight: 600, background: '#D8EDE3', padding: '5px 12px', borderRadius: 20 }}>{event.cupos_restantes} cupos</span>}
+          {event.precio != null && <span style={{ fontSize: 12, color: '#1A1A1A', fontWeight: 700, background: '#fff', padding: '5px 12px', borderRadius: 20, border: '1px solid var(--c-line)' }}>${event.precio}</span>}
+        </div>
+        <button
+          onClick={onClose}
+          style={{ width: '100%', background: '#1A3C2E', color: '#fff', border: 'none', borderRadius: 'var(--r-btn)', padding: '14px', fontSize: 14, fontWeight: 600 }}
+        >
+          Reservar mi lugar
+        </button>
+      </div>
+    </div>
+  );
+}
+
+export default function Home({ onTab, onProduct }) {
+  const { customer } = useCustomer();
+  const [events, setEvents] = useState([]);
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [videoOpen, setVideoOpen] = useState(false);
+
+  const nombre = customer?.nombre?.split(' ')[0] || 'Hola';
+  const nivel = customer?.nivel_lealtad || 'sin_nivel';
+  const puntos = customer?.puntos || 0;
+  const consumo = customer?.consumo_anual || 0;
+  const info = nivelInfo(nivel);
+  const prog = levelProgress(consumo);
+
+  useEffect(() => {
+    fetchEvents().then(setEvents);
+  }, []);
+
+  const nextEvent = events[0] || null;
+  const eventFecha = nextEvent?.fecha
+    ? new Date(nextEvent.fecha).toLocaleDateString('es-VE', { weekday: 'short', day: 'numeric', month: 'short' })
+    : null;
 
   return (
     <Phone>
@@ -64,21 +110,6 @@ export default function Home({ storeMode = false, onTab, onProduct }) {
       </div>
 
       <div className="scroll">
-        {storeMode && (
-          <div style={{
-            margin: '0 14px 8px', padding: '10px 14px',
-            background: 'linear-gradient(135deg,#2D6A4F,#1A3C2E)',
-            borderRadius: 13, display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-            animation: 'fadeUp .4s ease',
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
-              <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#A8D5B5', boxShadow: '0 0 0 4px rgba(168,213,181,0.25)', animation: 'pulseDot 1.6s infinite' }}/>
-              <span style={{ fontSize: 12, color: '#fff', fontWeight: 600 }}>Estás en Selva Garden · Las Mercedes</span>
-            </div>
-            <Icon.Chevron size={14}/>
-          </div>
-        )}
-
         {/* Level card */}
         <div style={{
           margin: '10px 14px 0', padding: '18px 18px',
@@ -89,27 +120,30 @@ export default function Home({ storeMode = false, onTab, onProduct }) {
           <div style={{ position: 'absolute', left: -30, bottom: -30, width: 120, height: 120, borderRadius: '50%', background: 'radial-gradient(circle, rgba(168,213,181,0.18), transparent 70%)' }}/>
           <div style={{ display: 'flex', justifyContent: 'space-between', position: 'relative' }}>
             <div>
-              <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.55)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 6, fontWeight: 600 }}>Hola, Carlos</p>
+              <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.55)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 6, fontWeight: 600 }}>Hola, {nombre}</p>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span style={{ fontSize: 18 }}>🥈</span>
-                <span style={{ fontFamily: 'var(--font-serif)', fontSize: 22, fontWeight: 600, color: '#fff' }}>Versailles</span>
-                <span className="chip" style={{ background: 'rgba(245,237,216,0.18)', borderColor: 'rgba(245,237,216,0.4)', border: '1px solid rgba(245,237,216,0.4)', color: '#F5EDD8', padding: '2px 8px', fontSize: 9 }}>10% OFF</span>
+                {info.emoji && <span style={{ fontSize: 18 }}>{info.emoji}</span>}
+                <span style={{ fontFamily: 'var(--font-serif)', fontSize: 22, fontWeight: 600, color: '#fff' }}>{info.label}</span>
+                {info.descuento > 0 && <span className="chip" style={{ background: 'rgba(245,237,216,0.18)', borderColor: 'rgba(245,237,216,0.4)', border: '1px solid rgba(245,237,216,0.4)', color: '#F5EDD8', padding: '2px 8px', fontSize: 9 }}>{info.descuento}% OFF</span>}
               </div>
             </div>
             <div style={{ textAlign: 'right' }}>
               <p style={{ fontSize: 9, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 2, fontWeight: 600 }}>Puntos</p>
-              <p style={{ fontFamily: 'var(--font-serif)', fontSize: 32, fontWeight: 600, color: '#fff', lineHeight: 1 }}>842</p>
+              <p style={{ fontFamily: 'var(--font-serif)', fontSize: 32, fontWeight: 600, color: '#fff', lineHeight: 1 }}>{puntos}</p>
             </div>
           </div>
           <div style={{ marginTop: 18, position: 'relative' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-              <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.55)' }}>$842 acumulados</span>
-              <span style={{ fontSize: 10, color: '#D4AA6B', fontWeight: 600 }}>🥇 Faltan $658 · Babilonia</span>
+              <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.55)' }}>${consumo.toFixed(0)} acumulados</span>
+              {prog.next
+                ? <span style={{ fontSize: 10, color: '#D4AA6B', fontWeight: 600 }}>{nivelInfo(prog.next).emoji} Faltan ${prog.remaining.toFixed(0)} · {nivelInfo(prog.next).label}</span>
+                : <span style={{ fontSize: 10, color: '#D4AA6B', fontWeight: 600 }}>Nivel máximo</span>
+              }
             </div>
             <div style={{ height: 6, background: 'rgba(255,255,255,0.12)', borderRadius: 99, overflow: 'hidden' }}>
-              <div style={{ height: '100%', width: '56%', background: 'linear-gradient(90deg, #A8D5B5, #B5873A)', borderRadius: 99, boxShadow: '0 0 12px rgba(181,135,58,0.5)', animation: 'barGrow 1.3s cubic-bezier(.4,0,.2,1)' }}/>
+              <div style={{ height: '100%', width: `${Math.round(prog.pct * 100)}%`, background: 'linear-gradient(90deg, #A8D5B5, #B5873A)', borderRadius: 99, boxShadow: '0 0 12px rgba(181,135,58,0.5)', animation: 'barGrow 1.3s cubic-bezier(.4,0,.2,1)' }}/>
             </div>
-            <p style={{ marginTop: 6, fontSize: 9, color: 'rgba(255,255,255,0.4)', textAlign: 'center', letterSpacing: '0.04em' }}>56% del camino</p>
+            <p style={{ marginTop: 6, fontSize: 9, color: 'rgba(255,255,255,0.4)', textAlign: 'center', letterSpacing: '0.04em' }}>{Math.round(prog.pct * 100)}% del camino</p>
           </div>
         </div>
 
@@ -121,32 +155,13 @@ export default function Home({ storeMode = false, onTab, onProduct }) {
           boxShadow: '0 2px 14px rgba(0,0,0,0.06)',
         }}>
           <QA icon={<Icon.Leaf size={20}/>} label="Mi Selva" onClick={() => onTab?.('selva')}/>
-          <QA icon={<Icon.Camera size={20}/>} label="Diagnóstico"/>
+          <QA icon={<Icon.Camera size={20}/>} label="Diagnóstico" onClick={() => onTab?.('selva')}/>
           <QA icon={<Icon.QR size={20}/>} label="Mi QR" onClick={() => onTab?.('card')}/>
-          {storeMode
-            ? <QA icon={<Icon.Ticket size={20}/>} label="Turno" highlight/>
-            : <QA icon={<Icon.Shop size={20}/>} label="Tienda" onClick={() => onTab?.('shop')}/>
-          }
+          <QA icon={<Icon.Shop size={20}/>} label="Tienda" onClick={() => onTab?.('shop')}/>
         </div>
 
-        {/* Turno (store mode) */}
-        {storeMode && (
-          <div style={{ margin: '12px 14px 0', padding: '14px', background: '#fff', borderRadius: 14, border: '1.5px solid rgba(26,60,46,0.12)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div style={{ display: 'flex', gap: 11, alignItems: 'center' }}>
-              <div style={{ width: 42, height: 42, borderRadius: 11, background: '#D8EDE3', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#1A3C2E' }}>
-                <Icon.Ticket size={20}/>
-              </div>
-              <div>
-                <p style={{ fontSize: 12, fontWeight: 600, color: '#1A1A1A' }}>Floristería · Pedir turno</p>
-                <p style={{ fontSize: 10, color: '#888', marginTop: 2 }}>Espera ~8 min · Turno #09 en curso</p>
-              </div>
-            </div>
-            <button style={{ background: '#1A3C2E', color: '#fff', border: 'none', borderRadius: 18, padding: '8px 14px', fontSize: 11, fontWeight: 600 }}>Pedir →</button>
-          </div>
-        )}
-
-        {/* Hero — plant of the week */}
-        <div onClick={onProduct} style={{ margin: '18px 14px 0', borderRadius: 18, overflow: 'hidden', position: 'relative', height: 230, cursor: 'pointer' }}>
+        {/* Hero */}
+        <div style={{ margin: '18px 14px 0', borderRadius: 18, overflow: 'hidden', position: 'relative', height: 230, cursor: 'pointer' }} onClick={() => onTab?.('shop')}>
           <img src="https://images.pexels.com/photos/3097770/pexels-photo-3097770.jpeg?auto=compress&cs=tinysrgb&w=700" alt="Monstera" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}/>
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(110deg, rgba(10,30,18,0.82) 0%, rgba(10,30,18,0.4) 60%, transparent 100%)' }}/>
           <div style={{ position: 'absolute', inset: 0, padding: '18px 18px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', maxWidth: '70%' }}>
@@ -159,63 +174,100 @@ export default function Home({ storeMode = false, onTab, onProduct }) {
               <button style={{ background: '#F5EDD8', color: '#1A3C2E', border: 'none', borderRadius: 20, padding: '8px 14px', fontSize: 11, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 6 }}>
                 <Icon.Cart size={14}/> Ver · $77
               </button>
-              <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', textDecoration: 'line-through' }}>$85</span>
             </div>
           </div>
         </div>
 
         {/* Esta semana */}
-        <SectionHeader title="Esta semana" cta="Ver tienda"/>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '0 18px', margin: '22px 0 12px' }}>
+          <h3 className="h-serif" style={{ fontSize: 22, fontWeight: 600 }}>Esta semana</h3>
+          <button onClick={() => onTab?.('shop')} style={{ background: 'none', border: 'none', fontSize: 12, color: 'var(--c-green)', fontWeight: 600 }}>Ver tienda →</button>
+        </div>
         <div style={{ display: 'flex', gap: 10, overflowX: 'auto', padding: '0 18px 4px', scrollbarWidth: 'none' }}>
-          {weekProducts.map((p, i) => (
-            <ProductCardSmall key={i} {...p} onClick={onProduct}/>
+          {[
+            { name: 'Orquídea Phalaenopsis', img: 'https://images.pexels.com/photos/931177/pexels-photo-931177.jpeg?auto=compress&w=400', price: 54, old: 60, tag: 'FLORES' },
+            { name: 'Pothos Marble Queen', img: 'https://images.pexels.com/photos/6913404/pexels-photo-6913404.jpeg?auto=compress&w=400', price: 18, old: 20, tag: 'PLANTA' },
+            { name: 'Matero Herstera Lino 24', img: 'https://images.pexels.com/photos/1084188/pexels-photo-1084188.jpeg?auto=compress&w=400', price: 32, old: 36, tag: 'MATERO' },
+            { name: 'Sansevieria Zeylanica', img: 'https://images.pexels.com/photos/2123482/pexels-photo-2123482.jpeg?auto=compress&w=400', price: 27, old: 30, tag: 'PLANTA' },
+          ].map((p, i) => (
+            <ProductCardSmall key={i} {...p} onClick={() => onTab?.('shop')}/>
           ))}
         </div>
 
         {/* Event card */}
-        <div style={{ margin: '22px 14px 0' }}>
-          <div style={{ display: 'flex', background: 'linear-gradient(135deg, #F5EDD8, #FBF6ED)', borderRadius: 15, overflow: 'hidden', border: '1px solid rgba(181,135,58,0.2)' }}>
-            <div style={{ width: 4, background: 'linear-gradient(180deg, #B5873A, #D4AA6B)' }}/>
-            <div style={{ flex: 1, padding: '14px 14px', display: 'flex', justifyContent: 'space-between', gap: 10 }}>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <p className="eyebrow" style={{ color: '#B5873A', marginBottom: 4 }}>Próximo evento</p>
-                <h3 className="h-serif" style={{ fontSize: 18, fontWeight: 600, marginBottom: 5 }}>Taller de bonsái</h3>
-                <p style={{ fontSize: 11, color: '#6B5A3A', lineHeight: 1.45, marginBottom: 9 }}>Iniciación con Hiroshi Tanaka. Materiales incluidos.</p>
-                <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                  <span style={{ fontSize: 11, color: '#B5873A', fontWeight: 600 }}>Sáb 14 Dic · 10am</span>
-                  <span style={{ fontSize: 10, background: 'rgba(181,135,58,0.14)', color: '#B5873A', padding: '2px 8px', borderRadius: 8, fontWeight: 600 }}>4 cupos</span>
+        {nextEvent ? (
+          <div style={{ margin: '22px 14px 0' }}>
+            <div onClick={() => setSelectedEvent(nextEvent)} style={{ display: 'flex', background: 'linear-gradient(135deg, #F5EDD8, #FBF6ED)', borderRadius: 15, overflow: 'hidden', border: '1px solid rgba(181,135,58,0.2)', cursor: 'pointer' }}>
+              <div style={{ width: 4, background: 'linear-gradient(180deg, #B5873A, #D4AA6B)' }}/>
+              <div style={{ flex: 1, padding: '14px 14px', display: 'flex', justifyContent: 'space-between', gap: 10 }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p className="eyebrow" style={{ color: '#B5873A', marginBottom: 4 }}>Próximo evento</p>
+                  <h3 className="h-serif" style={{ fontSize: 18, fontWeight: 600, marginBottom: 5 }}>{nextEvent.nombre || nextEvent.titulo || 'Evento especial'}</h3>
+                  {nextEvent.descripcion && <p style={{ fontSize: 11, color: '#6B5A3A', lineHeight: 1.45, marginBottom: 9 }}>{nextEvent.descripcion.slice(0, 80)}{nextEvent.descripcion.length > 80 ? '…' : ''}</p>}
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                    {eventFecha && <span style={{ fontSize: 11, color: '#B5873A', fontWeight: 600 }}>{eventFecha}</span>}
+                    {nextEvent.cupos_restantes != null && <span style={{ fontSize: 10, background: 'rgba(181,135,58,0.14)', color: '#B5873A', padding: '2px 8px', borderRadius: 8, fontWeight: 600 }}>{nextEvent.cupos_restantes} cupos</span>}
+                  </div>
                 </div>
-              </div>
-              <div style={{ textAlign: 'right' }}>
-                <p style={{ fontFamily: 'var(--font-serif)', fontSize: 22, fontWeight: 600, color: '#1A3C2E', marginBottom: 8 }}>$45</p>
-                <button style={{ background: '#1A3C2E', color: '#fff', border: 'none', borderRadius: 18, padding: '7px 14px', fontSize: 11, fontWeight: 600 }}>Reservar</button>
+                <div style={{ textAlign: 'right' }}>
+                  {nextEvent.precio != null && <p style={{ fontFamily: 'var(--font-serif)', fontSize: 22, fontWeight: 600, color: '#1A3C2E', marginBottom: 8 }}>${nextEvent.precio}</p>}
+                  <button style={{ background: '#1A3C2E', color: '#fff', border: 'none', borderRadius: 18, padding: '7px 14px', fontSize: 11, fontWeight: 600 }}>Reservar</button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <div style={{ margin: '22px 14px 0' }}>
+            <div style={{ display: 'flex', background: 'linear-gradient(135deg, #F5EDD8, #FBF6ED)', borderRadius: 15, overflow: 'hidden', border: '1px solid rgba(181,135,58,0.2)' }}>
+              <div style={{ width: 4, background: 'linear-gradient(180deg, #B5873A, #D4AA6B)' }}/>
+              <div style={{ flex: 1, padding: '14px 14px' }}>
+                <p className="eyebrow" style={{ color: '#B5873A', marginBottom: 4 }}>Próximo evento</p>
+                <h3 className="h-serif" style={{ fontSize: 18, fontWeight: 600, marginBottom: 5 }}>Taller de bonsái</h3>
+                <p style={{ fontSize: 11, color: '#6B5A3A', lineHeight: 1.45 }}>Iniciación con Hiroshi Tanaka. Materiales incluidos.</p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Video card */}
         <div style={{ margin: '14px 14px 0' }}>
-          <div style={{ background: '#0A1E10', borderRadius: 15, overflow: 'hidden', display: 'flex', alignItems: 'center', position: 'relative', height: 118 }}>
-            <img src="https://images.pexels.com/photos/4503273/pexels-photo-4503273.jpeg?auto=compress&cs=tinysrgb&w=600" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.4 }}/>
-            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(90deg, rgba(10,30,16,0.92), rgba(10,30,16,0.35))' }}/>
-            <div style={{ position: 'relative', zIndex: 1, padding: 14, display: 'flex', alignItems: 'center', gap: 14 }}>
-              <div style={{ width: 44, height: 44, borderRadius: '50%', background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
-                <Icon.Play size={16}/>
-              </div>
-              <div>
-                <p className="eyebrow" style={{ color: 'rgba(255,255,255,0.5)', marginBottom: 5 }}>Esta semana en Mi Selva</p>
-                <h3 className="h-serif" style={{ fontSize: 16, color: '#fff', fontWeight: 600 }}>Cómo podas tu Monstera</h3>
-                <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.45)', marginTop: 4 }}>4:23 · Por María Lemos</p>
+          {videoOpen ? (
+            <div style={{ borderRadius: 15, overflow: 'hidden', aspectRatio: '16/9' }}>
+              <iframe
+                width="100%"
+                height="100%"
+                src="https://www.youtube.com/embed/0CvjNNCv5_s?rel=0&modestbranding=1&autoplay=1"
+                title="Selva Garden video"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                style={{ display: 'block' }}
+              />
+            </div>
+          ) : (
+            <div onClick={() => setVideoOpen(true)} style={{ background: '#0A1E10', borderRadius: 15, overflow: 'hidden', display: 'flex', alignItems: 'center', position: 'relative', height: 118, cursor: 'pointer' }}>
+              <img src="https://images.pexels.com/photos/4503273/pexels-photo-4503273.jpeg?auto=compress&cs=tinysrgb&w=600" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.4 }}/>
+              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(90deg, rgba(10,30,16,0.92), rgba(10,30,16,0.35))' }}/>
+              <div style={{ position: 'relative', zIndex: 1, padding: 14, display: 'flex', alignItems: 'center', gap: 14 }}>
+                <div style={{ width: 44, height: 44, borderRadius: '50%', background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
+                  <Icon.Play size={16}/>
+                </div>
+                <div>
+                  <p className="eyebrow" style={{ color: 'rgba(255,255,255,0.5)', marginBottom: 5 }}>Esta semana en Mi Selva</p>
+                  <h3 className="h-serif" style={{ fontSize: 16, color: '#fff', fontWeight: 600 }}>Cómo podas tu Monstera</h3>
+                  <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.45)', marginTop: 4 }}>Ver en YouTube →</p>
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
 
         <div style={{ height: 24 }}/>
       </div>
 
       <TabBar active="home" onChange={onTab}/>
+
+      {selectedEvent && <EventModal event={selectedEvent} onClose={() => setSelectedEvent(null)}/>}
     </Phone>
   );
 }
