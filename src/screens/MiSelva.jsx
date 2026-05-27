@@ -153,11 +153,11 @@ function DiagnosticarTab() {
     setError(null);
     try {
       const base64 = preview.src.split(',')[1];
-      const imageType = preview.file.type || 'image/jpeg';
+      const mimeType = preview.file.type || 'image/jpeg';
       const res = await fetch('/api/diagnose', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ imageBase64: base64, imageType }),
+        body: JSON.stringify({ imageBase64: base64, mimeType }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Error en el diagnóstico');
@@ -243,15 +243,15 @@ function InspiracionTab() {
     setError(null);
     try {
       const base64 = preview.src.split(',')[1];
-      const imageType = preview.file.type || 'image/jpeg';
+      const mimeType = preview.file.type || 'image/jpeg';
       const res = await fetch('/api/floral', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ imageBase64: base64, imageType }),
+        body: JSON.stringify({ imageBase64: base64, mimeType }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Error en el análisis');
-      setResult(data.analysis);
+      setResult(data.result || data.analysis);
     } catch (e) {
       setError(e.message);
     } finally {
