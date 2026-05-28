@@ -138,7 +138,7 @@ async function syncProducts(supabase) {
             item_id: p.bc_item_id || `#item_${safeId}`,
             name: p.talla || 'Regular',
             pricing_type: 'FIXED_PRICING',
-            price_money: { amount: amountCents, currency: 'USD' },
+            price_money: { amount: amountCents, currency: 'EUR' },
             sku: p.sku || undefined,
           },
         }],
