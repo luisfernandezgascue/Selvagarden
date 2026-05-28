@@ -55,6 +55,18 @@ export async function fetchFeaturedProduct() {
   return first || null;
 }
 
+export async function fetchPlantCareForProduct(productId) {
+  if (!supabase || !productId) return null;
+  const { data, error } = await supabase
+    .from('plant_care')
+    .select('*')
+    .eq('product_id', productId)
+    .limit(1)
+    .maybeSingle();
+  if (error) console.error('[db] fetchPlantCareForProduct:', error.message);
+  return data || null;
+}
+
 export async function fetchProductWithCare(productId) {
   if (!supabase || !productId) return null;
   const { data, error } = await supabase

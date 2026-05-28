@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Phone } from '../components';
 import { Icon, SelvaLeaf } from '../icons';
 import { useCustomer, nivelInfo } from '../context/CustomerContext';
-import { fetchProductWithCare } from '../lib/db';
+import { fetchProductWithCare, fetchPlantCareForProduct } from '../lib/db';
 
 const floatBtn = {
   width: 38, height: 38, borderRadius: '50%',
@@ -12,31 +12,18 @@ const floatBtn = {
   boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
 };
 
-function CareTile({ icon, label, val }) {
+function CareCard({ icon, label, val }) {
   if (!val) return null;
   return (
-    <div style={{ textAlign: 'center', padding: '0 2px' }}>
-      <div style={{ width: 36, height: 36, borderRadius: 10, background: '#F0FAF5', color: '#2D6A4F', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 6px' }}>{icon}</div>
-      <p style={{ fontSize: 8.5, color: '#888', letterSpacing: '0.08em', textTransform: 'uppercase', fontWeight: 600, marginBottom: 2 }}>{label}</p>
-      <p style={{ fontSize: 10.5, color: '#1A1A1A', fontWeight: 600 }}>{val}</p>
+    <div style={{ background: '#F0FAF5', borderRadius: 12, padding: '14px 12px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, textAlign: 'center' }}>
+      <div style={{ color: '#2D6A4F' }}>{icon}</div>
+      <p style={{ fontSize: 9, color: '#888', letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 600 }}>{label}</p>
+      <p style={{ fontSize: 12, color: '#1A3C2E', fontWeight: 700, lineHeight: 1.3 }}>{val}</p>
     </div>
   );
 }
 
 const DIF_STARS = { facil: 1, fácil: 1, media: 2, medio: 2, experto: 3 };
-function DifTile({ val }) {
-  if (!val) return null;
-  const stars = DIF_STARS[(val || '').toLowerCase()] || 1;
-  return (
-    <div style={{ textAlign: 'center', padding: '0 2px' }}>
-      <div style={{ width: 36, height: 36, borderRadius: 10, background: '#F0FAF5', color: '#2D6A4F', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 6px' }}>
-        <Icon.Sparkle size={16}/>
-      </div>
-      <p style={{ fontSize: 8.5, color: '#888', letterSpacing: '0.08em', textTransform: 'uppercase', fontWeight: 600, marginBottom: 2 }}>Nivel</p>
-      <p style={{ fontSize: 11, color: '#B5873A', fontWeight: 700, letterSpacing: '-0.02em' }}>{'★'.repeat(stars)}{'☆'.repeat(3 - stars)}</p>
-    </div>
-  );
-}
 
 function SpecRow({ l, r, last }) {
   return (
@@ -51,14 +38,13 @@ export default function Producto({ product: productProp, onBack }) {
   const { addToCart, customer } = useCustomer();
   const [galleryIdx, setGalleryIdx] = useState(0);
   const [product, setProduct] = useState(productProp || null);
+  const [care, setCare] = useState(null);
   const [added, setAdded] = useState(false);
 
   useEffect(() => {
-    if (productProp?.id) {
-      fetchProductWithCare(productProp.id).then(data => {
-        if (data) setProduct(data);
-      });
-    }
+    if (!productProp?.id) return;
+    fetchProductWithCare(productProp.id).then(data => { if (data) setProduct(data); });
+    fetchPlantCareForProduct(productProp.id).then(data => { if (data) setCare(data); });
   }, [productProp?.id]);
 
   const discount = nivelInfo(customer?.nivel_lealtad).descuento;
@@ -77,11 +63,10 @@ export default function Producto({ product: productProp, onBack }) {
     ? [product.imagen_url]
     : ['https://images.pexels.com/photos/3097770/pexels-photo-3097770.jpeg?auto=compress&w=800'];
 
-  const care = product.plant_care;
   const finalPrice = (product.precio_venta || 0) * (1 - discount / 100);
   const subfamily = product.subfamily?.nombre || '';
-  const family = product.subfamily?.family?.nombre || '';
   const fullName = [product.nombre, product.color, product.talla].filter(Boolean).join(' ');
+  const difStars = care?.dificultad ? (DIF_STARS[(care.dificultad || '').toLowerCase()] || 1) : null;
 
   function handleAddToCart() {
     addToCart(product);
@@ -117,6 +102,7 @@ export default function Producto({ product: productProp, onBack }) {
 
         {/* Body */}
         <div style={{ padding: '18px 18px 0', background: '#F4F6F1' }}>
+          {/* Name + price */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
             <div style={{ flex: 1, minWidth: 0 }}>
               {subfamily && <p style={{ fontFamily: 'var(--font-serif)', fontStyle: 'italic', fontSize: 12, color: '#888', marginBottom: 4 }}>{subfamily}</p>}
@@ -129,21 +115,8 @@ export default function Producto({ product: productProp, onBack }) {
             </div>
           </div>
 
-          {care && (
-            <>
-              <div className="divider-rule" style={{ margin: '12px 0 16px' }}>cuidados</div>
-              <div style={{ background: '#fff', borderRadius: 14, padding: '16px 14px', border: '1px solid var(--c-line)', display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 6 }}>
-                <CareTile icon={<Icon.Sun/>} label="Luz" val={care.luz}/>
-                <CareTile icon={<Icon.Droplet/>} label="Riego" val={care.riego}/>
-                <CareTile icon={<Icon.Thermo/>} label="Temp" val={care.temperatura}/>
-                <CareTile icon={<Icon.Leaf/>} label="Abono" val={care.abono}/>
-                <DifTile val={care.dificultad}/>
-              </div>
-            </>
-          )}
-
-          {/* Add to Mi Selva nudge */}
-          <div style={{ margin: '14px 0 0', background: '#D8EDE3', border: '1px solid rgba(45,106,79,0.2)', borderRadius: 14, padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
+          {/* Mi Selva nudge */}
+          <div style={{ margin: '0 0 14px', background: '#D8EDE3', border: '1px solid rgba(45,106,79,0.2)', borderRadius: 14, padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
             <div className="selva-avatar" style={{ width: 36, height: 36, flexShrink: 0 }}>
               <SelvaLeaf size={18}/>
             </div>
@@ -154,19 +127,43 @@ export default function Producto({ product: productProp, onBack }) {
             <button style={{ background: 'transparent', border: '1.5px solid #1A3C2E', color: '#1A3C2E', borderRadius: 18, padding: '5px 12px', fontSize: 11, fontWeight: 600 }}>Añadir</button>
           </div>
 
+          {/* Description */}
           {product.descripcion && (
             <>
-              <div className="divider-rule" style={{ margin: '22px 0 14px' }}>la planta</div>
+              <div className="divider-rule" style={{ margin: '6px 0 14px' }}>la planta</div>
               <p style={{ fontSize: 13, color: '#4A4A4A', lineHeight: 1.65, marginBottom: 14 }}>{product.descripcion}</p>
             </>
           )}
 
-          {care?.abono && (
-            <div style={{ background: '#fff', borderRadius: 14, border: '1px solid var(--c-line)', padding: '4px 14px', marginBottom: 16 }}>
-              <SpecRow l="Abono" r={care.abono}/>
-              <SpecRow l="Entrega" r="2–3 días en Caracas" last/>
-            </div>
+          {/* Care infographic */}
+          {care && (
+            <>
+              <div className="divider-rule" style={{ margin: '6px 0 14px' }}>cuidados</div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12 }}>
+                <CareCard icon={<Icon.Sun size={24}/>} label="Luz" val={care.luz}/>
+                <CareCard icon={<Icon.Droplet size={24}/>} label="Riego" val={care.riego}/>
+                <CareCard icon={<Icon.Thermo size={24}/>} label="Temperatura" val={care.temperatura}/>
+                <CareCard icon={<Icon.Leaf size={24}/>} label="Abono" val={care.abono}/>
+              </div>
+              {difStars && (
+                <div style={{ background: '#F0FAF5', borderRadius: 12, padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <Icon.Sparkle size={18}/>
+                    <span style={{ fontSize: 11, color: '#888', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 600 }}>Dificultad</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <span style={{ fontSize: 18, color: '#B5873A', letterSpacing: 2 }}>{'★'.repeat(difStars)}{'☆'.repeat(3 - difStars)}</span>
+                    <span style={{ fontSize: 11, color: '#1A3C2E', fontWeight: 700 }}>{care.dificultad}</span>
+                  </div>
+                </div>
+              )}
+            </>
           )}
+
+          {/* Delivery row */}
+          <div style={{ background: '#fff', borderRadius: 14, border: '1px solid var(--c-line)', padding: '4px 14px', marginBottom: 16 }}>
+            <SpecRow l="Entrega" r="2–3 días en Caracas" last/>
+          </div>
 
           <div style={{ height: 80 }}/>
         </div>
