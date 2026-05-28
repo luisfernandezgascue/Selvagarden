@@ -55,10 +55,56 @@ function OrdersModal({ orders, onClose }) {
   );
 }
 
+function SyncButton() {
+  const [status, setStatus] = useState('idle'); // idle | loading | ok | error
+  const [detail, setDetail] = useState('');
+
+  async function runSync() {
+    setStatus('loading');
+    setDetail('');
+    try {
+      const res = await fetch('/api/sync-loyverse', { method: 'POST' });
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.error || 'Error desconocido');
+      const p = data.products || {};
+      const c = data.customers || {};
+      const d = data.discounts || {};
+      setDetail(`Productos: ${p.created ?? 0} creados, ${p.updated ?? 0} actualizados · Clientes: ${c.created ?? 0} creados, ${c.updated ?? 0} actualizados · Descuentos: ${d.created ?? 0} creados`);
+      setStatus('ok');
+    } catch (e) {
+      setDetail(e.message);
+      setStatus('error');
+    }
+  }
+
+  const bg = status === 'ok' ? '#2D6A4F' : status === 'error' ? '#B5873A' : '#1A3C2E';
+  const label = status === 'loading' ? 'Sincronizando…' : status === 'ok' ? '¡Sincronizado!' : status === 'error' ? 'Error — reintentar' : 'Sincronizar con Loyverse';
+
+  return (
+    <div style={{ padding: '0 14px 4px' }}>
+      <button
+        onClick={runSync}
+        disabled={status === 'loading'}
+        style={{ width: '100%', background: bg, color: '#fff', border: 'none', borderRadius: 12, padding: '12px 16px', fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, opacity: status === 'loading' ? 0.7 : 1, transition: 'background .2s' }}
+      >
+        {status === 'loading'
+          ? <div style={{ width: 16, height: 16, borderRadius: '50%', border: '2px solid rgba(255,255,255,0.4)', borderTopColor: '#fff', animation: 'spinSlow 0.8s linear infinite' }}/>
+          : <Icon.Sparkle size={16}/>
+        }
+        {label}
+      </button>
+      {detail && (
+        <p style={{ fontSize: 10, color: status === 'error' ? '#B5873A' : '#2D6A4F', marginTop: 6, lineHeight: 1.5 }}>{detail}</p>
+      )}
+    </div>
+  );
+}
+
 export default function Yo({ onTab }) {
   const { customer } = useCustomer();
   const [orders, setOrders] = useState([]);
   const [ordersOpen, setOrdersOpen] = useState(false);
+  const isAdmin = customer?.es_admin === true;
 
   const nombre = customer?.nombre || 'Mi perfil';
   const nivel = customer?.nivel_lealtad || 'sin_nivel';
@@ -155,6 +201,13 @@ export default function Yo({ onTab }) {
           <MenuRow icon={<Icon.Bell/>} text="Notificaciones"/>
           <MenuRow icon={<Icon.Settings/>} text="Ajustes y privacidad"/>
         </div>
+
+        {isAdmin && (
+          <>
+            <SectionHeader title="Administración"/>
+            <SyncButton/>
+          </>
+        )}
 
         <div style={{ padding: '22px 18px 24px', textAlign: 'center' }}>
           <button onClick={signOut} style={{ background: 'none', border: 'none', color: '#B5873A', fontSize: 12, fontWeight: 600 }}>Cerrar sesión</button>
