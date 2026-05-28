@@ -70,10 +70,26 @@ function SyncButton() {
       const p = data.products || {};
       const c = data.customers || {};
       const d = data.discounts || {};
-      const pTotal = (p.created ?? 0) + (p.updated ?? 0);
-      const cTotal = (c.created ?? 0) + (c.updated ?? 0);
+
+      const pTotal   = (p.created ?? 0) + (p.updated ?? 0);
+      const cTotal   = (c.created ?? 0) + (c.updated ?? 0);
       const dCreated = d.created ?? 0;
-      setDetail(`✅ Sincronización completada\n${pTotal} productos → Square\n${cTotal} clientes → Square\n${dCreated} descuentos creados`);
+      const pErr     = p.errors?.length ?? 0;
+      const cErr     = c.errors?.length ?? 0;
+
+      const lines = [
+        '✅ Sincronización completada',
+        p.error  ? `⚠️ Productos: ${p.error}`
+                 : `${pTotal} productos → Square${pErr > 0 ? ` (${pErr} errores)` : ''}`,
+        c.error  ? `⚠️ Clientes: ${c.error}`
+                 : `${cTotal} clientes → Square${cErr > 0 ? ` (${cErr} errores)` : ''}`,
+        d.error  ? `⚠️ Descuentos: ${d.error}`
+                 : `${dCreated} descuentos creados`,
+      ];
+      // Surface first per-product error if any
+      if (pErr > 0 && p.errors[0]) lines.push(`↳ ${p.errors[0].sku}: ${p.errors[0].error}`);
+
+      setDetail(lines.join('\n'));
       setStatus('ok');
     } catch (e) {
       setDetail(e.message);

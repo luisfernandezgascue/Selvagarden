@@ -104,34 +104,53 @@ async function syncCustomers(supabase) {
 
 // ── 2. Sync products ───────────────────────────────────────────────────────────
 async function syncProducts(supabase) {
+  console.log('[sync-pos] Starting product sync');
+  console.log('[sync-pos] SUPABASE_SERVICE_KEY present:', !!process.env.SUPABASE_SERVICE_KEY);
+  console.log('[sync-pos] SQUARE_ACCESS_TOKEN present:', !!process.env.SQUARE_ACCESS_TOKEN);
+
   const { data: products, error } = await supabase
     .from('products').select('*').eq('sync_pos', true).eq('activo', true);
+
+  console.log('[sync-pos] Supabase query result — count:', products?.length ?? 'null', '| error:', error?.message ?? 'none');
   if (error) throw new Error(`Supabase fetchProducts: ${error.message}`);
+  if (!products?.length) {
+    console.log('[sync-pos] No products found with sync_pos=true and activo=true');
+    return { total: 0, created: 0, updated: 0, errors: [] };
+  }
+
+  console.log('[sync-pos] First product sample:', JSON.stringify({
+    id: products[0].id, sku: products[0].sku, nombre: products[0].nombre,
+    sync_pos: products[0].sync_pos, activo: products[0].activo,
+    precio_venta: products[0].precio_venta, bc_item_id: products[0].bc_item_id,
+  }));
 
   const results = { created: 0, updated: 0, errors: [] };
 
-  for (const p of products || []) {
+  for (const p of products) {
     const displayName = [p.nombre, p.color, p.talla].filter(Boolean).join(' ');
     const amountCents = Math.round((p.precio_venta || 0) * 100);
+    // Use product UUID as fallback if SKU is missing to avoid ID collisions
+    const safeKey = (p.sku || p.id).replace(/[^a-zA-Z0-9_-]/g, '_');
 
     try {
-      let itemId = `#item_${p.sku}`;
-      let varId  = `#var_${p.sku}`;
+      let itemId = `#item_${safeKey}`;
+      let varId  = `#var_${safeKey}`;
 
       if (p.bc_item_id) {
-        // Fetch existing item to retrieve the real variation ID for update
+        // Fetch existing item to retrieve real variation ID for update
         const existing = await sq('GET', `/catalog/object/${p.bc_item_id}?include_related_objects=false`);
         itemId = p.bc_item_id;
         varId  = existing.object?.item_data?.variations?.[0]?.id || varId;
+        console.log('[sync-pos] Updating existing item:', p.sku, '→', itemId);
       }
 
-      const result = await sq('POST', '/catalog/object', {
-        idempotency_key: idemKey('catalog', p.sku, String(amountCents)),
+      const payload = {
+        idempotency_key: idemKey('catalog', safeKey, String(amountCents)),
         object: {
           type: 'ITEM',
           id: itemId,
           item_data: {
-            name: displayName,
+            name: displayName || 'Producto',
             ...(p.descripcion ? { description: p.descripcion } : {}),
             variations: [{
               type: 'ITEM_VARIATION',
@@ -145,7 +164,15 @@ async function syncProducts(supabase) {
             }],
           },
         },
-      });
+      };
+
+      console.log('[sync-pos] Upserting SKU:', p.sku, '| name:', displayName, '| cents:', amountCents);
+      const result = await sq('POST', '/catalog/object', payload);
+      console.log('[sync-pos] Square response for', p.sku, ':', JSON.stringify({
+        id: result.catalog_object?.id,
+        type: result.catalog_object?.type,
+        id_mappings: result.id_mappings,
+      }));
 
       const newId = result.catalog_object?.id;
       if (!p.bc_item_id && newId) {
@@ -155,11 +182,13 @@ async function syncProducts(supabase) {
         results.updated++;
       }
     } catch (err) {
+      console.error('[sync-pos] Error on SKU', p.sku, ':', err.message);
       results.errors.push({ sku: p.sku, error: err.message });
     }
   }
 
-  return { total: products?.length || 0, ...results };
+  console.log('[sync-pos] Product sync done — created:', results.created, '| updated:', results.updated, '| errors:', results.errors.length);
+  return { total: products.length, ...results };
 }
 
 // ── 3. Sync discounts ─────────────────────────────────────────────────────────
