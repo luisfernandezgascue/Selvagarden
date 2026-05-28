@@ -108,19 +108,7 @@ function AppInner() {
     if (tab === 'me')    content = <Yo onTab={goTab}/>;
   }
 
-  return (
-    <div className="app-shell">
-      {content}
-      {view === 'main' && isAdmin(customer) && (
-        <button
-          onClick={() => setView('calc')}
-          style={{ position: 'fixed', bottom: 78, right: 16, background: '#1A3C2E', color: '#fff', border: 'none', borderRadius: 'var(--r-pill)', padding: '9px 15px 9px 12px', fontSize: 12, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 7, boxShadow: '0 4px 18px rgba(26,60,46,0.4)', zIndex: 50, cursor: 'pointer' }}
-        >
-          🌸 Calculadora
-        </button>
-      )}
-    </div>
-  );
+  return <div className="app-shell">{content}</div>;
 }
 
 export default function App() {

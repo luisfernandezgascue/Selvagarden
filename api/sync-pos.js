@@ -3,7 +3,7 @@ import crypto from 'crypto';
 
 export const config = { maxDuration: 60 };
 
-const SQUARE_BASE = 'https://connect.squareup.com/v2';
+const SQUARE_BASE = 'https://connect.squareupsandbox.com/v2';
 const SQUARE_VERSION = '2024-06-04';
 const SUPABASE_URL = process.env.SUPABASE_URL || 'https://vmqhxyclcrofiphdriub.supabase.co';
 

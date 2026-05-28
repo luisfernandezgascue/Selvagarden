@@ -70,7 +70,10 @@ function SyncButton() {
       const p = data.products || {};
       const c = data.customers || {};
       const d = data.discounts || {};
-      setDetail(`Productos: ${p.created ?? 0} creados, ${p.updated ?? 0} actualizados · Clientes: ${c.created ?? 0} creados, ${c.updated ?? 0} actualizados · Descuentos: ${d.created ?? 0} creados`);
+      const pTotal = (p.created ?? 0) + (p.updated ?? 0);
+      const cTotal = (c.created ?? 0) + (c.updated ?? 0);
+      const dCreated = d.created ?? 0;
+      setDetail(`✅ Sincronización completada\n${pTotal} productos → Square\n${cTotal} clientes → Square\n${dCreated} descuentos creados`);
       setStatus('ok');
     } catch (e) {
       setDetail(e.message);
@@ -95,7 +98,7 @@ function SyncButton() {
         {label}
       </button>
       {detail && (
-        <p style={{ fontSize: 10, color: status === 'error' ? '#B5873A' : '#2D6A4F', marginTop: 6, lineHeight: 1.5 }}>{detail}</p>
+        <pre style={{ fontSize: 10, color: status === 'error' ? '#B5873A' : '#2D6A4F', marginTop: 6, lineHeight: 1.7, whiteSpace: 'pre-wrap', fontFamily: 'var(--font-sans)' }}>{detail}</pre>
       )}
     </div>
   );
