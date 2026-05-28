@@ -102,7 +102,7 @@ async function syncCustomers(supabase) {
   return { total: customers?.length || 0, ...results };
 }
 
-// ── 2. Sync products ───────────────────────────────────────────────────────────
+// ── 2. Sync products via batch-upsert ─────────────────────────────────────────
 async function syncProducts(supabase) {
   console.log('[sync-pos] Starting product sync');
   console.log('[sync-pos] SUPABASE_SERVICE_KEY present:', !!process.env.SUPABASE_SERVICE_KEY);
@@ -111,84 +111,88 @@ async function syncProducts(supabase) {
   const { data: products, error } = await supabase
     .from('products').select('*').eq('sync_pos', true).eq('activo', true);
 
-  console.log('[sync-pos] Supabase query result — count:', products?.length ?? 'null', '| error:', error?.message ?? 'none');
+  console.log('[sync-pos] Supabase — count:', products?.length ?? 'null', '| error:', error?.message ?? 'none');
   if (error) throw new Error(`Supabase fetchProducts: ${error.message}`);
   if (!products?.length) {
-    console.log('[sync-pos] No products found with sync_pos=true and activo=true');
-    return { total: 0, created: 0, updated: 0, errors: [] };
+    console.log('[sync-pos] No products with sync_pos=true and activo=true');
+    return { total: 0, created: 0, errors: [] };
   }
 
-  console.log('[sync-pos] First product sample:', JSON.stringify({
+  console.log('[sync-pos] First product:', JSON.stringify({
     id: products[0].id, sku: products[0].sku, nombre: products[0].nombre,
-    sync_pos: products[0].sync_pos, activo: products[0].activo,
+    color: products[0].color, talla: products[0].talla,
     precio_venta: products[0].precio_venta, bc_item_id: products[0].bc_item_id,
   }));
 
-  const results = { created: 0, updated: 0, errors: [] };
-
-  for (const p of products) {
-    const displayName = [p.nombre, p.color, p.talla].filter(Boolean).join(' ');
+  // Build Square catalog objects — one ITEM per product with one ITEM_VARIATION
+  const objects = products.map(p => {
+    const safeId = (p.sku || p.id).replace(/-/g, '_');
+    const name = [p.nombre, p.color !== '00' ? p.color : '', p.talla]
+      .filter(Boolean).join(' ').trim() || 'Producto';
     const amountCents = Math.round((p.precio_venta || 0) * 100);
-    // Use product UUID as fallback if SKU is missing to avoid ID collisions
-    const safeKey = (p.sku || p.id).replace(/[^a-zA-Z0-9_-]/g, '_');
 
-    try {
-      let itemId = `#item_${safeKey}`;
-      let varId  = `#var_${safeKey}`;
-
-      if (p.bc_item_id) {
-        // Fetch existing item to retrieve real variation ID for update
-        const existing = await sq('GET', `/catalog/object/${p.bc_item_id}?include_related_objects=false`);
-        itemId = p.bc_item_id;
-        varId  = existing.object?.item_data?.variations?.[0]?.id || varId;
-        console.log('[sync-pos] Updating existing item:', p.sku, '→', itemId);
-      }
-
-      const payload = {
-        idempotency_key: idemKey('catalog', safeKey, String(amountCents)),
-        object: {
-          type: 'ITEM',
-          id: itemId,
-          item_data: {
-            name: displayName || 'Producto',
-            ...(p.descripcion ? { description: p.descripcion } : {}),
-            variations: [{
-              type: 'ITEM_VARIATION',
-              id: varId,
-              item_variation_data: {
-                name: p.talla || 'Estándar',
-                pricing_type: 'FIXED_PRICING',
-                price_money: { amount: amountCents, currency: 'USD' },
-                ...(p.sku ? { sku: p.sku } : {}),
-              },
-            }],
+    return {
+      type: 'ITEM',
+      id: p.bc_item_id || `#item_${safeId}`,
+      item_data: {
+        name,
+        description: p.descripcion || '',
+        variations: [{
+          type: 'ITEM_VARIATION',
+          id: `#var_${safeId}`,
+          item_variation_data: {
+            item_id: p.bc_item_id || `#item_${safeId}`,
+            name: p.talla || 'Regular',
+            pricing_type: 'FIXED_PRICING',
+            price_money: { amount: amountCents, currency: 'USD' },
+            sku: p.sku || undefined,
           },
-        },
-      };
+        }],
+      },
+    };
+  });
 
-      console.log('[sync-pos] Upserting SKU:', p.sku, '| name:', displayName, '| cents:', amountCents);
-      const result = await sq('POST', '/catalog/object', payload);
-      console.log('[sync-pos] Square response for', p.sku, ':', JSON.stringify({
-        id: result.catalog_object?.id,
-        type: result.catalog_object?.type,
-        id_mappings: result.id_mappings,
-      }));
+  console.log('[sync-pos] Sending batch-upsert with', objects.length, 'objects');
 
-      const newId = result.catalog_object?.id;
-      if (!p.bc_item_id && newId) {
-        await supabase.from('products').update({ bc_item_id: newId }).eq('id', p.id);
-        results.created++;
-      } else {
-        results.updated++;
-      }
-    } catch (err) {
-      console.error('[sync-pos] Error on SKU', p.sku, ':', err.message);
-      results.errors.push({ sku: p.sku, error: err.message });
+  const response = await fetch(
+    `${SQUARE_BASE}/catalog/batch-upsert`,
+    {
+      method: 'POST',
+      headers: sqHeaders(),
+      body: JSON.stringify({
+        idempotency_key: crypto.randomUUID(),
+        batches: [{ objects }],
+      }),
+    }
+  );
+
+  const result = await response.json();
+  console.log('[sync-pos] Square batch result:', JSON.stringify(result).slice(0, 1000));
+
+  if (!response.ok) {
+    console.error('[sync-pos] Square batch error (full):', JSON.stringify(result));
+    const detail = (result.errors || []).map(e => `${e.code}: ${e.detail}`).join(' | ') || JSON.stringify(result);
+    throw new Error(`Square batch-upsert failed: ${detail}`);
+  }
+
+  // Map temp IDs back to real Square IDs and store in bc_item_id
+  const mappings = result.id_mappings || [];
+  console.log('[sync-pos] id_mappings count:', mappings.length);
+
+  let stored = 0;
+  for (const p of products) {
+    if (p.bc_item_id) continue; // already has a Square ID
+    const safeId = (p.sku || p.id).replace(/-/g, '_');
+    const mapping = mappings.find(m => m.client_object_id === `#item_${safeId}`);
+    if (mapping?.object_id) {
+      await supabase.from('products').update({ bc_item_id: mapping.object_id }).eq('id', p.id);
+      stored++;
     }
   }
 
-  console.log('[sync-pos] Product sync done — created:', results.created, '| updated:', results.updated, '| errors:', results.errors.length);
-  return { total: products.length, ...results };
+  const created = mappings.filter(m => m.client_object_id?.startsWith('#item_')).length;
+  console.log('[sync-pos] Done — objects in batch:', objects.length, '| IDs stored back:', stored);
+  return { total: products.length, created, errors: [] };
 }
 
 // ── 3. Sync discounts ─────────────────────────────────────────────────────────
