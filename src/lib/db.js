@@ -129,3 +129,16 @@ export async function fetchPlantCare() {
   if (error) console.error('[db] fetchPlantCare:', error.message);
   return data || [];
 }
+
+export async function fetchRelatedProducts(subfamilyId, excludeId, limit = 3) {
+  if (!supabase || !subfamilyId) return [];
+  const { data, error } = await supabase
+    .from('products')
+    .select(PRODUCT_SELECT)
+    .eq('activo', true)
+    .eq('subfamily_id', subfamilyId)
+    .neq('id', excludeId)
+    .limit(limit);
+  if (error) console.error('[db] fetchRelatedProducts:', error.message);
+  return data || [];
+}

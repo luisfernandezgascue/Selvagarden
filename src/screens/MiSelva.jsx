@@ -451,15 +451,44 @@ function CuidadosTab() {
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
-const TABS = [
-  { id: 'plantas', label: 'Mis Plantas' },
-  { id: 'diagnosticar', label: 'Diagnosticar' },
-  { id: 'inspiracion', label: 'Inspiración' },
-  { id: 'cuidados', label: 'Cuidados' },
+const SECTIONS = [
+  { id: 'plantas',      label: 'Mis Plantas',   sub: 'Tu colección personal',    emoji: '🌿', bg: '#D8EDE3' },
+  { id: 'diagnosticar', label: 'Diagnosticar',  sub: 'Analiza tu planta con IA', emoji: '📸', bg: '#F0FAF5' },
+  { id: 'inspiracion',  label: 'Inspirar Ramo', sub: 'Diseña tu ramo ideal',     emoji: '🎨', bg: '#FBF6ED' },
+  { id: 'cuidados',     label: 'Cuidados',       sub: 'Guías y videos',           emoji: '📹', bg: '#F5EDD8' },
 ];
 
 export default function MiSelva({ onTab }) {
-  const [activeTab, setActiveTab] = useState('plantas');
+  const { customer } = useCustomer();
+  const [section, setSection] = useState(null);
+
+  const nombre = customer?.nombre?.split(' ')[0] || 'viajero';
+  const active = SECTIONS.find(s => s.id === section);
+
+  if (section) {
+    return (
+      <Phone>
+        <div style={{ flexShrink: 0 }}>
+          <div style={{ padding: '8px 18px 0', display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+            <button onClick={() => setSection(null)} style={{ background: 'none', border: 'none', color: '#1A1A1A', display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 500 }}>
+              <Icon.ArrowLeft size={18}/> Mi Selva
+            </button>
+          </div>
+          <div style={{ padding: '6px 18px 12px', borderBottom: '1px solid var(--c-line-soft)', display: 'flex', alignItems: 'center', gap: 10 }}>
+            <span style={{ fontSize: 20 }}>{active?.emoji}</span>
+            <p style={{ fontSize: 11, color: '#888', letterSpacing: '0.14em', fontWeight: 600 }}>{active?.label.toUpperCase()}</p>
+          </div>
+        </div>
+        <div className="scroll">
+          {section === 'plantas'      && <MisPlantasTab/>}
+          {section === 'diagnosticar' && <DiagnosticarTab/>}
+          {section === 'inspiracion'  && <InspiracionTab/>}
+          {section === 'cuidados'     && <CuidadosTab/>}
+        </div>
+        <TabBar active="selva" onChange={onTab}/>
+      </Phone>
+    );
+  }
 
   return (
     <Phone>
@@ -469,29 +498,36 @@ export default function MiSelva({ onTab }) {
           <span style={{ fontSize: 11, color: '#888', letterSpacing: '0.14em', fontWeight: 600 }}>MI SELVA</span>
           <button style={{ background: 'none', border: 'none', color: '#1A1A1A' }}><Icon.Bell size={20}/></button>
         </div>
-        {/* Tab bar */}
-        <div style={{ display: 'flex', gap: 0, overflowX: 'auto', padding: '0 14px 0', borderBottom: '1px solid var(--c-line-soft)', scrollbarWidth: 'none' }}>
-          {TABS.map(t => (
-            <button
-              key={t.id}
-              onClick={() => setActiveTab(t.id)}
-              style={{
-                background: 'none', border: 'none', padding: '10px 12px',
-                fontSize: 12, fontWeight: activeTab === t.id ? 700 : 500,
-                color: activeTab === t.id ? '#1A1A1A' : '#888',
-                borderBottom: activeTab === t.id ? '2px solid #1A3C2E' : '2px solid transparent',
-                whiteSpace: 'nowrap', flexShrink: 0,
-              }}
-            >{t.label}</button>
-          ))}
-        </div>
       </div>
 
       <div className="scroll">
-        {activeTab === 'plantas'      && <MisPlantasTab/>}
-        {activeTab === 'diagnosticar' && <DiagnosticarTab/>}
-        {activeTab === 'inspiracion'  && <InspiracionTab/>}
-        {activeTab === 'cuidados'     && <CuidadosTab/>}
+        {/* Greeting */}
+        <div style={{ padding: '4px 18px 22px', display: 'flex', alignItems: 'center', gap: 14 }}>
+          <div className="selva-avatar breathing" style={{ width: 48, height: 48, flexShrink: 0 }}><SelvaLeaf size={24}/></div>
+          <div>
+            <p style={{ fontFamily: 'var(--font-serif)', fontSize: 21, fontWeight: 600, color: '#1A1A1A', lineHeight: 1.2 }}>Hola, {nombre}</p>
+            <p style={{ fontSize: 12, color: '#888', marginTop: 3 }}>¿Qué hacemos hoy con tu selva?</p>
+          </div>
+        </div>
+
+        {/* 2×2 grid */}
+        <div style={{ padding: '0 14px 32px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          {SECTIONS.map(s => (
+            <button
+              key={s.id}
+              onClick={() => setSection(s.id)}
+              style={{ background: '#fff', border: '1px solid var(--c-line-soft)', borderRadius: 18, padding: '18px 14px', textAlign: 'left', display: 'flex', flexDirection: 'column', gap: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}
+            >
+              <div style={{ width: 46, height: 46, borderRadius: 14, background: s.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>
+                {s.emoji}
+              </div>
+              <div>
+                <p style={{ fontSize: 13, fontWeight: 700, color: '#1A1A1A', marginBottom: 3 }}>{s.label}</p>
+                <p style={{ fontSize: 11, color: '#888', lineHeight: 1.3 }}>{s.sub}</p>
+              </div>
+            </button>
+          ))}
+        </div>
       </div>
 
       <TabBar active="selva" onChange={onTab}/>

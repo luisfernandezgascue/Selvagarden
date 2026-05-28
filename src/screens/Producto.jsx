@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Phone } from '../components';
 import { Icon, SelvaLeaf } from '../icons';
 import { useCustomer, nivelInfo } from '../context/CustomerContext';
-import { fetchProductWithCare } from '../lib/db';
+import { fetchProductWithCare, fetchRelatedProducts } from '../lib/db';
 import { supabase } from '../lib/supabase';
 
 const floatBtn = {
@@ -22,12 +22,13 @@ function SpecRow({ l, r, last }) {
   );
 }
 
-export default function Producto({ product: productProp, onBack }) {
+export default function Producto({ product: productProp, onBack, onProduct }) {
   const { addToCart, customer } = useCustomer();
   const [galleryIdx, setGalleryIdx] = useState(0);
   const [product, setProduct] = useState(productProp || null);
   const [careData, setCareData] = useState(null);
   const [added, setAdded] = useState(false);
+  const [related, setRelated] = useState([]);
 
   useEffect(() => {
     if (!productProp?.id) return;
@@ -47,6 +48,12 @@ export default function Producto({ product: productProp, onBack }) {
         console.log('Care data:', care);
         console.log('Care error:', careError);
         setCareData(care);
+      }
+
+      const subfamilyId = productProp?.subfamily?.id;
+      if (subfamilyId) {
+        const rel = await fetchRelatedProducts(subfamilyId, productProp.id, 4);
+        setRelated(rel);
       }
     }
 
@@ -177,6 +184,42 @@ export default function Producto({ product: productProp, onBack }) {
           <div style={{ background: '#fff', borderRadius: 14, border: '1px solid var(--c-line)', padding: '4px 14px', marginBottom: 16 }}>
             <SpecRow l="Entrega" r="2–3 días en Caracas" last/>
           </div>
+
+          {/* Related products */}
+          {related.length > 0 && (
+            <div style={{ marginBottom: 16 }}>
+              <p style={{ fontSize: 12, fontWeight: 700, color: '#1A3C2E', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 12 }}>
+                También te puede interesar
+              </p>
+              <div style={{ display: 'flex', gap: 10, overflowX: 'auto', scrollbarWidth: 'none', marginRight: -18 }}>
+                {related.map(p => {
+                  const relDiscount = nivelInfo(customer?.nivel_lealtad).descuento;
+                  const relPrice = (p.precio_venta || 0) * (1 - relDiscount / 100);
+                  return (
+                    <button
+                      key={p.id}
+                      onClick={() => onProduct?.(p)}
+                      style={{ flexShrink: 0, width: 130, background: '#fff', border: '1px solid var(--c-line-soft)', borderRadius: 14, overflow: 'hidden', textAlign: 'left' }}
+                    >
+                      <div style={{ height: 100, background: '#EDEBE3', overflow: 'hidden' }}>
+                        <img
+                          src={p.imagen_url || 'https://picsum.photos/seed/plant/200/200'}
+                          alt={p.nombre}
+                          onError={e => { e.target.src = 'https://picsum.photos/seed/plant/200/200'; }}
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        />
+                      </div>
+                      <div style={{ padding: '8px 10px 10px' }}>
+                        <p style={{ fontSize: 11, fontWeight: 600, color: '#1A1A1A', lineHeight: 1.3, marginBottom: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.nombre}</p>
+                        <p style={{ fontFamily: 'var(--font-serif)', fontSize: 13, fontWeight: 600, color: '#1A3C2E' }}>${relPrice.toFixed(2)}</p>
+                      </div>
+                    </button>
+                  );
+                })}
+                <div style={{ width: 4, flexShrink: 0 }}/>
+              </div>
+            </div>
+          )}
 
           <div style={{ height: 80 }}/>
         </div>

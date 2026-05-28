@@ -99,7 +99,7 @@ function AppInner() {
   else if (view === 'onboard2')      content = <OnboardSignup onBack={() => setView('onboard1')}/>;
   else if (view === 'onboard-login') content = <OnboardLogin onBack={() => setView('onboard1')}/>;
   else if (view === 'onboard3')      content = <OnboardCardReady customer={customer} onNext={() => setView('main')}/>;
-  else if (view === 'product')       content = <Producto product={selectedProduct} onBack={goBack}/>;
+  else if (view === 'product')       content = <Producto product={selectedProduct} onBack={goBack} onProduct={goProduct}/>;
   else {
     if (tab === 'home')  content = <Home  onTab={goTab} onProduct={goProduct}/>;
     if (tab === 'shop')  content = <Tienda onTab={goTab} onProduct={goProduct}/>;

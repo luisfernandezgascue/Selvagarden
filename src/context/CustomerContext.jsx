@@ -59,9 +59,9 @@ export function CustomerProvider({ children }) {
   const cartCount = cart.reduce((s, i) => s + i.quantity, 0);
   const cartTotal = cart.reduce((s, i) => s + (i.product.precio_venta || 0) * (1 - discount / 100) * i.quantity, 0);
 
-  const checkout = useCallback(async () => {
+  const checkout = useCallback(async (extraDiscountPct = 0) => {
     if (!supabase || !customer || cart.length === 0) return null;
-    const disc = nivelInfo(customer.nivel_lealtad).descuento;
+    const disc = nivelInfo(customer.nivel_lealtad).descuento + extraDiscountPct;
 
     const items = cart.map(i => ({
       product_id: i.product.id,
