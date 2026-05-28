@@ -4,6 +4,7 @@ import { Icon } from '../icons';
 import { signOut } from '../lib/auth';
 import { useCustomer, nivelInfo } from '../context/CustomerContext';
 import { fetchOrders } from '../lib/db';
+import { isAdmin as checkAdmin } from '../lib/admin';
 
 function Stat({ n, lbl, gold }) {
   return (
@@ -104,7 +105,7 @@ export default function Yo({ onTab }) {
   const { customer } = useCustomer();
   const [orders, setOrders] = useState([]);
   const [ordersOpen, setOrdersOpen] = useState(false);
-  const isAdmin = customer?.es_admin === true;
+  const isAdmin = checkAdmin(customer);
 
   const nombre = customer?.nombre || 'Mi perfil';
   const nivel = customer?.nivel_lealtad || 'sin_nivel';

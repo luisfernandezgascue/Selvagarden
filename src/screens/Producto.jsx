@@ -22,37 +22,35 @@ function SpecRow({ l, r, last }) {
   );
 }
 
-const DIF_MAP = {
-  facil: { stars: '⭐', label: 'Fácil' },
-  fácil: { stars: '⭐', label: 'Fácil' },
-  media: { stars: '⭐⭐', label: 'Nivel medio' },
-  medio: { stars: '⭐⭐', label: 'Nivel medio' },
-  experto: { stars: '⭐⭐⭐', label: 'Para expertos' },
-};
-
 export default function Producto({ product: productProp, onBack }) {
   const { addToCart, customer } = useCustomer();
   const [galleryIdx, setGalleryIdx] = useState(0);
   const [product, setProduct] = useState(productProp || null);
-  const [care, setCare] = useState(null);
+  const [careData, setCareData] = useState(null);
   const [added, setAdded] = useState(false);
 
   useEffect(() => {
     if (!productProp?.id) return;
 
-    fetchProductWithCare(productProp.id).then(data => { if (data) setProduct(data); });
+    async function load() {
+      console.log('Product ID:', productProp?.id);
 
-    if (supabase) {
-      supabase
-        .from('plant_care')
-        .select('*')
-        .eq('product_id', productProp.id)
-        .single()
-        .then(({ data: careData, error }) => {
-          console.log('[Producto] plant_care result:', careData, 'error:', error);
-          if (careData) setCare(careData);
-        });
+      const data = await fetchProductWithCare(productProp.id);
+      if (data) setProduct(data);
+
+      if (supabase) {
+        const { data: care, error: careError } = await supabase
+          .from('plant_care')
+          .select('*')
+          .eq('product_id', productProp.id)
+          .maybeSingle();
+        console.log('Care data:', care);
+        console.log('Care error:', careError);
+        setCareData(care);
+      }
     }
+
+    load();
   }, [productProp?.id]);
 
   const discount = nivelInfo(customer?.nivel_lealtad).descuento;
@@ -74,7 +72,6 @@ export default function Producto({ product: productProp, onBack }) {
   const finalPrice = (product.precio_venta || 0) * (1 - discount / 100);
   const subfamily = product.subfamily?.nombre || '';
   const fullName = [product.nombre, product.color, product.talla].filter(Boolean).join(' ');
-  const dif = care?.dificultad ? DIF_MAP[(care.dificultad || '').toLowerCase()] : null;
 
   function handleAddToCart() {
     addToCart(product);
@@ -144,33 +141,36 @@ export default function Producto({ product: productProp, onBack }) {
           )}
 
           {/* Care infographic */}
-          {care && (
-            <>
-              <div className="divider-rule" style={{ margin: '6px 0 14px' }}>cuidados</div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, margin: '0 0 10px' }}>
+          {careData && (
+            <div style={{ margin: '16px 0' }}>
+              <h4 style={{ fontSize: 13, fontWeight: 700, color: '#1A3C2E', marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                Cuidados
+              </h4>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
                 {[
-                  { emoji: '☀️', label: 'Luz', val: care.luz },
-                  { emoji: '💧', label: 'Riego', val: care.riego },
-                  { emoji: '🌡️', label: 'Temperatura', val: care.temperatura },
-                  { emoji: '🌱', label: 'Abono', val: care.abono },
-                ].map(({ emoji, label, val }) => val ? (
-                  <div key={label} style={{ background: '#F0FAF5', borderRadius: 12, padding: 12, textAlign: 'center' }}>
-                    <div style={{ fontSize: 24 }}>{emoji}</div>
-                    <div style={{ fontSize: 10, color: '#888', textTransform: 'uppercase', marginTop: 4, letterSpacing: '0.06em', fontWeight: 600 }}>{label}</div>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: '#1A3C2E', marginTop: 3, lineHeight: 1.3 }}>{val}</div>
+                  { icon: '☀️', label: 'Luz',         value: careData.luz },
+                  { icon: '💧', label: 'Riego',       value: careData.riego },
+                  { icon: '🌡️', label: 'Temperatura', value: careData.temperatura },
+                  { icon: '🌱', label: 'Abono',       value: careData.abono },
+                ].map(item => item.value ? (
+                  <div key={item.label} style={{ background: '#F0FAF5', borderRadius: 12, padding: '10px 8px', textAlign: 'center' }}>
+                    <div style={{ fontSize: 22 }}>{item.icon}</div>
+                    <div style={{ fontSize: 9, color: '#888', textTransform: 'uppercase', margin: '3px 0 2px', letterSpacing: '0.06em' }}>{item.label}</div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: '#1A3C2E' }}>{item.value}</div>
                   </div>
                 ) : null)}
               </div>
-              {dif && (
-                <div style={{ background: '#F0FAF5', borderRadius: 12, padding: '11px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-                  <span style={{ fontSize: 11, color: '#888', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600 }}>Dificultad</span>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span style={{ fontSize: 16 }}>{dif.stars}</span>
-                    <span style={{ fontSize: 12, color: '#1A3C2E', fontWeight: 700 }}>{dif.label}</span>
-                  </div>
+              {careData.dificultad && (
+                <div style={{ marginTop: 8, textAlign: 'center', fontSize: 12, color: '#2D6A4F' }}>
+                  {careData.dificultad === 'Facil'   && '⭐ Fácil'}
+                  {careData.dificultad === 'Media'   && '⭐⭐ Nivel medio'}
+                  {careData.dificultad === 'Experto' && '⭐⭐⭐ Para expertos'}
+                  {careData.dificultad === 'facil'   && '⭐ Fácil'}
+                  {careData.dificultad === 'media'   && '⭐⭐ Nivel medio'}
+                  {careData.dificultad === 'experto' && '⭐⭐⭐ Para expertos'}
                 </div>
               )}
-            </>
+            </div>
           )}
 
           {/* Delivery */}
