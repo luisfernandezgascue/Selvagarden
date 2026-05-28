@@ -5,13 +5,7 @@ export const config = { maxDuration: 60 };
 
 const SQUARE_BASE = 'https://connect.squareupsandbox.com/v2';
 const SQUARE_VERSION = '2024-06-04';
-const SUPABASE_URL = process.env.SUPABASE_URL || 'https://vmqhxyclcrofiphdriub.supabase.co';
 
-function db() {
-  const key = process.env.SUPABASE_SERVICE_KEY;
-  if (!key) throw new Error('SUPABASE_SERVICE_KEY not configured');
-  return createClient(SUPABASE_URL, key);
-}
 
 function sqHeaders() {
   return {
@@ -229,12 +223,27 @@ async function syncDiscounts() {
 // ── Handler ───────────────────────────────────────────────────────────────────
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-  if (!process.env.SQUARE_ACCESS_TOKEN) return res.status(500).json({ error: 'SQUARE_ACCESS_TOKEN not configured' });
+
+  // Log env check first — if these are false the rest won't work
+  console.log('ENV check:', {
+    hasSupabaseUrl:    !!process.env.SUPABASE_URL,
+    hasServiceKey:     !!process.env.SUPABASE_SERVICE_KEY,
+    hasSquareToken:    !!process.env.SQUARE_ACCESS_TOKEN,
+    hasLocationId:     !!process.env.SQUARE_LOCATION_ID,
+    supabaseUrl:       process.env.SUPABASE_URL || '(not set)',
+  });
+
+  if (!process.env.SQUARE_ACCESS_TOKEN)  return res.status(500).json({ error: 'SQUARE_ACCESS_TOKEN not configured' });
   if (!process.env.SUPABASE_SERVICE_KEY) return res.status(500).json({ error: 'SUPABASE_SERVICE_KEY not configured' });
 
-  try {
-    const supabase = db();
+  // Explicit server-side Supabase client — uses SUPABASE_URL + SUPABASE_SERVICE_KEY,
+  // NOT VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY (those are client-side only)
+  const supabase = createClient(
+    process.env.SUPABASE_URL || 'https://vmqhxyclcrofiphdriub.supabase.co',
+    process.env.SUPABASE_SERVICE_KEY,
+  );
 
+  try {
     const [productResults, customerResults, discountResults] = await Promise.allSettled([
       syncProducts(supabase),
       syncCustomers(supabase),
