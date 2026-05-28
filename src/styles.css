@@ -26,7 +26,7 @@
 html, body, #root {
   min-height: 100%;
   min-height: 100dvh;
-  background-color: #1A3C2E;
+  background-color: #F4F6F1;
 }
 body { font-family: var(--font-sans); color: var(--c-black); }
 button { font-family: inherit; cursor: pointer; }
@@ -46,7 +46,7 @@ a { text-decoration: none; }
   flex-direction: column;
   position: relative;
   background: var(--c-bg);
-  background-color: #1A3C2E; /* fills safe-area gutters on iPhone */
+  background-color: #F4F6F1;
   overflow: hidden;
   font-family: var(--font-sans);
   padding-top: env(safe-area-inset-top);
