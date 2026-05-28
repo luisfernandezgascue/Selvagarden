@@ -64,7 +64,7 @@ function SyncButton() {
     setStatus('loading');
     setDetail('');
     try {
-      const res = await fetch('/api/sync-loyverse', { method: 'POST' });
+      const res = await fetch('/api/sync-pos', { method: 'POST' });
       const data = await res.json();
       if (!data.ok) throw new Error(data.error || 'Error desconocido');
       const p = data.products || {};
@@ -79,7 +79,7 @@ function SyncButton() {
   }
 
   const bg = status === 'ok' ? '#2D6A4F' : status === 'error' ? '#B5873A' : '#1A3C2E';
-  const label = status === 'loading' ? 'Sincronizando…' : status === 'ok' ? '¡Sincronizado!' : status === 'error' ? 'Error — reintentar' : 'Sincronizar con Loyverse';
+  const label = status === 'loading' ? 'Sincronizando…' : status === 'ok' ? '¡Sincronizado!' : status === 'error' ? 'Error — reintentar' : 'Sincronizar con Square';
 
   return (
     <div style={{ padding: '0 14px 4px' }}>
