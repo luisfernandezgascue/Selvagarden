@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { Phone } from '../components';
 import { Icon, SelvaLeaf } from '../icons';
 import { useCustomer, nivelInfo } from '../context/CustomerContext';
-import { fetchProductWithCare, fetchPlantCareForProduct } from '../lib/db';
+import { fetchProductWithCare } from '../lib/db';
+import { supabase } from '../lib/supabase';
 
 const floatBtn = {
   width: 38, height: 38, borderRadius: '50%',
@@ -11,19 +12,6 @@ const floatBtn = {
   display: 'flex', alignItems: 'center', justifyContent: 'center',
   boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
 };
-
-function CareCard({ icon, label, val }) {
-  if (!val) return null;
-  return (
-    <div style={{ background: '#F0FAF5', borderRadius: 12, padding: '14px 12px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, textAlign: 'center' }}>
-      <div style={{ color: '#2D6A4F' }}>{icon}</div>
-      <p style={{ fontSize: 9, color: '#888', letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 600 }}>{label}</p>
-      <p style={{ fontSize: 12, color: '#1A3C2E', fontWeight: 700, lineHeight: 1.3 }}>{val}</p>
-    </div>
-  );
-}
-
-const DIF_STARS = { facil: 1, fácil: 1, media: 2, medio: 2, experto: 3 };
 
 function SpecRow({ l, r, last }) {
   return (
@@ -34,6 +22,14 @@ function SpecRow({ l, r, last }) {
   );
 }
 
+const DIF_MAP = {
+  facil: { stars: '⭐', label: 'Fácil' },
+  fácil: { stars: '⭐', label: 'Fácil' },
+  media: { stars: '⭐⭐', label: 'Nivel medio' },
+  medio: { stars: '⭐⭐', label: 'Nivel medio' },
+  experto: { stars: '⭐⭐⭐', label: 'Para expertos' },
+};
+
 export default function Producto({ product: productProp, onBack }) {
   const { addToCart, customer } = useCustomer();
   const [galleryIdx, setGalleryIdx] = useState(0);
@@ -43,8 +39,20 @@ export default function Producto({ product: productProp, onBack }) {
 
   useEffect(() => {
     if (!productProp?.id) return;
+
     fetchProductWithCare(productProp.id).then(data => { if (data) setProduct(data); });
-    fetchPlantCareForProduct(productProp.id).then(data => { if (data) setCare(data); });
+
+    if (supabase) {
+      supabase
+        .from('plant_care')
+        .select('*')
+        .eq('product_id', productProp.id)
+        .single()
+        .then(({ data: careData, error }) => {
+          console.log('[Producto] plant_care result:', careData, 'error:', error);
+          if (careData) setCare(careData);
+        });
+    }
   }, [productProp?.id]);
 
   const discount = nivelInfo(customer?.nivel_lealtad).descuento;
@@ -66,7 +74,7 @@ export default function Producto({ product: productProp, onBack }) {
   const finalPrice = (product.precio_venta || 0) * (1 - discount / 100);
   const subfamily = product.subfamily?.nombre || '';
   const fullName = [product.nombre, product.color, product.talla].filter(Boolean).join(' ');
-  const difStars = care?.dificultad ? (DIF_STARS[(care.dificultad || '').toLowerCase()] || 1) : null;
+  const dif = care?.dificultad ? DIF_MAP[(care.dificultad || '').toLowerCase()] : null;
 
   function handleAddToCart() {
     addToCart(product);
@@ -139,28 +147,33 @@ export default function Producto({ product: productProp, onBack }) {
           {care && (
             <>
               <div className="divider-rule" style={{ margin: '6px 0 14px' }}>cuidados</div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12 }}>
-                <CareCard icon={<Icon.Sun size={24}/>} label="Luz" val={care.luz}/>
-                <CareCard icon={<Icon.Droplet size={24}/>} label="Riego" val={care.riego}/>
-                <CareCard icon={<Icon.Thermo size={24}/>} label="Temperatura" val={care.temperatura}/>
-                <CareCard icon={<Icon.Leaf size={24}/>} label="Abono" val={care.abono}/>
-              </div>
-              {difStars && (
-                <div style={{ background: '#F0FAF5', borderRadius: 12, padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <Icon.Sparkle size={18}/>
-                    <span style={{ fontSize: 11, color: '#888', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 600 }}>Dificultad</span>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, margin: '0 0 10px' }}>
+                {[
+                  { emoji: '☀️', label: 'Luz', val: care.luz },
+                  { emoji: '💧', label: 'Riego', val: care.riego },
+                  { emoji: '🌡️', label: 'Temperatura', val: care.temperatura },
+                  { emoji: '🌱', label: 'Abono', val: care.abono },
+                ].map(({ emoji, label, val }) => val ? (
+                  <div key={label} style={{ background: '#F0FAF5', borderRadius: 12, padding: 12, textAlign: 'center' }}>
+                    <div style={{ fontSize: 24 }}>{emoji}</div>
+                    <div style={{ fontSize: 10, color: '#888', textTransform: 'uppercase', marginTop: 4, letterSpacing: '0.06em', fontWeight: 600 }}>{label}</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: '#1A3C2E', marginTop: 3, lineHeight: 1.3 }}>{val}</div>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span style={{ fontSize: 18, color: '#B5873A', letterSpacing: 2 }}>{'★'.repeat(difStars)}{'☆'.repeat(3 - difStars)}</span>
-                    <span style={{ fontSize: 11, color: '#1A3C2E', fontWeight: 700 }}>{care.dificultad}</span>
+                ) : null)}
+              </div>
+              {dif && (
+                <div style={{ background: '#F0FAF5', borderRadius: 12, padding: '11px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+                  <span style={{ fontSize: 11, color: '#888', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600 }}>Dificultad</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ fontSize: 16 }}>{dif.stars}</span>
+                    <span style={{ fontSize: 12, color: '#1A3C2E', fontWeight: 700 }}>{dif.label}</span>
                   </div>
                 </div>
               )}
             </>
           )}
 
-          {/* Delivery row */}
+          {/* Delivery */}
           <div style={{ background: '#fff', borderRadius: 14, border: '1px solid var(--c-line)', padding: '4px 14px', marginBottom: 16 }}>
             <SpecRow l="Entrega" r="2–3 días en Caracas" last/>
           </div>
