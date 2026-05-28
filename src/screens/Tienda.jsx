@@ -6,11 +6,15 @@ import { useCustomer } from '../context/CustomerContext';
 
 const FALLBACK_IMG = 'https://picsum.photos/seed/plant/400/400';
 
-const CATEGORY_ORDER = ['flores', 'plantas', 'materos', 'jardin', 'arreglos', 'otros'];
+const CATEGORY_ORDER = ['flores', 'plantas', 'arreglos', 'materos', 'jardin', 'otros'];
 const CATEGORY_LABELS = {
-  flores: 'Flores', plantas: 'Plantas', materos: 'Materos',
-  jardin: 'Jardin', arreglos: 'Arreglos', otros: 'Otros',
+  flores: 'Flores', plantas: 'Plantas', arreglos: 'Arreglos',
+  materos: 'Materos', jardin: 'Jardin', otros: 'Otros',
 };
+
+function displayName(p) {
+  return [p.nombre, p.color, p.talla].filter(Boolean).join(' ');
+}
 
 function ProductCardLarge({ product, discount, onProduct, onAddToCart }) {
   const finalPrice = (product.precio_venta || 0) * (1 - discount / 100);
@@ -34,7 +38,7 @@ function ProductCardLarge({ product, discount, onProduct, onAddToCart }) {
       </div>
       <div style={{ padding: '10px 11px 12px' }}>
         {subfamilyName && <p style={{ fontFamily: 'var(--font-serif)', fontStyle: 'italic', fontSize: 10, color: '#888', marginBottom: 2 }}>{subfamilyName}</p>}
-        <p onClick={() => onProduct(product)} style={{ fontSize: 12, color: '#1A1A1A', fontWeight: 600, lineHeight: 1.3, marginBottom: 8, height: 30, overflow: 'hidden' }}>{product.nombre}</p>
+        <p onClick={() => onProduct(product)} style={{ fontSize: 12, color: '#1A1A1A', fontWeight: 600, lineHeight: 1.3, marginBottom: 8, height: 30, overflow: 'hidden' }}>{displayName(product)}</p>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}>
             <span style={{ fontFamily: 'var(--font-serif)', fontSize: 17, fontWeight: 600, color: '#1A3C2E' }}>${finalPrice.toFixed(2)}</span>

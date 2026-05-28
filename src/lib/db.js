@@ -1,20 +1,58 @@
 import { supabase } from './supabase';
 
+const PRODUCT_SELECT = `
+  *,
+  subfamily:product_subfamilies(
+    id, nombre, slug, codigo, orden,
+    family:product_families(id, nombre, slug, codigo, orden)
+  )
+`;
+
+function sortProducts(products) {
+  return (products || []).sort((a, b) => {
+    const fo = p => p?.subfamily?.family?.orden ?? 99;
+    const so = p => p?.subfamily?.orden ?? 99;
+    if (fo(a) !== fo(b)) return fo(a) - fo(b);
+    if (so(a) !== so(b)) return so(a) - so(b);
+    return (a.nombre || '').localeCompare(b.nombre || '', 'es');
+  });
+}
+
 export async function fetchProducts() {
   if (!supabase) return [];
   const { data, error } = await supabase
     .from('products')
-    .select(`
-      *,
-      subfamily:product_subfamilies(
-        id, nombre, slug,
-        family:product_families(id, nombre, slug)
-      )
-    `)
-    .eq('activo', true)
-    .order('nombre');
+    .select(PRODUCT_SELECT)
+    .eq('activo', true);
   if (error) console.error('[db] fetchProducts:', error.message);
-  return data || [];
+  return sortProducts(data);
+}
+
+export async function fetchFeaturedProduct() {
+  if (!supabase) return null;
+  const { data: feat } = await supabase
+    .from('products')
+    .select(PRODUCT_SELECT)
+    .eq('activo', true)
+    .eq('featured', true)
+    .limit(1)
+    .maybeSingle();
+  if (feat) return feat;
+  const { data: mons } = await supabase
+    .from('products')
+    .select(PRODUCT_SELECT)
+    .eq('activo', true)
+    .ilike('nombre', '%monstera%')
+    .limit(1)
+    .maybeSingle();
+  if (mons) return mons;
+  const { data: first } = await supabase
+    .from('products')
+    .select(PRODUCT_SELECT)
+    .eq('activo', true)
+    .limit(1)
+    .maybeSingle();
+  return first || null;
 }
 
 export async function fetchProductWithCare(productId) {
@@ -25,8 +63,8 @@ export async function fetchProductWithCare(productId) {
       *,
       plant_care(*),
       subfamily:product_subfamilies(
-        nombre, slug,
-        family:product_families(nombre, slug)
+        nombre, slug, codigo,
+        family:product_families(nombre, slug, codigo)
       )
     `)
     .eq('id', productId)

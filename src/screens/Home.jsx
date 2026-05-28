@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Phone, TabBar, SectionHeader, iconBtn } from '../components';
 import { Icon, SelvaLeaf } from '../icons';
 import { useCustomer, nivelInfo, levelProgress } from '../context/CustomerContext';
-import { fetchEvents } from '../lib/db';
+import { fetchEvents, fetchFeaturedProduct } from '../lib/db';
 
 const NOTIF_SEEN_KEY = 'selva_notif_seen';
 
@@ -124,6 +124,7 @@ function EventModal({ event, onClose }) {
 export default function Home({ onTab, onProduct }) {
   const { customer } = useCustomer();
   const [events, setEvents] = useState([]);
+  const [hero, setHero] = useState(null);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [videoOpen, setVideoOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
@@ -136,7 +137,10 @@ export default function Home({ onTab, onProduct }) {
   const info = nivelInfo(nivel);
   const prog = levelProgress(consumo);
 
-  useEffect(() => { fetchEvents().then(setEvents); }, []);
+  useEffect(() => {
+    fetchEvents().then(setEvents);
+    fetchFeaturedProduct().then(setHero);
+  }, []);
 
   function openNotif() {
     setNotifOpen(true);
@@ -219,22 +223,29 @@ export default function Home({ onTab, onProduct }) {
         </div>
 
         {/* Hero */}
-        <div style={{ margin: '18px 14px 0', borderRadius: 18, overflow: 'hidden', position: 'relative', height: 230, cursor: 'pointer' }} onClick={() => onTab?.('shop')}>
-          <img src="https://images.pexels.com/photos/3097770/pexels-photo-3097770.jpeg?auto=compress&cs=tinysrgb&w=700" alt="Monstera" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}/>
-          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(110deg, rgba(10,30,18,0.82) 0%, rgba(10,30,18,0.4) 60%, transparent 100%)' }}/>
-          <div style={{ position: 'absolute', inset: 0, padding: '18px 18px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', maxWidth: '70%' }}>
-            <span className="chip" style={{ background: 'rgba(181,135,58,0.28)', borderColor: 'rgba(181,135,58,0.45)', border: '1px solid rgba(181,135,58,0.45)', color: '#F5EDD8', alignSelf: 'flex-start', marginBottom: 10, fontSize: 9, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Planta de la semana</span>
-            <h2 className="h-serif" style={{ fontSize: 30, color: '#fff', fontWeight: 500, marginBottom: 5 }}>
-              <span style={{ fontStyle: 'italic' }}>Monstera</span><br/>Deliciosa
-            </h2>
-            <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.65)', marginBottom: 14 }}>Luz indirecta · Riego semanal · Interior</p>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <button style={{ background: '#F5EDD8', color: '#1A3C2E', border: 'none', borderRadius: 20, padding: '8px 14px', fontSize: 11, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 6 }}>
-                <Icon.Cart size={14}/> Ver · $77
-              </button>
+        {hero && (
+          <div style={{ margin: '18px 14px 0', borderRadius: 18, overflow: 'hidden', position: 'relative', height: 230, cursor: 'pointer' }} onClick={() => onProduct?.(hero)}>
+            <img
+              src={hero.imagen_url || 'https://images.pexels.com/photos/3097770/pexels-photo-3097770.jpeg?auto=compress&cs=tinysrgb&w=700'}
+              alt={hero.nombre}
+              onError={e => { e.target.src = 'https://images.pexels.com/photos/3097770/pexels-photo-3097770.jpeg?auto=compress&cs=tinysrgb&w=700'; }}
+              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+            />
+            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(110deg, rgba(10,30,18,0.82) 0%, rgba(10,30,18,0.4) 60%, transparent 100%)' }}/>
+            <div style={{ position: 'absolute', inset: 0, padding: '18px 18px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', maxWidth: '75%' }}>
+              <span className="chip" style={{ background: 'rgba(181,135,58,0.28)', border: '1px solid rgba(181,135,58,0.45)', color: '#F5EDD8', alignSelf: 'flex-start', marginBottom: 10, fontSize: 9, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Planta de la semana</span>
+              <h2 className="h-serif" style={{ fontSize: 28, color: '#fff', fontWeight: 500, marginBottom: 5, lineHeight: 1.15 }}>
+                {[hero.nombre, hero.color, hero.talla].filter(Boolean).join(' ')}
+              </h2>
+              {hero.subfamily?.nombre && <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.65)', marginBottom: 14 }}>{hero.subfamily.nombre}</p>}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <button style={{ background: '#F5EDD8', color: '#1A3C2E', border: 'none', borderRadius: 20, padding: '8px 14px', fontSize: 11, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <Icon.Cart size={14}/> Ver · ${(hero.precio_venta || 0).toFixed(0)}
+                </button>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Esta semana */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '0 18px', margin: '22px 0 12px' }}>

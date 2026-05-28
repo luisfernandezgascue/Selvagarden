@@ -23,6 +23,21 @@ function CareTile({ icon, label, val }) {
   );
 }
 
+const DIF_STARS = { facil: 1, fácil: 1, media: 2, medio: 2, experto: 3 };
+function DifTile({ val }) {
+  if (!val) return null;
+  const stars = DIF_STARS[(val || '').toLowerCase()] || 1;
+  return (
+    <div style={{ textAlign: 'center', padding: '0 2px' }}>
+      <div style={{ width: 36, height: 36, borderRadius: 10, background: '#F0FAF5', color: '#2D6A4F', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 6px' }}>
+        <Icon.Sparkle size={16}/>
+      </div>
+      <p style={{ fontSize: 8.5, color: '#888', letterSpacing: '0.08em', textTransform: 'uppercase', fontWeight: 600, marginBottom: 2 }}>Nivel</p>
+      <p style={{ fontSize: 11, color: '#B5873A', fontWeight: 700, letterSpacing: '-0.02em' }}>{'★'.repeat(stars)}{'☆'.repeat(3 - stars)}</p>
+    </div>
+  );
+}
+
 function SpecRow({ l, r, last }) {
   return (
     <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: last ? 'none' : '1px solid var(--c-line-soft)', fontSize: 12 }}>
@@ -66,6 +81,7 @@ export default function Producto({ product: productProp, onBack }) {
   const finalPrice = (product.precio_venta || 0) * (1 - discount / 100);
   const subfamily = product.subfamily?.nombre || '';
   const family = product.subfamily?.family?.nombre || '';
+  const fullName = [product.nombre, product.color, product.talla].filter(Boolean).join(' ');
 
   function handleAddToCart() {
     addToCart(product);
@@ -104,7 +120,7 @@ export default function Producto({ product: productProp, onBack }) {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
             <div style={{ flex: 1, minWidth: 0 }}>
               {subfamily && <p style={{ fontFamily: 'var(--font-serif)', fontStyle: 'italic', fontSize: 12, color: '#888', marginBottom: 4 }}>{subfamily}</p>}
-              <h1 className="h-serif" style={{ fontSize: 28, fontWeight: 500, lineHeight: 1.1 }}>{product.nombre}</h1>
+              <h1 className="h-serif" style={{ fontSize: 28, fontWeight: 500, lineHeight: 1.1 }}>{fullName}</h1>
             </div>
             <div style={{ textAlign: 'right', marginLeft: 10 }}>
               {discount > 0 && <p style={{ fontSize: 11, color: '#C0C0C0', textDecoration: 'line-through' }}>${product.precio_venta}</p>}
@@ -120,8 +136,8 @@ export default function Producto({ product: productProp, onBack }) {
                 <CareTile icon={<Icon.Sun/>} label="Luz" val={care.luz}/>
                 <CareTile icon={<Icon.Droplet/>} label="Riego" val={care.riego}/>
                 <CareTile icon={<Icon.Thermo/>} label="Temp" val={care.temperatura}/>
-                <CareTile icon={<Icon.Leaf/>} label="Tipo" val={family}/>
-                <CareTile icon={<Icon.Sparkle/>} label="Cuido" val={care.dificultad}/>
+                <CareTile icon={<Icon.Leaf/>} label="Abono" val={care.abono}/>
+                <DifTile val={care.dificultad}/>
               </div>
             </>
           )}
