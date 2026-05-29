@@ -38,6 +38,15 @@ function getDiscountText(nivel) {
   return map[(nivel || '').toLowerCase()] || 'Sin descuento';
 }
 
+// ── 0. Clear stale sandbox IDs before syncing ─────────────────────────────────
+async function clearSandboxIds(supabase) {
+  const [p, c] = await Promise.all([
+    supabase.from('products').update({ bc_item_id: null }).not('bc_item_id', 'is', null),
+    supabase.from('customers').update({ shopify_customer_id: null }).not('shopify_customer_id', 'is', null),
+  ]);
+  console.log('[sync-pos] Cleared sandbox IDs — products error:', p.error?.message ?? 'none', '| customers error:', c.error?.message ?? 'none');
+}
+
 // ── 1. Sync customers ──────────────────────────────────────────────────────────
 async function syncCustomers(supabase) {
   const { data: customers, error } = await supabase.from('customers').select('*');
@@ -53,40 +62,34 @@ async function syncCustomers(supabase) {
     ].filter(Boolean).join(' · ');
 
     try {
-      if (c.shopify_customer_id) {
-        // Update existing Square customer note with current loyalty level
-        await sq('PUT', `/customers/${c.shopify_customer_id}`, { note });
+      // Always search by reference_id first — shopify_customer_id was cleared
+      let squareId = null;
+      if (c.numero_socio) {
+        const search = await sq('POST', '/customers/search', {
+          query: { filter: { reference_id: { exact: c.numero_socio } } },
+          limit: 1,
+        });
+        squareId = search.customers?.[0]?.id || null;
+      }
+
+      if (squareId) {
+        await sq('PUT', `/customers/${squareId}`, { note });
+        await supabase.from('customers').update({ shopify_customer_id: squareId }).eq('id', c.id);
         results.updated++;
       } else {
-        // Search Square for existing customer by reference_id (numero_socio)
-        let squareId = null;
-        if (c.numero_socio) {
-          const search = await sq('POST', '/customers/search', {
-            query: { filter: { reference_id: { exact: c.numero_socio } } },
-            limit: 1,
-          });
-          squareId = search.customers?.[0]?.id || null;
-        }
-
-        if (squareId) {
-          await sq('PUT', `/customers/${squareId}`, { note });
-          results.updated++;
-        } else {
-          const created = await sq('POST', '/customers', {
-            given_name: c.nombre || 'Cliente',
-            ...(c.email    ? { email_address: c.email }        : {}),
-            ...(c.telefono ? { phone_number:  c.telefono }     : {}),
-            ...(c.numero_socio ? { reference_id: c.numero_socio } : {}),
-            note,
-            idempotency_key: idemKey('cust', c.id),
-          });
-          squareId = created.customer?.id;
-          results.created++;
-        }
-
+        const created = await sq('POST', '/customers', {
+          given_name: c.nombre || 'Cliente',
+          ...(c.email    ? { email_address: c.email }        : {}),
+          ...(c.telefono ? { phone_number:  c.telefono }     : {}),
+          ...(c.numero_socio ? { reference_id: c.numero_socio } : {}),
+          note,
+          idempotency_key: crypto.randomUUID(),
+        });
+        squareId = created.customer?.id;
         if (squareId) {
           await supabase.from('customers').update({ shopify_customer_id: squareId }).eq('id', c.id);
         }
+        results.created++;
       }
     } catch (err) {
       results.errors.push({ email: c.email, error: err.message });
@@ -118,7 +121,9 @@ async function syncProducts(supabase) {
     precio_venta: products[0].precio_venta, bc_item_id: products[0].bc_item_id,
   }));
 
-  // Build Square catalog objects — one ITEM per product with one ITEM_VARIATION
+  // Build Square catalog objects — always use client-generated IDs so Square
+  // creates on first sync and updates idempotently on subsequent syncs.
+  // Never use bc_item_id here — those may be stale sandbox IDs.
   const objects = products.map(p => {
     const safeId = (p.sku || p.id).replace(/-/g, '_');
     const name = [p.nombre, p.color !== '00' ? p.color : '', p.talla]
@@ -127,7 +132,7 @@ async function syncProducts(supabase) {
 
     return {
       type: 'ITEM',
-      id: p.bc_item_id || `#item_${safeId}`,
+      id: `#item_${safeId}`,
       item_data: {
         name,
         description: p.descripcion || '',
@@ -135,7 +140,7 @@ async function syncProducts(supabase) {
           type: 'ITEM_VARIATION',
           id: `#var_${safeId}`,
           item_variation_data: {
-            item_id: p.bc_item_id || `#item_${safeId}`,
+            item_id: `#item_${safeId}`,
             name: p.talla || 'Regular',
             pricing_type: 'FIXED_PRICING',
             price_money: { amount: amountCents, currency: 'EUR' },
@@ -169,13 +174,12 @@ async function syncProducts(supabase) {
     throw new Error(`Square batch-upsert failed: ${detail}`);
   }
 
-  // Map temp IDs back to real Square IDs and store in bc_item_id
+  // Map client IDs back to real Square object IDs and store for all products
   const mappings = result.id_mappings || [];
   console.log('[sync-pos] id_mappings count:', mappings.length);
 
   let stored = 0;
   for (const p of products) {
-    if (p.bc_item_id) continue; // already has a Square ID
     const safeId = (p.sku || p.id).replace(/-/g, '_');
     const mapping = mappings.find(m => m.client_object_id === `#item_${safeId}`);
     if (mapping?.object_id) {
@@ -184,9 +188,9 @@ async function syncProducts(supabase) {
     }
   }
 
-  const created = mappings.filter(m => m.client_object_id?.startsWith('#item_')).length;
+  const upserted = mappings.filter(m => m.client_object_id?.startsWith('#item_')).length;
   console.log('[sync-pos] Done — objects in batch:', objects.length, '| IDs stored back:', stored);
-  return { total: products.length, created, errors: [] };
+  return { total: products.length, upserted, errors: [] };
 }
 
 // ── 3. Sync discounts ─────────────────────────────────────────────────────────
@@ -203,7 +207,7 @@ async function syncDiscounts() {
   if (toCreate.length === 0) return { created: 0, skipped: 3 };
 
   await sq('POST', '/catalog/batch-upsert', {
-    idempotency_key: idemKey('discounts', new Date().toDateString()),
+    idempotency_key: crypto.randomUUID(),
     batches: [{
       objects: toCreate.map(d => ({
         type: 'DISCOUNT',
@@ -244,6 +248,9 @@ export default async function handler(req, res) {
   );
 
   try {
+    // Clear stale sandbox IDs before syncing so we don't send dead IDs to production
+    await clearSandboxIds(supabase);
+
     const [productResults, customerResults, discountResults] = await Promise.allSettled([
       syncProducts(supabase),
       syncCustomers(supabase),
