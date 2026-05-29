@@ -3,6 +3,7 @@ import { Phone, TabBar, SectionHeader, iconBtn } from '../components';
 import { Icon, SelvaLeaf } from '../icons';
 import { useCustomer, nivelInfo, levelProgress } from '../context/CustomerContext';
 import { fetchEvents, fetchFeaturedProduct } from '../lib/db';
+import { isAdmin } from '../lib/admin';
 
 const NOTIF_SEEN_KEY = 'selva_notif_seen';
 
@@ -122,7 +123,7 @@ function EventModal({ event, onClose }) {
 }
 
 export default function Home({ onTab, onProduct }) {
-  const { customer } = useCustomer();
+  const { customer, storeMode } = useCustomer();
   const [events, setEvents] = useState([]);
   const [hero, setHero] = useState(null);
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -170,6 +171,14 @@ export default function Home({ onTab, onProduct }) {
           </button>
         </div>
       </div>
+
+      {/* Store mode banner */}
+      {storeMode && isAdmin(customer) && (
+        <div style={{ flexShrink: 0, background: '#1A3C2E', padding: '7px 18px', display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#4CAF50', flexShrink: 0, boxShadow: '0 0 0 3px rgba(76,175,80,0.25)', animation: 'storePulse 1.5s ease-in-out infinite' }}/>
+          <span style={{ fontSize: 11, color: '#A8D5B5', fontWeight: 600, letterSpacing: '0.04em' }}>Modo Tienda Activo · Square POS conectado</span>
+        </div>
+      )}
 
       <div className="scroll">
         {/* Level card */}
@@ -220,6 +229,9 @@ export default function Home({ onTab, onProduct }) {
           <QA icon={<Icon.Camera size={20}/>} label="Diagnóstico" onClick={() => onTab?.('selva')}/>
           <QA icon={<Icon.QR size={20}/>} label="Mi QR" onClick={() => onTab?.('card')}/>
           <QA icon={<Icon.Shop size={20}/>} label="Tienda" onClick={() => onTab?.('shop')}/>
+          {storeMode && isAdmin(customer) && (
+            <QA icon={<span style={{ fontSize: 18 }}>🏪</span>} label="Turno" highlight onClick={() => onTab?.('card')}/>
+          )}
         </div>
 
         {/* Hero */}

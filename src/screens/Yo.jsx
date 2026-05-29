@@ -124,7 +124,15 @@ export default function Yo({ onTab }) {
   const { customer } = useCustomer();
   const [orders, setOrders] = useState([]);
   const [ordersOpen, setOrdersOpen] = useState(false);
+  const [storeMode, setStoreMode] = useState(() => localStorage.getItem('storeMode') === 'true');
   const isAdmin = checkAdmin(customer);
+
+  function toggleStoreMode() {
+    const newVal = !storeMode;
+    setStoreMode(newVal);
+    localStorage.setItem('storeMode', String(newVal));
+    window.dispatchEvent(new Event('storeModeChanged'));
+  }
 
   const nombre = customer?.nombre || 'Mi perfil';
   const nivel = customer?.nivel_lealtad || 'sin_nivel';
@@ -239,6 +247,33 @@ export default function Yo({ onTab }) {
               </button>
             </div>
             <SyncButton/>
+            {/* Store Mode toggle */}
+            <div style={{ padding: '8px 14px 4px' }}>
+              <button
+                onClick={toggleStoreMode}
+                style={{
+                  width: '100%', border: storeMode ? 'none' : '1px solid #1A3C2E',
+                  background: storeMode ? '#1A3C2E' : '#fff',
+                  color: storeMode ? '#fff' : '#1A3C2E',
+                  borderRadius: 12, padding: '12px 16px',
+                  fontSize: 13, fontWeight: 600,
+                  display: 'flex', alignItems: 'center', gap: 10,
+                  transition: 'background .2s',
+                }}
+              >
+                {storeMode ? (
+                  <>
+                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#4CAF50', boxShadow: '0 0 0 3px rgba(76,175,80,0.3)', animation: 'storePulse 1.5s ease-in-out infinite', flexShrink: 0 }}/>
+                    ✅ Modo Tienda Activo
+                  </>
+                ) : (
+                  <>
+                    <span style={{ fontSize: 16 }}>🏪</span>
+                    Activar Modo Tienda
+                  </>
+                )}
+              </button>
+            </div>
           </>
         )}
 

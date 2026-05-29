@@ -4,6 +4,7 @@ import { Phone, TabBar, SectionHeader } from '../components';
 import { Icon } from '../icons';
 import { useCustomer, nivelInfo, levelProgress } from '../context/CustomerContext';
 import { fetchLoyaltyTransactions } from '../lib/db';
+import { isAdmin } from '../lib/admin';
 
 function RealQR({ value, size = 200 }) {
   const [dataUrl, setDataUrl] = useState(null);
@@ -152,7 +153,7 @@ const BENEFITS = {
 };
 
 export default function MiTarjeta({ onTab }) {
-  const { customer } = useCustomer();
+  const { customer, storeMode } = useCustomer();
   const [transactions, setTransactions] = useState([]);
   const [walletOpen, setWalletOpen] = useState(false);
 
@@ -193,15 +194,31 @@ export default function MiTarjeta({ onTab }) {
           <p style={{ fontSize: 11, color: '#888', marginTop: 4 }}>Miembro desde {joinDate}</p>
         </div>
 
-        {/* QR card */}
-        <div style={{ margin: '0 14px', padding: '20px 18px', background: '#fff', borderRadius: 20, border: '1px solid var(--c-line)', boxShadow: '0 6px 30px rgba(26,60,46,0.08)' }}>
-          <div style={{ display: 'flex', justifyContent: 'center', position: 'relative' }}>
-            <RealQR value={numeroSocio} size={220}/>
-            <CornerCuts/>
+        {/* QR card — store mode shows large QR for cashier scanning */}
+        {storeMode && isAdmin(customer) ? (
+          <div style={{ margin: '0 14px', padding: '28px 18px 24px', background: '#fff', borderRadius: 20, border: '2.5px solid #1A3C2E', boxShadow: '0 6px 30px rgba(26,60,46,0.15)', textAlign: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 18 }}>
+              <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#4CAF50', display: 'inline-block', animation: 'storePulse 1.5s ease-in-out infinite' }}/>
+              <span style={{ fontSize: 10, color: '#1A3C2E', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase' }}>Modo Tienda — Escanear</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'center', position: 'relative', marginBottom: 16 }}>
+              <RealQR value={numeroSocio} size={290}/>
+              <CornerCuts/>
+            </div>
+            <p style={{ fontFamily: 'var(--font-serif)', fontSize: 22, fontWeight: 600, color: '#1A3C2E', marginBottom: 4 }}>{nombre}</p>
+            <p style={{ fontSize: 13, color: '#888', marginBottom: 6 }}>{info.emoji} {info.label}</p>
+            <p style={{ fontFamily: 'var(--font-serif)', fontSize: 18, fontWeight: 600, color: '#B5873A' }}>{puntos} pts</p>
           </div>
-          <p style={{ textAlign: 'center', marginTop: 10, fontSize: 10, color: '#888', letterSpacing: '0.1em', fontWeight: 600 }}>{numeroSocio || '—'}</p>
-          <p style={{ textAlign: 'center', marginTop: 4, fontSize: 11, color: '#888' }}>Escanéalo en caja para acumular puntos</p>
-        </div>
+        ) : (
+          <div style={{ margin: '0 14px', padding: '20px 18px', background: '#fff', borderRadius: 20, border: '1px solid var(--c-line)', boxShadow: '0 6px 30px rgba(26,60,46,0.08)' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', position: 'relative' }}>
+              <RealQR value={numeroSocio} size={220}/>
+              <CornerCuts/>
+            </div>
+            <p style={{ textAlign: 'center', marginTop: 10, fontSize: 10, color: '#888', letterSpacing: '0.1em', fontWeight: 600 }}>{numeroSocio || '—'}</p>
+            <p style={{ textAlign: 'center', marginTop: 4, fontSize: 11, color: '#888' }}>Escanéalo en caja para acumular puntos</p>
+          </div>
+        )}
 
         {/* Points & progress */}
         <div style={{ margin: '18px 14px 0', padding: '16px 18px', background: 'linear-gradient(135deg, #1A3C2E, #2D6A4F)', borderRadius: 16, color: '#fff' }}>

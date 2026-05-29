@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 
 const CustomerContext = createContext(null);
@@ -33,6 +33,13 @@ export function CustomerProvider({ children }) {
   const [customer, setCustomer] = useState(null);
   const [cart, setCart] = useState([]);
   const [cartOpen, setCartOpen] = useState(false);
+  const [storeMode, setStoreMode] = useState(() => localStorage.getItem('storeMode') === 'true');
+
+  useEffect(() => {
+    const handler = () => setStoreMode(localStorage.getItem('storeMode') === 'true');
+    window.addEventListener('storeModeChanged', handler);
+    return () => window.removeEventListener('storeModeChanged', handler);
+  }, []);
 
   const refreshCustomer = useCallback(async () => {
     if (!supabase || !customer?.id) return;
@@ -114,7 +121,7 @@ export function CustomerProvider({ children }) {
       cartOpen, setCartOpen,
       addToCart, removeFromCart, updateCartQty,
       checkout, refreshCustomer,
-      discount,
+      discount, storeMode,
     }}>
       {children}
     </CustomerContext.Provider>
