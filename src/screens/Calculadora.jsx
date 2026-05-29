@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Icon, SelvaLeaf } from '../icons';
+import { supabase } from '../lib/supabase';
 
 const inp = {
   background: 'transparent', border: 'none', outline: 'none',
@@ -11,6 +12,12 @@ const btnGhost = {
   background: '#fff', border: '1px solid var(--c-line)', borderRadius: 18,
   padding: '6px 12px', fontSize: 11, fontWeight: 600, color: '#1A1A1A',
   display: 'inline-flex', alignItems: 'center', gap: 6, cursor: 'pointer',
+};
+
+const fieldStyle = {
+  background: '#FAF9F4', border: '1px solid var(--c-line)', borderRadius: 8,
+  padding: '9px 11px', fontSize: 12, color: '#1A1A1A', width: '100%',
+  fontFamily: 'var(--font-sans)', outline: 'none', boxSizing: 'border-box',
 };
 
 function PriceRow({ l, r, bold }) {
@@ -34,6 +41,17 @@ function SliderRow({ label, pct, setPct, max = 100 }) {
   );
 }
 
+function FieldRow({ label, required, children }) {
+  return (
+    <div>
+      <p style={{ fontSize: 10.5, color: '#888', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 5 }}>{label}{required && <span style={{ color: '#B5873A' }}> *</span>}</p>
+      {children}
+    </div>
+  );
+}
+
+const WA_NUMBER = '584120000000';
+
 export default function Calculadora({ onBack }) {
   const [flowers, setFlowers] = useState([
     { name: 'Rosa roja ecuatoriana', qty: 24, unit: 1.20 },
@@ -45,6 +63,16 @@ export default function Calculadora({ onBack }) {
   const [servicePct, setServicePct] = useState(35);
   const [marginPct, setMarginPct] = useState(20);
 
+  // Client fields
+  const [clienteNombre, setClienteNombre] = useState('');
+  const [clienteEmail, setClienteEmail] = useState('');
+  const [clienteTelefono, setClienteTelefono] = useState('');
+  const [notas, setNotas] = useState('');
+
+  // Send state
+  const [sendStatus, setSendStatus] = useState('idle'); // idle | loading | ok | error
+  const [sendMsg, setSendMsg] = useState('');
+
   const flowerCost = flowers.reduce((s, f) => s + f.qty * f.unit, 0);
   const subtotal = flowerCost + materials;
   const service = subtotal * (servicePct / 100);
@@ -52,12 +80,72 @@ export default function Calculadora({ onBack }) {
   const margin = beforeMargin * (marginPct / 100);
   const total = beforeMargin + margin;
   const rounded = Math.ceil(total / 5) * 5;
+  const manoDeObra = parseFloat((service + margin).toFixed(2));
 
   const updateFlower = (i, field, val) => setFlowers(f => f.map((row, idx) => idx === i ? { ...row, [field]: val } : row));
   const addFlower = () => setFlowers(f => [...f, { name: 'Nueva flor', qty: 1, unit: 1.00 }]);
   const removeFlower = (i) => setFlowers(f => f.filter((_, idx) => idx !== i));
 
   const waMsg = `🌿 *Cotización Selva Garden*\n\n${flowers.map(f => `${f.qty}× ${f.name} — $${(f.qty * f.unit).toFixed(2)}`).join('\n')}\n\nMateriales: $${materials.toFixed(2)}\nServicio (${servicePct}%): $${service.toFixed(2)}\nSubtotal: $${beforeMargin.toFixed(2)}\n\n*Total: $${rounded}*\n\nEntrega Caracas 24h.`;
+  const waUrl = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(waMsg)}`;
+
+  async function handleEnviar() {
+    if (!clienteEmail.trim()) {
+      setSendMsg('⚠️ El email del cliente es obligatorio');
+      return;
+    }
+    if (!supabase) {
+      setSendMsg('⚠️ Supabase no configurado');
+      return;
+    }
+    setSendStatus('loading');
+    setSendMsg('');
+
+    const items = flowers.map(f => ({
+      nombre: f.name,
+      cantidad: f.qty,
+      precio_unit: f.unit,
+      subtotal: parseFloat((f.qty * f.unit).toFixed(2)),
+    }));
+
+    const payload = {
+      cliente_email: clienteEmail.trim(),
+      cliente_nombre: clienteNombre.trim() || null,
+      cliente_telefono: clienteTelefono.trim() || null,
+      items,
+      subtotal: parseFloat(subtotal.toFixed(2)),
+      porcentaje_servicio: servicePct,
+      mano_de_obra: manoDeObra,
+      total: rounded,
+      notas: notas.trim() || null,
+      estado: 'enviado',
+    };
+
+    const { data: presupuesto, error } = await supabase
+      .from('presupuestos')
+      .insert(payload)
+      .select()
+      .single();
+
+    if (error) {
+      setSendStatus('error');
+      setSendMsg(`⚠️ Error guardando: ${error.message}`);
+      return;
+    }
+
+    try {
+      await fetch('/api/send-presupuesto', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ presupuesto_id: presupuesto.id, ...payload }),
+      });
+    } catch (e) {
+      console.warn('[Calculadora] send-presupuesto fetch failed:', e.message);
+    }
+
+    setSendStatus('ok');
+    setSendMsg(`✅ Presupuesto enviado a ${clienteEmail}`);
+  }
 
   return (
     <div style={{ width: 760, height: 920, background: '#fff', fontFamily: 'var(--font-sans)', borderRadius: 20, overflow: 'hidden', boxShadow: '0 30px 80px rgba(0,0,0,0.25), 0 0 0 1px rgba(0,0,0,0.06)', display: 'flex', flexDirection: 'column' }}>
@@ -85,13 +173,14 @@ export default function Calculadora({ onBack }) {
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
           <button style={btnGhost}><Icon.Camera size={16}/> Subir foto del cliente</button>
-          <button style={btnGhost} onClick={() => setFlowers([{ name: 'Nueva flor', qty: 1, unit: 1.00 }])}>Limpiar</button>
+          <button style={btnGhost} onClick={() => { setFlowers([{ name: 'Nueva flor', qty: 1, unit: 1.00 }]); setClienteNombre(''); setClienteEmail(''); setClienteTelefono(''); setNotas(''); setSendStatus('idle'); setSendMsg(''); }}>Limpiar</button>
         </div>
       </div>
 
       {/* Body 2-col */}
       <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1.4fr 1fr', overflow: 'hidden', minHeight: 0 }}>
-        {/* Left: flower list */}
+
+        {/* Left: flower list + client fields */}
         <div style={{ padding: '22px 28px', overflowY: 'auto', borderRight: '1px solid var(--c-line)' }}>
           <div style={{ background: '#F5EDD8', border: '1px dashed rgba(181,135,58,0.4)', borderRadius: 12, padding: '12px 14px', marginBottom: 18, display: 'flex', alignItems: 'center', gap: 10 }}>
             <span style={{ color: '#B5873A' }}><Icon.Sparkle size={18}/></span>
@@ -127,6 +216,49 @@ export default function Calculadora({ onBack }) {
                 <button onClick={() => removeFlower(i)} style={{ background: 'none', border: 'none', color: '#C0C0C0', fontSize: 18, lineHeight: 1, cursor: 'pointer' }}>×</button>
               </div>
             ))}
+          </div>
+
+          {/* Client section */}
+          <div style={{ marginTop: 26, borderTop: '1px solid var(--c-line)', paddingTop: 20 }}>
+            <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: 18, fontWeight: 600, marginBottom: 14 }}>Cliente</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <FieldRow label="Nombre del cliente">
+                <input
+                  type="text"
+                  value={clienteNombre}
+                  onChange={e => setClienteNombre(e.target.value)}
+                  placeholder="Nombre del cliente"
+                  style={fieldStyle}
+                />
+              </FieldRow>
+              <FieldRow label="Email del cliente" required>
+                <input
+                  type="email"
+                  value={clienteEmail}
+                  onChange={e => setClienteEmail(e.target.value)}
+                  placeholder="email@ejemplo.com"
+                  style={{ ...fieldStyle, borderColor: !clienteEmail && sendMsg.includes('email') ? '#B5873A' : undefined }}
+                />
+              </FieldRow>
+              <FieldRow label="Teléfono">
+                <input
+                  type="tel"
+                  value={clienteTelefono}
+                  onChange={e => setClienteTelefono(e.target.value)}
+                  placeholder="+58 412 0000000"
+                  style={fieldStyle}
+                />
+              </FieldRow>
+              <FieldRow label="Notas adicionales">
+                <textarea
+                  value={notas}
+                  onChange={e => setNotas(e.target.value)}
+                  placeholder="Instrucciones especiales, fecha de entrega, etc."
+                  rows={3}
+                  style={{ ...fieldStyle, resize: 'vertical', lineHeight: 1.5 }}
+                />
+              </FieldRow>
+            </div>
           </div>
         </div>
 
@@ -166,11 +298,42 @@ export default function Calculadora({ onBack }) {
             </div>
           </div>
 
-          <button onClick={() => navigator.clipboard?.writeText(waMsg)} style={{ marginTop: 10, background: '#25D366', color: '#fff', border: 'none', borderRadius: 'var(--r-btn)', padding: '13px', fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 9 }}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M12 2C6.5 2 2 6.5 2 12c0 1.8.5 3.5 1.3 5L2 22l5.2-1.3c1.5.8 3.1 1.2 4.8 1.2 5.5 0 10-4.5 10-10S17.5 2 12 2zm5.4 14c-.2.6-1.3 1.2-1.8 1.3-.5.1-1 .2-3.2-.7-2.7-1.1-4.4-3.8-4.5-4-.1-.2-1.1-1.4-1.1-2.7 0-1.3.7-1.9.9-2.2.2-.2.5-.3.7-.3h.5c.2 0 .4 0 .6.5.2.5.7 1.8.8 1.9 0 .1.1.3 0 .5l-.3.4c-.1.2-.3.3-.4.5-.1.1-.3.3-.1.6.2.3.8 1.4 1.8 2.3 1.3 1.1 2.3 1.5 2.6 1.6.3.1.5.1.7-.1.2-.2.8-.9 1-1.2.2-.3.4-.2.6-.2.2.1 1.5.7 1.7.8.2.1.4.2.5.3.1.1.1.6-.1 1.2z"/></svg>
-            Copiar para WhatsApp
-          </button>
-          <p style={{ fontSize: 10, color: '#888', textAlign: 'center', marginTop: 8 }}>Pega en el chat con el cliente. Incluye desglose y total.</p>
+          {/* Action buttons */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 10 }}>
+            <button
+              onClick={() => navigator.clipboard?.writeText(waMsg)}
+              style={{ background: '#fff', color: '#1A1A1A', border: '1px solid var(--c-line)', borderRadius: 'var(--r-btn)', padding: '11px', fontSize: 12, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, cursor: 'pointer' }}
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="#25D366"><path d="M12 2C6.5 2 2 6.5 2 12c0 1.8.5 3.5 1.3 5L2 22l5.2-1.3c1.5.8 3.1 1.2 4.8 1.2 5.5 0 10-4.5 10-10S17.5 2 12 2zm5.4 14c-.2.6-1.3 1.2-1.8 1.3-.5.1-1 .2-3.2-.7-2.7-1.1-4.4-3.8-4.5-4-.1-.2-1.1-1.4-1.1-2.7 0-1.3.7-1.9.9-2.2.2-.2.5-.3.7-.3h.5c.2 0 .4 0 .6.5.2.5.7 1.8.8 1.9 0 .1.1.3 0 .5l-.3.4c-.1.2-.3.3-.4.5-.1.1-.3.3-.1.6.2.3.8 1.4 1.8 2.3 1.3 1.1 2.3 1.5 2.6 1.6.3.1.5.1.7-.1.2-.2.8-.9 1-1.2.2-.3.4-.2.6-.2.2.1 1.5.7 1.7.8.2.1.4.2.5.3.1.1.1.6-.1 1.2z"/></svg>
+              Copiar para WhatsApp
+            </button>
+
+            <a
+              href={waUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ background: '#25D366', color: '#fff', borderRadius: 'var(--r-btn)', padding: '11px', fontSize: 12, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, textDecoration: 'none' }}
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="#fff"><path d="M12 2C6.5 2 2 6.5 2 12c0 1.8.5 3.5 1.3 5L2 22l5.2-1.3c1.5.8 3.1 1.2 4.8 1.2 5.5 0 10-4.5 10-10S17.5 2 12 2zm5.4 14c-.2.6-1.3 1.2-1.8 1.3-.5.1-1 .2-3.2-.7-2.7-1.1-4.4-3.8-4.5-4-.1-.2-1.1-1.4-1.1-2.7 0-1.3.7-1.9.9-2.2.2-.2.5-.3.7-.3h.5c.2 0 .4 0 .6.5.2.5.7 1.8.8 1.9 0 .1.1.3 0 .5l-.3.4c-.1.2-.3.3-.4.5-.1.1-.3.3-.1.6.2.3.8 1.4 1.8 2.3 1.3 1.1 2.3 1.5 2.6 1.6.3.1.5.1.7-.1.2-.2.8-.9 1-1.2.2-.3.4-.2.6-.2.2.1 1.5.7 1.7.8.2.1.4.2.5.3.1.1.1.6-.1 1.2z"/></svg>
+              📱 Abrir WhatsApp
+            </a>
+
+            <button
+              onClick={handleEnviar}
+              disabled={sendStatus === 'loading'}
+              style={{ background: sendStatus === 'ok' ? '#2D6A4F' : '#1A3C2E', color: '#fff', border: 'none', borderRadius: 'var(--r-btn)', padding: '13px', fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 9, cursor: sendStatus === 'loading' ? 'default' : 'pointer', opacity: sendStatus === 'loading' ? 0.75 : 1 }}
+            >
+              {sendStatus === 'loading'
+                ? <div style={{ width: 15, height: 15, borderRadius: '50%', border: '2px solid rgba(255,255,255,0.35)', borderTopColor: '#fff', animation: 'spinSlow 0.8s linear infinite' }}/>
+                : '📧'
+              }
+              {sendStatus === 'loading' ? 'Enviando…' : sendStatus === 'ok' ? '¡Enviado!' : 'Enviar presupuesto'}
+            </button>
+
+            {sendMsg && (
+              <p style={{ fontSize: 11, color: sendStatus === 'error' ? '#B5873A' : '#2D6A4F', textAlign: 'center', lineHeight: 1.4 }}>{sendMsg}</p>
+            )}
+          </div>
         </div>
       </div>
     </div>

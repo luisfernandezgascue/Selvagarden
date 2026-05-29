@@ -233,7 +233,7 @@ export default function Yo({ onTab }) {
         {isAdmin && (
           <>
             <SectionHeader title="Administración"/>
-            <div style={{ padding: '0 14px 8px' }}>
+            <div style={{ padding: '0 14px 8px', display: 'flex', flexDirection: 'column', gap: 8 }}>
               <button
                 onClick={() => window.open('/etiquetas', '_blank')}
                 style={{ width: '100%', background: '#fff', border: '1px solid var(--c-line)', borderRadius: 12, padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 11, textAlign: 'left' }}
@@ -242,6 +242,17 @@ export default function Yo({ onTab }) {
                 <div style={{ flex: 1 }}>
                   <p style={{ fontSize: 13, fontWeight: 600 }}>Ver etiquetas</p>
                   <p style={{ fontSize: 10, color: '#888', marginTop: 1 }}>Habladores y etiquetas de anaquel</p>
+                </div>
+                <Icon.Chevron size={14}/>
+              </button>
+              <button
+                onClick={() => window.open('/presupuestos', '_blank')}
+                style={{ width: '100%', background: '#fff', border: '1px solid var(--c-line)', borderRadius: 12, padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 11, textAlign: 'left' }}
+              >
+                <div style={{ width: 34, height: 34, borderRadius: 10, background: '#D8EDE3', color: '#1A3C2E', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>📋</div>
+                <div style={{ flex: 1 }}>
+                  <p style={{ fontSize: 13, fontWeight: 600 }}>Ver presupuestos</p>
+                  <p style={{ fontSize: 10, color: '#888', marginTop: 1 }}>Cotizaciones enviadas a clientes</p>
                 </div>
                 <Icon.Chevron size={14}/>
               </button>
