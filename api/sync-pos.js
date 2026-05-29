@@ -96,7 +96,8 @@ async function syncCustomers(supabase) {
     }
   }
 
-  return { total: customers?.length || 0, ...results };
+  const synced = results.created + results.updated;
+  return { synced, total: customers?.length || 0, errors: results.errors };
 }
 
 // ── 2. Sync products via batch-upsert ─────────────────────────────────────────
@@ -112,7 +113,7 @@ async function syncProducts(supabase) {
   if (error) throw new Error(`Supabase fetchProducts: ${error.message}`);
   if (!products?.length) {
     console.log('[sync-pos] No products with sync_pos=true and activo=true');
-    return { total: 0, created: 0, errors: [] };
+    return { synced: 0, total: 0, errors: [] };
   }
 
   console.log('[sync-pos] First product:', JSON.stringify({
@@ -188,9 +189,8 @@ async function syncProducts(supabase) {
     }
   }
 
-  const upserted = mappings.filter(m => m.client_object_id?.startsWith('#item_')).length;
   console.log('[sync-pos] Done — objects in batch:', objects.length, '| IDs stored back:', stored);
-  return { total: products.length, upserted, errors: [] };
+  return { synced: stored, total: products.length, errors: [] };
 }
 
 // ── 3. Sync discounts ─────────────────────────────────────────────────────────
@@ -204,7 +204,7 @@ async function syncDiscounts() {
     { name: 'Babilonia 15%',  percentage: '15.0' },
   ].filter(d => !existingNames.includes(d.name));
 
-  if (toCreate.length === 0) return { created: 0, skipped: 3 };
+  if (toCreate.length === 0) return { synced: 3, skipped: 0 };
 
   await sq('POST', '/catalog/batch-upsert', {
     idempotency_key: crypto.randomUUID(),
@@ -221,7 +221,7 @@ async function syncDiscounts() {
     }],
   });
 
-  return { created: toCreate.length, skipped: 3 - toCreate.length };
+  return { synced: toCreate.length, skipped: 3 - toCreate.length };
 }
 
 // ── Handler ───────────────────────────────────────────────────────────────────

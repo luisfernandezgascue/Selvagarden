@@ -71,23 +71,22 @@ function SyncButton() {
       const c = data.customers || {};
       const d = data.discounts || {};
 
-      const pTotal   = (p.created ?? 0) + (p.updated ?? 0);
-      const cTotal   = (c.created ?? 0) + (c.updated ?? 0);
-      const dCreated = d.created ?? 0;
+      const pSynced  = p.synced ?? 0;
+      const cSynced  = c.synced ?? 0;
+      const dSynced  = d.synced ?? 0;
       const pErr     = p.errors?.length ?? 0;
       const cErr     = c.errors?.length ?? 0;
 
       const lines = [
         '✅ Sincronización completada',
         p.error  ? `⚠️ Productos: ${p.error}`
-                 : `${pTotal} productos → Square${pErr > 0 ? ` (${pErr} errores)` : ''}`,
+                 : `${pSynced} productos → Square ✅${pErr > 0 ? ` (${pErr} errores)` : ''}`,
         c.error  ? `⚠️ Clientes: ${c.error}`
-                 : `${cTotal} clientes → Square${cErr > 0 ? ` (${cErr} errores)` : ''}`,
+                 : `${cSynced} clientes → Square${cErr > 0 ? ` (${cErr} errores)` : ''}`,
         d.error  ? `⚠️ Descuentos: ${d.error}`
-                 : `${dCreated} descuentos creados`,
+                 : `${dSynced} descuentos ✅`,
       ];
-      // Surface first per-product error if any
-      if (pErr > 0 && p.errors[0]) lines.push(`↳ ${p.errors[0].sku}: ${p.errors[0].error}`);
+      if (pErr > 0 && p.errors[0]) lines.push(`↳ ${p.errors[0].email ?? p.errors[0].sku}: ${p.errors[0].error}`);
 
       setDetail(lines.join('\n'));
       setStatus('ok');
