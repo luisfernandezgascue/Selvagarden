@@ -38,7 +38,9 @@ function LoadingScreen() {
     <div style={{ minHeight:'100dvh', display:'flex', alignItems:'center', justifyContent:'center', background:'#F5F0E8' }}>
       <div style={{ textAlign:'center' }}>
         <div style={{ width:48, height:48, borderRadius:'50%', border:'3px solid #E8F0EA', borderTopColor:'#2D5A3D', animation:'spinSlow 0.8s linear infinite', margin:'0 auto 16px' }}/>
-        <img src="/brand/SelvaGarden_horizontal_claro.svg" alt="Selva Garden" style={{ height: '60px', width: 'auto', minWidth: '200px', maxWidth: '280px', objectFit: 'contain' }}/>
+        <div style={{ height: '56px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <img src="/brand/SelvaGarden_horizontal_claro_1024.png" alt="Selva Garden" style={{ height: '100%', width: 'auto', display: 'block' }}/>
+        </div>
       </div>
     </div>
   );
