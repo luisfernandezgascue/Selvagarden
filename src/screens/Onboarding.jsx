@@ -326,7 +326,7 @@ export function OnboardCardReady({ onNext, customer }) {
     <Phone>
       <div className="scroll" style={{ padding: '10px 24px 30px', display: 'flex', flexDirection: 'column' }}>
         <div style={{ marginTop: 14, marginBottom: 18 }}>
-          <img src="/brand/SelvaGarden_horizontal_claro_512.png" alt="Selva Garden" style={{ height: 28, width: 'auto' }}/>
+          <img src="/brand/SelvaGarden_horizontal_claro.svg" alt="Selva Garden" style={{ height: '40px', width: 'auto', objectFit: 'contain', maxWidth: '200px' }}/>
         </div>
 
         <div style={{

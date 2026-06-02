@@ -158,7 +158,7 @@ export default function Home({ onTab, onProduct }) {
     <Phone>
       <div style={{ flexShrink: 0, padding: '4px 18px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <img src="/brand/SelvaGarden_horizontal_claro_512.png" alt="Selva Garden" style={{ height: 44, width: 'auto', objectFit: 'contain' }}/>
+          <img src="/brand/SelvaGarden_horizontal_claro.svg" alt="Selva Garden" style={{ height: '40px', width: 'auto', objectFit: 'contain', maxWidth: '200px' }}/>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
           <button onClick={() => onTab?.('shop')} style={iconBtn}><Icon.Search/></button>
