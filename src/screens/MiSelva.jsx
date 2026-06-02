@@ -503,7 +503,7 @@ export default function MiSelva({ onTab }) {
       <div className="scroll">
         {/* Greeting */}
         <div style={{ padding: '4px 18px 22px', display: 'flex', alignItems: 'center', gap: 14 }}>
-          <div style={{ width: 44, height: 44, borderRadius: '50%', background: '#2D5A3D', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 2px 10px rgba(45,90,61,0.3)' }}><img src="/brand/SelvaGarden_pictograma_oscuro.svg" alt="Selva" style={{ width: '28px', height: '28px', objectFit: 'contain' }}/></div>
+          <div style={{ width: 44, height: 44, borderRadius: '50%', background: '#2D5A3D', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 2px 10px rgba(45,90,61,0.3)' }}><img src="/brand/SelvaGarden_pictograma_oscuro.svg" alt="Selva" style={{ width: '32px', height: '32px', objectFit: 'contain' }}/></div>
           <div>
             <p style={{ fontFamily: 'var(--font-serif)', fontSize: 21, fontWeight: 600, color: '#1A1A1A', lineHeight: 1.2 }}>Hola, {nombre}</p>
             <p style={{ fontSize: 12, color: '#888', marginTop: 3 }}>¿Qué hacemos hoy con tu selva?</p>

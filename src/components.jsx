@@ -14,7 +14,7 @@ export function TabBar({ active = 'home', onChange = () => {} }) {
       <Tab id="shop" icon={<Icon.Shop size={22}/>} label="Tienda"/>
       <button className="tab-btn center" onClick={() => onChange('selva')}>
         <div className="tab-center-circle">
-          <img src="/brand/SelvaGarden_pictograma_claro.svg" alt="Mi Selva" style={{ width: '28px', height: '28px' }}/>
+          <img src="/brand/SelvaGarden_pictograma_oscuro_512.png" alt="Mi Selva" style={{ width: '32px', height: '32px', objectFit: 'contain' }}/>
         </div>
         <span className="tab-lbl" style={{ marginTop: 4, fontWeight: active === 'selva' ? 600 : 500, color: active === 'selva' ? '#2D5A3D' : '#888' }}>Mi Selva</span>
       </button>
