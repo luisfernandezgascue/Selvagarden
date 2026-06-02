@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Phone } from '../components';
-import { Icon, SelvaLeaf, GoogleG } from '../icons';
+import { Icon, GoogleG } from '../icons';
 import { QRCode } from '../components';
 import { supabase } from '../lib/supabase';
 import { signUpWithEmail, signInWithEmail } from '../lib/auth';

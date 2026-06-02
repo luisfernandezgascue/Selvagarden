@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Phone, TabBar, SectionHeader, iconBtn } from '../components';
-import { Icon, SelvaLeaf } from '../icons';
+import { Icon } from '../icons';
 import { useCustomer, nivelInfo, levelProgress } from '../context/CustomerContext';
 import { fetchEvents, fetchFeaturedProduct } from '../lib/db';
 import { isAdmin } from '../lib/admin';
@@ -158,7 +158,7 @@ export default function Home({ onTab, onProduct }) {
     <Phone>
       <div style={{ flexShrink: 0, padding: '4px 18px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <img src="/brand/SelvaGarden_horizontal_claro_512.png" alt="Selva Garden" style={{ height: 28, width: 'auto' }}/>
+          <img src="/brand/SelvaGarden_horizontal_claro_512.png" alt="Selva Garden" style={{ height: 36, width: 'auto' }}/>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
           <button onClick={() => onTab?.('shop')} style={iconBtn}><Icon.Search/></button>

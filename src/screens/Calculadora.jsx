@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Icon, SelvaLeaf } from '../icons';
+import { Icon } from '../icons';
 import { supabase } from '../lib/supabase';
 
 const inp = {
@@ -161,9 +161,7 @@ export default function Calculadora({ onBack }) {
       {/* Header */}
       <div style={{ padding: '22px 28px 18px', borderBottom: '1px solid var(--c-line)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 11 }}>
-          <div className="selva-avatar" style={{ width: 38, height: 38 }}>
-            <SelvaLeaf size={20}/>
-          </div>
+          <div style={{ width: 38, height: 38, borderRadius: '50%', background: '#2D5A3D', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><img src="/brand/SelvaGarden_pictograma_oscuro_512.png" alt="Selva" style={{ width: 22, height: 22, objectFit: 'contain' }}/></div>
           <div>
             <p className="eyebrow" style={{ color: '#B8956A' }}>Selva Garden · interna</p>
             <h2 className="h-serif" style={{ fontSize: 22, fontWeight: 600, lineHeight: 1.1 }}>

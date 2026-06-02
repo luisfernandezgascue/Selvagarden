@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Phone, TabBar } from '../components';
-import { Icon, SelvaLeaf } from '../icons';
+import { Icon } from '../icons';
 import { useCustomer } from '../context/CustomerContext';
 import { fetchOrders } from '../lib/db';
 import { fetchProductWithCare } from '../lib/db';
@@ -180,7 +180,7 @@ function MisPlantasTab() {
 
   if (plants.length === 0) return (
     <div style={{ padding: '40px 18px', textAlign: 'center' }}>
-      <div className="selva-avatar breathing" style={{ width: 64, height: 64, margin: '0 auto 16px' }}><SelvaLeaf size={32}/></div>
+      <div style={{ width: 64, height: 64, borderRadius: '50%', background: '#2D5A3D', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}><img src="/brand/SelvaGarden_pictograma_oscuro_512.png" alt="Selva" style={{ width: 36, height: 36, objectFit: 'contain' }}/></div>
       <p style={{ fontFamily: 'var(--font-serif)', fontSize: 18, color: '#1A1A1A', marginBottom: 8 }}>Tu selva está vacía</p>
       <p style={{ fontSize: 13, color: '#888', lineHeight: 1.5 }}>Las plantas de tus pedidos aparecerán aquí</p>
     </div>
@@ -278,7 +278,7 @@ function DiagnosticarTab() {
       {result && (
         <div style={{ background: '#fff', border: '1px solid var(--c-line)', borderRadius: 16, padding: '18px 16px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-            <div className="selva-avatar" style={{ width: 36, height: 36, flexShrink: 0 }}><SelvaLeaf size={18}/></div>
+            <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#2D5A3D', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><img src="/brand/SelvaGarden_pictograma_oscuro_512.png" alt="Selva" style={{ width: 20, height: 20, objectFit: 'contain' }}/></div>
             <p style={{ fontSize: 12, fontWeight: 700, color: '#2D5A3D' }}>Diagnóstico de Selva Garden</p>
           </div>
           <p style={{ fontSize: 13, color: '#333', lineHeight: 1.65, whiteSpace: 'pre-line' }}>{result}</p>
@@ -503,7 +503,7 @@ export default function MiSelva({ onTab }) {
       <div className="scroll">
         {/* Greeting */}
         <div style={{ padding: '4px 18px 22px', display: 'flex', alignItems: 'center', gap: 14 }}>
-          <div className="selva-avatar breathing" style={{ width: 48, height: 48, flexShrink: 0 }}><SelvaLeaf size={24}/></div>
+          <div style={{ width: 48, height: 48, borderRadius: '50%', background: '#2D5A3D', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><img src="/brand/SelvaGarden_pictograma_oscuro_512.png" alt="Selva" style={{ width: 28, height: 28, objectFit: 'contain' }}/></div>
           <div>
             <p style={{ fontFamily: 'var(--font-serif)', fontSize: 21, fontWeight: 600, color: '#1A1A1A', lineHeight: 1.2 }}>Hola, {nombre}</p>
             <p style={{ fontSize: 12, color: '#888', marginTop: 3 }}>¿Qué hacemos hoy con tu selva?</p>

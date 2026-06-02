@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Phone } from '../components';
-import { Icon, SelvaLeaf } from '../icons';
+import { Icon } from '../icons';
 import { useCustomer, nivelInfo } from '../context/CustomerContext';
 import { fetchProductWithCare, fetchRelatedProducts } from '../lib/db';
 import { supabase } from '../lib/supabase';
@@ -129,9 +129,7 @@ export default function Producto({ product: productProp, onBack, onProduct }) {
 
           {/* Mi Selva nudge */}
           <div style={{ margin: '0 0 14px', background: '#E8F0EA', border: '1px solid rgba(45,106,79,0.2)', borderRadius: 14, padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div className="selva-avatar" style={{ width: 36, height: 36, flexShrink: 0 }}>
-              <SelvaLeaf size={18}/>
-            </div>
+            <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#2D5A3D', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><img src="/brand/SelvaGarden_pictograma_oscuro_512.png" alt="Selva" style={{ width: 20, height: 20, objectFit: 'contain' }}/></div>
             <div style={{ flex: 1 }}>
               <p style={{ fontSize: 11, fontWeight: 600, color: '#2D5A3D' }}>¿Ya la tienes en casa?</p>
               <p style={{ fontSize: 10, color: '#3D7A55', marginTop: 2 }}>Añádela a Mi Selva para recordatorios</p>

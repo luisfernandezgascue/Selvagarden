@@ -1,4 +1,4 @@
-import { Icon, SelvaLeaf } from './icons';
+import { Icon } from './icons';
 
 
 export function TabBar({ active = 'home', onChange = () => {} }) {
@@ -14,7 +14,7 @@ export function TabBar({ active = 'home', onChange = () => {} }) {
       <Tab id="shop" icon={<Icon.Shop size={22}/>} label="Tienda"/>
       <button className="tab-btn center" onClick={() => onChange('selva')}>
         <div className="tab-center-circle">
-          <img src="/brand/SelvaGarden_pictograma_oscuro_512.png" alt="Mi Selva" style={{ width: 22, height: 22, objectFit: 'contain' }}/>
+          <img src="/brand/SelvaGarden_pictograma_oscuro_512.png" alt="Mi Selva" style={{ width: 30, height: 30, objectFit: 'contain' }}/>
         </div>
         <span className="tab-lbl" style={{ marginTop: 4, fontWeight: active === 'selva' ? 600 : 500, color: active === 'selva' ? '#2D5A3D' : '#888' }}>Mi Selva</span>
       </button>
