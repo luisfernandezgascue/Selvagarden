@@ -13,7 +13,7 @@ const CATEGORY_LABELS = {
 };
 
 function displayName(p) {
-  return [p.nombre, p.color, p.talla].filter(Boolean).join(' ');
+  return p.nombre.charAt(0).toUpperCase() + p.nombre.slice(1).toLowerCase();
 }
 
 function ProductCardLarge({ product, discount, onProduct, onAddToCart }) {

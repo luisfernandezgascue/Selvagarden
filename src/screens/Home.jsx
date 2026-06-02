@@ -158,7 +158,7 @@ export default function Home({ onTab, onProduct }) {
     <Phone>
       <div style={{ flexShrink: 0, padding: '4px 18px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <img src="/brand/SelvaGarden_horizontal_claro.svg" alt="Selva Garden" style={{ height: '48px', width: 'auto', objectFit: 'contain', maxWidth: '220px' }}/>
+          <img src="/brand/SelvaGarden_horizontal_claro.svg" alt="Selva Garden" className="header-logo"/>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
           <button onClick={() => onTab?.('shop')} style={iconBtn}><Icon.Search/></button>
@@ -244,7 +244,7 @@ export default function Home({ onTab, onProduct }) {
             <div style={{ position: 'absolute', inset: 0, padding: '18px 18px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', maxWidth: '75%' }}>
               <span className="chip" style={{ background: 'rgba(184,149,106,0.28)', border: '1px solid rgba(184,149,106,0.45)', color: '#F5EDD8', alignSelf: 'flex-start', marginBottom: 10, fontSize: 9, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Planta de la semana</span>
               <h2 className="h-serif" style={{ fontSize: 28, color: '#fff', fontWeight: 500, marginBottom: 5, lineHeight: 1.15 }}>
-                {[hero.nombre, hero.color, hero.talla].filter(Boolean).join(' ')}
+                {hero.nombre.charAt(0).toUpperCase() + hero.nombre.slice(1).toLowerCase()}
               </h2>
               {hero.subfamily?.nombre && <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.65)', marginBottom: 14 }}>{hero.subfamily.nombre}</p>}
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
