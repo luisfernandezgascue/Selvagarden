@@ -8,7 +8,7 @@ export function nivelInfo(nivel) {
     sin_nivel:  { label: 'Sin nivel',  emoji: '',    descuento: 0,  color: '#888' },
     alhambra:   { label: 'Alhambra',   emoji: '🥉',  descuento: 5,  color: '#A0785A' },
     versailles: { label: 'Versailles', emoji: '🥈',  descuento: 10, color: '#8A8A8A' },
-    babilonia:  { label: 'Babilonia',  emoji: '🥇',  descuento: 15, color: '#B5873A' },
+    babilonia:  { label: 'Babilonia',  emoji: '🥇',  descuento: 15, color: '#B8956A' },
   };
   return map[nivel] || map.sin_nivel;
 }

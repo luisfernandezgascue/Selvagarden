@@ -31,7 +31,7 @@ function ProductCardLarge({ product, discount, onProduct, onAddToCart }) {
         />
         <button
           onClick={e => e.stopPropagation()}
-          style={{ position: 'absolute', top: 7, right: 7, width: 28, height: 28, borderRadius: '50%', background: 'rgba(255,255,255,0.88)', border: 'none', color: '#1A3C2E', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          style={{ position: 'absolute', top: 7, right: 7, width: 28, height: 28, borderRadius: '50%', background: 'rgba(255,255,255,0.88)', border: 'none', color: '#2D5A3D', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
         >
           <Icon.Heart size={14}/>
         </button>
@@ -41,12 +41,12 @@ function ProductCardLarge({ product, discount, onProduct, onAddToCart }) {
         <p onClick={() => onProduct(product)} style={{ fontSize: 12, color: '#1A1A1A', fontWeight: 600, lineHeight: 1.3, marginBottom: 8, height: 30, overflow: 'hidden' }}>{displayName(product)}</p>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}>
-            <span style={{ fontFamily: 'var(--font-serif)', fontSize: 17, fontWeight: 600, color: '#1A3C2E' }}>${finalPrice.toFixed(2)}</span>
+            <span style={{ fontFamily: 'var(--font-serif)', fontSize: 17, fontWeight: 600, color: '#2D5A3D' }}>${finalPrice.toFixed(2)}</span>
             {discount > 0 && <span style={{ fontSize: 10, color: '#C0C0C0', textDecoration: 'line-through' }}>${product.precio_venta}</span>}
           </div>
           <button
             onClick={e => { e.stopPropagation(); onAddToCart(product); }}
-            style={{ width: 28, height: 28, borderRadius: '50%', background: '#1A3C2E', border: 'none', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            style={{ width: 28, height: 28, borderRadius: '50%', background: '#2D5A3D', border: 'none', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
           >
             <Icon.Plus size={14}/>
           </button>
@@ -116,7 +116,7 @@ export default function Tienda({ onTab, onProduct }) {
             <button onClick={() => setCartOpen(true)} style={{ ...iconBtn, position: 'relative' }}>
               <Icon.Cart/>
               {cartCount > 0 && (
-                <span style={{ position: 'absolute', top: -2, right: -2, background: '#B5873A', color: '#fff', fontSize: 9, fontWeight: 700, borderRadius: 99, minWidth: 16, height: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 3px', border: '2px solid #F4F6F1' }}>{cartCount}</span>
+                <span style={{ position: 'absolute', top: -2, right: -2, background: '#B8956A', color: '#fff', fontSize: 9, fontWeight: 700, borderRadius: 99, minWidth: 16, height: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 3px', border: '2px solid #F5F0E8' }}>{cartCount}</span>
               )}
             </button>
           </div>
@@ -149,7 +149,7 @@ export default function Tienda({ onTab, onProduct }) {
               background: 'none', border: 'none', padding: '10px 14px 10px 0',
               fontSize: 11, letterSpacing: '0.12em', fontWeight: cat === 'todos' ? 700 : 500,
               color: cat === 'todos' ? '#1A1A1A' : '#888',
-              borderBottom: cat === 'todos' ? '2px solid #1A3C2E' : '2px solid transparent',
+              borderBottom: cat === 'todos' ? '2px solid #2D5A3D' : '2px solid transparent',
               whiteSpace: 'nowrap', flexShrink: 0,
             }}>TODOS</button>
             {sortedFamilies.map(f => (
@@ -157,7 +157,7 @@ export default function Tienda({ onTab, onProduct }) {
                 background: 'none', border: 'none', padding: '10px 14px',
                 fontSize: 11, letterSpacing: '0.12em', fontWeight: cat === f.slug ? 700 : 500,
                 color: cat === f.slug ? '#1A1A1A' : '#888',
-                borderBottom: cat === f.slug ? '2px solid #1A3C2E' : '2px solid transparent',
+                borderBottom: cat === f.slug ? '2px solid #2D5A3D' : '2px solid transparent',
                 whiteSpace: 'nowrap', flexShrink: 0,
               }}>{(CATEGORY_LABELS[f.slug] || f.nombre)?.toUpperCase()}</button>
             ))}
@@ -165,9 +165,9 @@ export default function Tienda({ onTab, onProduct }) {
         )}
 
         {discount > 0 && (
-          <div style={{ margin: '12px 14px 0', padding: '10px 14px', background: '#D8EDE3', borderRadius: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ margin: '12px 14px 0', padding: '10px 14px', background: '#E8F0EA', borderRadius: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
             <Icon.Sparkle size={14}/>
-            <span style={{ fontSize: 12, color: '#1A3C2E', fontWeight: 600 }}>{discount}% OFF activo · nivel {['Alhambra','Versailles','Babilonia'][[5,10,15].indexOf(discount)]}</span>
+            <span style={{ fontSize: 12, color: '#2D5A3D', fontWeight: 600 }}>{discount}% OFF activo · nivel {['Alhambra','Versailles','Babilonia'][[5,10,15].indexOf(discount)]}</span>
           </div>
         )}
 
@@ -178,7 +178,7 @@ export default function Tienda({ onTab, onProduct }) {
 
         {loading ? (
           <div style={{ display: 'flex', justifyContent: 'center', padding: 40 }}>
-            <div style={{ width: 32, height: 32, borderRadius: '50%', border: '3px solid #D8EDE3', borderTopColor: '#1A3C2E', animation: 'spinSlow 0.8s linear infinite' }}/>
+            <div style={{ width: 32, height: 32, borderRadius: '50%', border: '3px solid #E8F0EA', borderTopColor: '#2D5A3D', animation: 'spinSlow 0.8s linear infinite' }}/>
           </div>
         ) : filtered.length === 0 ? (
           <div style={{ padding: '40px 18px', textAlign: 'center' }}>
@@ -191,7 +191,7 @@ export default function Tienda({ onTab, onProduct }) {
               <div key={product.id} style={{ position: 'relative' }}>
                 <ProductCardLarge product={product} discount={discount} onProduct={onProduct} onAddToCart={handleAddToCart}/>
                 {addedId === product.id && (
-                  <div style={{ position: 'absolute', inset: 0, background: 'rgba(26,60,46,0.85)', borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10 }}>
+                  <div style={{ position: 'absolute', inset: 0, background: 'rgba(45,90,61,0.85)', borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10 }}>
                     <span style={{ fontSize: 13, color: '#fff', fontWeight: 600 }}>¡Añadido!</span>
                   </div>
                 )}

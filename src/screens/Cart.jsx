@@ -68,19 +68,19 @@ export default function Cart({ onClose }) {
   if (success) {
     return (
       <Phone>
-        <div style={{ minHeight: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 32, textAlign: 'center', background: '#F4F6F1' }}>
-          <div style={{ width: 80, height: 80, borderRadius: '50%', background: '#D8EDE3', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 20 }}>
+        <div style={{ minHeight: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 32, textAlign: 'center', background: '#F5F0E8' }}>
+          <div style={{ width: 80, height: 80, borderRadius: '50%', background: '#E8F0EA', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 20 }}>
             <span style={{ fontSize: 36 }}>🌿</span>
           </div>
-          <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 28, fontWeight: 600, color: '#1A3C2E', marginBottom: 10 }}>¡Pedido confirmado!</h2>
+          <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 28, fontWeight: 600, color: '#2D5A3D', marginBottom: 10 }}>¡Pedido confirmado!</h2>
           <p style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 1.6, marginBottom: 8 }}>Tu pedido ha sido registrado exitosamente.</p>
           {puntosGanados > 0 && (
-            <div style={{ background: '#D8EDE3', borderRadius: 12, padding: '10px 20px', marginBottom: 20 }}>
-              <p style={{ fontSize: 13, fontWeight: 700, color: '#1A3C2E' }}>+{puntosGanados} puntos ganados 🎉</p>
+            <div style={{ background: '#E8F0EA', borderRadius: 12, padding: '10px 20px', marginBottom: 20 }}>
+              <p style={{ fontSize: 13, fontWeight: 700, color: '#2D5A3D' }}>+{puntosGanados} puntos ganados 🎉</p>
             </div>
           )}
           <p style={{ fontSize: 13, color: '#888', marginBottom: 32 }}>Recibirás confirmación en tu correo.</p>
-          <button onClick={onClose} style={{ background: '#1A3C2E', color: '#fff', border: 'none', borderRadius: 'var(--r-btn)', padding: '14px 32px', fontSize: 14, fontWeight: 600 }}>
+          <button onClick={onClose} style={{ background: '#2D5A3D', color: '#fff', border: 'none', borderRadius: 'var(--r-btn)', padding: '14px 32px', fontSize: 14, fontWeight: 600 }}>
             Volver a la tienda
           </button>
         </div>
@@ -101,12 +101,12 @@ export default function Cart({ onClose }) {
 
       {cart.length === 0 ? (
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 32, textAlign: 'center' }}>
-          <div style={{ width: 60, height: 60, borderRadius: '50%', background: '#D8EDE3', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
+          <div style={{ width: 60, height: 60, borderRadius: '50%', background: '#E8F0EA', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
             <Icon.Cart size={28}/>
           </div>
           <p style={{ fontFamily: 'var(--font-serif)', fontSize: 20, color: '#1A1A1A', marginBottom: 8 }}>Tu carrito está vacío</p>
           <p style={{ fontSize: 13, color: '#888', marginBottom: 24 }}>Agrega productos desde la tienda</p>
-          <button onClick={onClose} style={{ background: '#1A3C2E', color: '#fff', border: 'none', borderRadius: 'var(--r-btn)', padding: '12px 24px', fontSize: 13, fontWeight: 600 }}>
+          <button onClick={onClose} style={{ background: '#2D5A3D', color: '#fff', border: 'none', borderRadius: 'var(--r-btn)', padding: '12px 24px', fontSize: 13, fontWeight: 600 }}>
             Ir a la tienda
           </button>
         </div>
@@ -115,9 +115,9 @@ export default function Cart({ onClose }) {
           <div className="scroll" style={{ flex: 1 }}>
             {/* Loyalty banner */}
             {discount > 0 && (
-              <div style={{ margin: '12px 14px 0', padding: '10px 14px', background: '#D8EDE3', borderRadius: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div style={{ margin: '12px 14px 0', padding: '10px 14px', background: '#E8F0EA', borderRadius: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
                 <span style={{ fontSize: 16 }}>{info.emoji}</span>
-                <p style={{ fontSize: 12, color: '#1A3C2E', fontWeight: 600 }}>Nivel {info.label}: {discount}% OFF aplicado</p>
+                <p style={{ fontSize: 12, color: '#2D5A3D', fontWeight: 600 }}>Nivel {info.label}: {discount}% OFF aplicado</p>
               </div>
             )}
 
@@ -138,7 +138,7 @@ export default function Cart({ onClose }) {
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', lineHeight: 1.3, marginBottom: 4 }}>{product.nombre}</p>
                       <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 8 }}>
-                        <span style={{ fontFamily: 'var(--font-serif)', fontSize: 16, fontWeight: 600, color: '#1A3C2E' }}>${linePrice.toFixed(2)}</span>
+                        <span style={{ fontFamily: 'var(--font-serif)', fontSize: 16, fontWeight: 600, color: '#2D5A3D' }}>${linePrice.toFixed(2)}</span>
                         {discount > 0 && <span style={{ fontSize: 10, color: '#C0C0C0', textDecoration: 'line-through' }}>${product.precio_venta}</span>}
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -148,7 +148,7 @@ export default function Cart({ onClose }) {
                           <button onClick={() => updateCartQty(product.id, quantity + 1)} style={{ width: 30, height: 30, background: 'none', border: 'none', fontSize: 16, color: '#1A1A1A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>+</button>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                          <span style={{ fontSize: 13, fontWeight: 700, color: '#1A3C2E' }}>${(linePrice * quantity).toFixed(2)}</span>
+                          <span style={{ fontSize: 13, fontWeight: 700, color: '#2D5A3D' }}>${(linePrice * quantity).toFixed(2)}</span>
                           <button onClick={() => removeFromCart(product.id)} style={{ background: 'none', border: 'none', color: '#C0C0C0', padding: 4 }}>
                             <Icon.ArrowLeft size={14}/>
                           </button>
@@ -164,8 +164,8 @@ export default function Cart({ onClose }) {
             <div style={{ margin: '0 14px 14px', background: '#fff', borderRadius: 14, padding: '14px 16px', border: '1px solid var(--c-line-soft)' }}>
               <p style={{ fontSize: 12, fontWeight: 700, color: '#1A1A1A', marginBottom: 10 }}>Código de descuento</p>
               {promoCode ? (
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#D8EDE3', borderRadius: 10, padding: '10px 12px' }}>
-                  <span style={{ fontSize: 12, fontWeight: 700, color: '#1A3C2E' }}>✓ {promoCode.codigo} · −{promoCode.descuento_pct}%</span>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#E8F0EA', borderRadius: 10, padding: '10px 12px' }}>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: '#2D5A3D' }}>✓ {promoCode.codigo} · −{promoCode.descuento_pct}%</span>
                   <button onClick={() => setPromoCode(null)} style={{ background: 'none', border: 'none', color: '#888', fontSize: 11 }}>Quitar</button>
                 </div>
               ) : (
@@ -181,7 +181,7 @@ export default function Cart({ onClose }) {
                     <button
                       onClick={applyCode}
                       disabled={codeLoading || !codeInput.trim()}
-                      style={{ background: '#1A3C2E', color: '#fff', border: 'none', borderRadius: 10, padding: '10px 16px', fontSize: 12, fontWeight: 600, opacity: codeLoading || !codeInput.trim() ? 0.5 : 1 }}
+                      style={{ background: '#2D5A3D', color: '#fff', border: 'none', borderRadius: 10, padding: '10px 16px', fontSize: 12, fontWeight: 600, opacity: codeLoading || !codeInput.trim() ? 0.5 : 1 }}
                     >
                       {codeLoading ? '…' : 'Aplicar'}
                     </button>
@@ -203,27 +203,27 @@ export default function Cart({ onClose }) {
               {discount > 0 && (
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
                   <span style={{ fontSize: 12, color: '#888' }}>Descuento {info.label} ({discount}%)</span>
-                  <span style={{ fontSize: 12, color: '#2D6A4F', fontWeight: 600 }}>−${loyaltyAmt.toFixed(2)}</span>
+                  <span style={{ fontSize: 12, color: '#3D7A55', fontWeight: 600 }}>−${loyaltyAmt.toFixed(2)}</span>
                 </div>
               )}
 
               {promoCode && (
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
                   <span style={{ fontSize: 12, color: '#888' }}>Código {promoCode.codigo} ({codeDiscPct}%)</span>
-                  <span style={{ fontSize: 12, color: '#2D6A4F', fontWeight: 600 }}>−${codeAmt.toFixed(2)}</span>
+                  <span style={{ fontSize: 12, color: '#3D7A55', fontWeight: 600 }}>−${codeAmt.toFixed(2)}</span>
                 </div>
               )}
 
               <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: 10, borderTop: '1px solid var(--c-line-soft)', marginBottom: 12 }}>
                 <span style={{ fontSize: 14, fontWeight: 700 }}>Total</span>
-                <span style={{ fontFamily: 'var(--font-serif)', fontSize: 20, fontWeight: 700, color: '#1A3C2E' }}>${finalTotal.toFixed(2)}</span>
+                <span style={{ fontFamily: 'var(--font-serif)', fontSize: 20, fontWeight: 700, color: '#2D5A3D' }}>${finalTotal.toFixed(2)}</span>
               </div>
 
               {/* Points banner */}
-              <div style={{ background: 'linear-gradient(135deg, #FBF6ED, #F5EDD8)', border: '1px solid rgba(181,135,58,0.25)', borderRadius: 10, padding: '10px 12px', display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{ background: 'linear-gradient(135deg, #FBF6ED, #F5EDD8)', border: '1px solid rgba(184,149,106,0.25)', borderRadius: 10, padding: '10px 12px', display: 'flex', alignItems: 'center', gap: 10 }}>
                 <span style={{ fontSize: 20 }}>⭐</span>
                 <div>
-                  <p style={{ fontSize: 12, fontWeight: 700, color: '#B5873A' }}>Ganarás {puntosGanados} puntos</p>
+                  <p style={{ fontSize: 12, fontWeight: 700, color: '#B8956A' }}>Ganarás {puntosGanados} puntos</p>
                   <p style={{ fontSize: 10, color: '#6B5A3A', marginTop: 1 }}>Acumulables para tu próxima compra</p>
                 </div>
               </div>
@@ -231,12 +231,12 @@ export default function Cart({ onClose }) {
           </div>
 
           {/* Sticky CTA */}
-          <div style={{ flexShrink: 0, padding: '12px 18px max(22px, env(safe-area-inset-bottom))', background: '#F4F6F1', borderTop: '1px solid var(--c-line-soft)' }}>
+          <div style={{ flexShrink: 0, padding: '12px 18px max(22px, env(safe-area-inset-bottom))', background: '#F5F0E8', borderTop: '1px solid var(--c-line-soft)' }}>
             {error && <p style={{ fontSize: 12, color: '#E53935', marginBottom: 10, textAlign: 'center' }}>{error}</p>}
             <button
               onClick={handleCheckout}
               disabled={loading}
-              style={{ width: '100%', background: loading ? '#A8D5B5' : '#1A3C2E', color: '#fff', border: 'none', borderRadius: 'var(--r-btn)', padding: '15px', fontSize: 14, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, opacity: loading ? 0.8 : 1 }}
+              style={{ width: '100%', background: loading ? '#A8D5B5' : '#2D5A3D', color: '#fff', border: 'none', borderRadius: 'var(--r-btn)', padding: '15px', fontSize: 14, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, opacity: loading ? 0.8 : 1 }}
             >
               {loading ? 'Procesando…' : `Comprar ahora · $${finalTotal.toFixed(2)}`}
             </button>

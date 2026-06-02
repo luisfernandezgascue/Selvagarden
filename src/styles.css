@@ -1,12 +1,12 @@
 /* SELVA GARDEN — Brand system */
 :root {
-  --c-green-dark: #1A3C2E;
-  --c-green: #2D6A4F;
-  --c-green-light: #D8EDE3;
+  --c-green-dark: #2D5A3D;
+  --c-green: #3D7A55;
+  --c-green-light: #E8F0EA;
   --c-green-mid: #A8D5B5;
-  --c-gold: #B5873A;
+  --c-gold: #B8956A;
   --c-gold-light: #F5EDD8;
-  --c-bg: #F4F6F1;
+  --c-bg: #F5F0E8;
   --c-black: #1A1A1A;
   --c-gray: #4A4A4A;
   --c-gray-soft: #888;
@@ -14,7 +14,7 @@
   --c-line-soft: rgba(26,26,26,0.04);
 
   --font-serif: 'Cormorant Garamond', 'Times New Roman', serif;
-  --font-sans: 'DM Sans', -apple-system, system-ui, sans-serif;
+  --font-sans: 'Jost', -apple-system, system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
 
   --r-card: 14px;
@@ -26,7 +26,7 @@
 html, body, #root {
   min-height: 100%;
   min-height: 100dvh;
-  background-color: #F4F6F1;
+  background-color: #F5F0E8;
 }
 body { font-family: var(--font-sans); color: var(--c-black); }
 button { font-family: inherit; cursor: pointer; }
@@ -46,7 +46,7 @@ a { text-decoration: none; }
   flex-direction: column;
   position: relative;
   background: var(--c-bg);
-  background-color: #F4F6F1;
+  background-color: #F5F0E8;
   overflow: hidden;
   font-family: var(--font-sans);
   padding-top: env(safe-area-inset-top);
@@ -59,7 +59,7 @@ a { text-decoration: none; }
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(160deg, #0a1810 0%, #1A3C2E 60%, #0f2318 100%);
+    background: linear-gradient(160deg, #0a1810 0%, #2D5A3D 60%, #0f2318 100%);
     min-height: 100dvh;
   }
   .screen-root {
@@ -78,7 +78,7 @@ a { text-decoration: none; }
 
 .calc-shell {
   min-height: 100vh;
-  background: linear-gradient(160deg, #0a1810 0%, #1A3C2E 100%);
+  background: linear-gradient(160deg, #0a1810 0%, #2D5A3D 100%);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -115,7 +115,7 @@ a { text-decoration: none; }
 /* ============ TAB BAR ============ */
 .tab-bar {
   flex-shrink: 0; position: relative;
-  background: rgba(244,246,241,0.94);
+  background: rgba(245,240,232,0.94);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   border-top: 1px solid var(--c-line);
@@ -137,10 +137,10 @@ a { text-decoration: none; }
 .tab-btn.center { position: relative; }
 .tab-center-circle {
   width: 54px; height: 54px; border-radius: 50%;
-  background: linear-gradient(160deg, #2D6A4F 0%, #1A3C2E 100%);
+  background: linear-gradient(160deg, #3D7A55 0%, #2D5A3D 100%);
   display: flex; align-items: center; justify-content: center;
   box-shadow:
-    0 8px 22px rgba(26,60,46,0.45),
+    0 8px 22px rgba(45,90,61,0.45),
     inset 0 1px 0 rgba(255,255,255,0.12);
   border: 3px solid var(--c-bg);
   margin-top: -28px;
@@ -189,9 +189,9 @@ a { text-decoration: none; }
 /* Selva avatar */
 .selva-avatar {
   border-radius: 50%;
-  background: radial-gradient(circle at 30% 25%, #2D6A4F 0%, #1A3C2E 75%);
+  background: radial-gradient(circle at 30% 25%, #3D7A55 0%, #2D5A3D 75%);
   display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 4px 14px rgba(26,60,46,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
+  box-shadow: 0 4px 14px rgba(45,90,61,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
   position: relative;
   flex-shrink: 0;
 }
@@ -203,7 +203,7 @@ a { text-decoration: none; }
   padding: 4px 10px; border-radius: var(--r-pill);
   font-size: 10px; font-weight: 600; letter-spacing: 0.02em;
 }
-.chip-gold { background: rgba(181,135,58,0.14); color: var(--c-gold); border: 1px solid rgba(181,135,58,0.25); }
+.chip-gold { background: rgba(184,149,106,0.14); color: var(--c-gold); border: 1px solid rgba(184,149,106,0.25); }
 .chip-green { background: var(--c-green-light); color: var(--c-green-dark); }
 .chip-dark { background: var(--c-green-dark); color: white; }
 .chip-white { background: white; color: var(--c-green-dark); }

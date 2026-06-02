@@ -14,9 +14,9 @@ export function TabBar({ active = 'home', onChange = () => {} }) {
       <Tab id="shop" icon={<Icon.Shop size={22}/>} label="Tienda"/>
       <button className="tab-btn center" onClick={() => onChange('selva')}>
         <div className="tab-center-circle">
-          <SelvaLeaf size={22} color={active === 'selva' ? '#F5EDD8' : '#fff'}/>
+          <img src="/brand/SelvaGarden_pictograma_oscuro_512.png" alt="Mi Selva" style={{ width: 22, height: 22, objectFit: 'contain' }}/>
         </div>
-        <span className="tab-lbl" style={{ marginTop: 4, fontWeight: active === 'selva' ? 600 : 500, color: active === 'selva' ? '#1A3C2E' : '#888' }}>Mi Selva</span>
+        <span className="tab-lbl" style={{ marginTop: 4, fontWeight: active === 'selva' ? 600 : 500, color: active === 'selva' ? '#2D5A3D' : '#888' }}>Mi Selva</span>
       </button>
       <Tab id="card" icon={<Icon.Card size={22}/>} label="Mi Tarjeta"/>
       <Tab id="me" icon={<Icon.User size={22}/>} label="Yo"/>
@@ -50,7 +50,7 @@ export function SectionHeader({ title, cta, style = {} }) {
   );
 }
 
-export function QRCode({ size = 220, dark = '#1A3C2E', light = 'transparent' }) {
+export function QRCode({ size = 220, dark = '#2D5A3D', light = 'transparent' }) {
   const n = 25;
   const cell = size / n;
   const seed = (x, y) => ((x * 73856093) ^ (y * 19349663) ^ 2654435761) >>> 0;
@@ -79,7 +79,7 @@ export function QRCode({ size = 220, dark = '#1A3C2E', light = 'transparent' }) 
       <rect x={0} y={size - 7 * cell - cell} width={7 * cell + cell} height={7 * cell + cell} fill={light}/>
       {finder(0, 0)}{finder(n - 7, 0)}{finder(0, n - 7)}
       <rect x={size / 2 - 22} y={size / 2 - 22} width={44} height={44} rx={10} fill={bg}/>
-      <rect x={size / 2 - 22} y={size / 2 - 22} width={44} height={44} rx={10} fill="#1A3C2E"/>
+      <rect x={size / 2 - 22} y={size / 2 - 22} width={44} height={44} rx={10} fill="#2D5A3D"/>
       <g transform={`translate(${size / 2 - 10},${size / 2 - 10})`}>
         <path d="M10 1.6 C 7.2 4, 5.8 7.2, 5.8 10.8 L 10 11.4 L 14.2 10.8 C 14.2 7.2, 12.8 4, 10 1.6 Z" fill="#fff"/>
         <path d="M10 11.4 L 10 18" stroke="#fff" strokeWidth="1.2" strokeLinecap="round"/>

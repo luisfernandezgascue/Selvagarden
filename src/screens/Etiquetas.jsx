@@ -17,7 +17,7 @@ const LAYOUTS = {
 function QR({ url = SITE_URL, size = 44 }) {
   const [src, setSrc] = useState('');
   useEffect(() => {
-    QRCode.toDataURL(url, { width: size * 2, margin: 1, color: { dark: '#1A3C2E', light: '#ffffff' } })
+    QRCode.toDataURL(url, { width: size * 2, margin: 1, color: { dark: '#2D5A3D', light: '#ffffff' } })
       .then(setSrc).catch(() => {});
   }, [url, size]);
   return src
@@ -46,23 +46,23 @@ function Hablador({ product }) {
   return (
     <div className="hablador" style={{
       width: '100%', height: '100%',
-      border: '1px solid #D8EDE3', borderRadius: 8,
+      border: '1px solid #E8F0EA', borderRadius: 8,
       overflow: 'hidden', display: 'flex', flexDirection: 'column',
       fontFamily: 'Inter, sans-serif', background: '#fff',
     }}>
-      <div style={{ background: '#1A3C2E', color: '#fff', padding: '5px 8px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexShrink: 0 }}>
+      <div style={{ background: '#2D5A3D', color: '#fff', padding: '5px 8px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexShrink: 0 }}>
         <div>
           <div style={{ fontSize: 12, fontWeight: 700, lineHeight: 1.2 }}>{nombre}</div>
           {cientifico && <div style={{ fontSize: 9, fontStyle: 'italic', color: '#A8D5B5', lineHeight: 1.2, marginTop: 1 }}>{cientifico}</div>}
         </div>
-        <div style={{ fontSize: 7, fontWeight: 700, letterSpacing: '0.1em', opacity: 0.7, marginTop: 2, whiteSpace: 'nowrap' }}>SELVA GARDEN</div>
+        <img src="/brand/SelvaGarden_pictograma_claro_512.png" style={{ height: 24, width: 'auto', opacity: 0.9 }} alt="Selva Garden"/>
       </div>
 
       <div style={{ flex: 1, display: 'flex', minHeight: 0 }}>
-        <div style={{ width: '42%', flexShrink: 0, overflow: 'hidden', borderRight: '1px solid #D8EDE3' }}>
+        <div style={{ width: '42%', flexShrink: 0, overflow: 'hidden', borderRight: '1px solid #E8F0EA' }}>
           {product.imagen_url
             ? <img src={product.imagen_url} alt={nombre} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}/>
-            : <div style={{ width: '100%', height: '100%', background: '#D8EDE3', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28 }}>🌿</div>
+            : <div style={{ width: '100%', height: '100%', background: '#E8F0EA', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28 }}>🌿</div>
           }
         </div>
         <div style={{ flex: 1, padding: '6px 8px', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 4, overflow: 'hidden' }}>
@@ -71,7 +71,7 @@ function Hablador({ product }) {
               <span style={{ fontSize: 13, lineHeight: 1, flexShrink: 0 }}>{c.icon}</span>
               <div>
                 <div style={{ fontSize: 7, color: '#999', lineHeight: 1, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{c.label}</div>
-                <div style={{ fontSize: 10, fontWeight: 600, color: '#1A3C2E', lineHeight: 1.2 }}>{c.val}</div>
+                <div style={{ fontSize: 10, fontWeight: 600, color: '#2D5A3D', lineHeight: 1.2 }}>{c.val}</div>
               </div>
             </div>
           ))}
@@ -80,8 +80,8 @@ function Hablador({ product }) {
         </div>
       </div>
 
-      <div style={{ background: '#F4F6F1', borderTop: '1px solid #D8EDE3', padding: '4px 8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
-        <div style={{ fontFamily: 'Cormorant Garamond, Georgia, serif', fontSize: 22, fontWeight: 700, color: '#1A3C2E', lineHeight: 1 }}>${precio}</div>
+      <div style={{ background: '#F5F0E8', borderTop: '1px solid #E8F0EA', padding: '4px 8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
+        <div style={{ fontFamily: 'Cormorant Garamond, Georgia, serif', fontSize: 22, fontWeight: 700, color: '#2D5A3D', lineHeight: 1 }}>${precio}</div>
         <QR url={SITE_URL} size={44}/>
       </div>
     </div>
@@ -100,18 +100,18 @@ function EtiquetaAnaquel({ product }) {
   return (
     <div className="etiqueta-anaquel" style={{
       width: '100%', height: '100%',
-      border: '1px solid #1A3C2E', borderRadius: 6,
+      border: '1px solid #2D5A3D', borderRadius: 6,
       overflow: 'hidden', display: 'flex',
       fontFamily: 'Inter, sans-serif',
     }}>
       <div style={{ flex: 1, padding: '6px 12px', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 2, background: '#fff', minWidth: 0 }}>
-        <div style={{ fontSize: 11, fontWeight: 800, color: '#1A3C2E', textTransform: 'uppercase', letterSpacing: '0.05em', lineHeight: 1.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{nombre}</div>
+        <div style={{ fontSize: 11, fontWeight: 800, color: '#2D5A3D', textTransform: 'uppercase', letterSpacing: '0.05em', lineHeight: 1.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{nombre}</div>
         {descripcion && <div style={{ fontSize: 8, color: '#666', lineHeight: 1.3, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{descripcion}</div>}
         <div style={{ fontSize: 8, color: '#444', fontStyle: 'italic', lineHeight: 1.3 }}>Modo de uso: {modo}</div>
         {sku && <div style={{ fontSize: 7, color: '#bbb', lineHeight: 1, marginTop: 1 }}>SKU: {sku}</div>}
       </div>
-      <div style={{ width: '18%', minWidth: 60, flexShrink: 0, background: '#1A3C2E', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '4px 8px', gap: 2 }}>
-        <div style={{ fontSize: 7, color: '#A8D5B5', fontWeight: 600, letterSpacing: '0.1em' }}>PRECIO</div>
+      <div style={{ width: '18%', minWidth: 60, flexShrink: 0, background: '#2D5A3D', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '4px 8px', gap: 3 }}>
+        <img src="/brand/SelvaGarden_pictograma_claro_512.png" style={{ height: 16, width: 'auto', opacity: 0.85 }} alt=""/>
         <div style={{ fontFamily: 'Cormorant Garamond, Georgia, serif', fontSize: 20, fontWeight: 700, color: '#fff', lineHeight: 1 }}>${precio}</div>
       </div>
     </div>
@@ -128,9 +128,9 @@ function CheckBox({ checked, onClick }) {
       style={{
         position: 'absolute', top: 6, left: 6, zIndex: 10,
         width: 20, height: 20,
-        background: checked ? '#1A3C2E' : '#fff',
+        background: checked ? '#2D5A3D' : '#fff',
         borderRadius: 5,
-        border: `2px solid ${checked ? '#1A3C2E' : '#ccc'}`,
+        border: `2px solid ${checked ? '#2D5A3D' : '#ccc'}`,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         cursor: 'pointer',
         boxShadow: '0 1px 4px rgba(0,0,0,0.18)',
@@ -249,7 +249,7 @@ export default function Etiquetas() {
   `;
 
   const btnStyle = (active) => ({
-    background: active ? '#1A3C2E' : '#F0F2ED',
+    background: active ? '#2D5A3D' : '#F0F2ED',
     color: active ? '#fff' : '#555',
     border: 'none', borderRadius: 20,
     padding: '5px 13px', fontSize: 11,
@@ -268,15 +268,15 @@ export default function Etiquetas() {
       <style>{printCSS}</style>
 
       {/* ── Header ── */}
-      <div className="no-print" style={{ background: '#1A3C2E', color: '#fff', padding: '10px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 30, boxShadow: '0 2px 8px rgba(0,0,0,0.2)' }}>
+      <div className="no-print" style={{ background: '#2D5A3D', color: '#fff', padding: '10px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 30, boxShadow: '0 2px 8px rgba(0,0,0,0.2)' }}>
         <div>
-          <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 20, fontWeight: 700, lineHeight: 1 }}>Selva Garden</div>
-          <div style={{ fontSize: 11, color: '#A8D5B5', marginTop: 3 }}>Etiquetas de impresión</div>
+          <img src="/brand/SelvaGarden_horizontal_oscuro_512.png" alt="Selva Garden" style={{ height: 32, width: 'auto', display: 'block' }}/>
+          <div style={{ fontSize: 11, color: '#A8D5B5', marginTop: 4 }}>Etiquetas de impresión</div>
         </div>
         <button
           onClick={() => window.print()}
           disabled={selectedCount === 0}
-          style={{ background: selectedCount > 0 ? '#fff' : 'rgba(255,255,255,0.3)', color: selectedCount > 0 ? '#1A3C2E' : 'rgba(255,255,255,0.6)', border: 'none', borderRadius: 8, padding: '9px 18px', fontSize: 13, fontWeight: 700, cursor: selectedCount > 0 ? 'pointer' : 'default', display: 'flex', alignItems: 'center', gap: 6, transition: 'background .15s' }}
+          style={{ background: selectedCount > 0 ? '#fff' : 'rgba(255,255,255,0.3)', color: selectedCount > 0 ? '#2D5A3D' : 'rgba(255,255,255,0.6)', border: 'none', borderRadius: 8, padding: '9px 18px', fontSize: 13, fontWeight: 700, cursor: selectedCount > 0 ? 'pointer' : 'default', display: 'flex', alignItems: 'center', gap: 6, transition: 'background .15s' }}
         >
           🖨️ Imprimir seleccionados ({selectedCount})
         </button>
@@ -288,7 +288,7 @@ export default function Etiquetas() {
           <button
             key={id}
             onClick={() => { setTab(id); setCategoryFilter('all'); }}
-            style={{ background: 'none', border: 'none', padding: '12px 16px', fontSize: 13, fontWeight: tab === id ? 700 : 500, color: tab === id ? '#1A3C2E' : '#888', borderBottom: tab === id ? '2px solid #1A3C2E' : '2px solid transparent', cursor: 'pointer' }}
+            style={{ background: 'none', border: 'none', padding: '12px 16px', fontSize: 13, fontWeight: tab === id ? 700 : 500, color: tab === id ? '#2D5A3D' : '#888', borderBottom: tab === id ? '2px solid #2D5A3D' : '2px solid transparent', cursor: 'pointer' }}
           >
             {label}
           </button>
@@ -312,7 +312,7 @@ export default function Etiquetas() {
 
           {/* Select / deselect */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <button onClick={selectAll} style={{ fontSize: 11, color: '#1A3C2E', fontWeight: 600, background: 'none', border: '1px solid #D8EDE3', borderRadius: 6, padding: '4px 10px', cursor: 'pointer' }}>
+            <button onClick={selectAll} style={{ fontSize: 11, color: '#2D5A3D', fontWeight: 600, background: 'none', border: '1px solid #E8F0EA', borderRadius: 6, padding: '4px 10px', cursor: 'pointer' }}>
               Seleccionar todo
             </button>
             <button onClick={deselectAll} style={{ fontSize: 11, color: '#888', fontWeight: 500, background: 'none', border: '1px solid #e0e0e0', borderRadius: 6, padding: '4px 10px', cursor: 'pointer' }}>
@@ -332,7 +332,7 @@ export default function Etiquetas() {
                   <button
                     key={n}
                     onClick={() => setPerPage(n)}
-                    style={{ width: 30, height: 28, background: perPage === n ? '#1A3C2E' : '#F0F2ED', color: perPage === n ? '#fff' : '#555', border: 'none', borderRadius: 6, fontSize: 12, fontWeight: 600, cursor: 'pointer', transition: 'background .1s' }}
+                    style={{ width: 30, height: 28, background: perPage === n ? '#2D5A3D' : '#F0F2ED', color: perPage === n ? '#fff' : '#555', border: 'none', borderRadius: 6, fontSize: 12, fontWeight: 600, cursor: 'pointer', transition: 'background .1s' }}
                   >
                     {n}
                   </button>
@@ -347,7 +347,7 @@ export default function Etiquetas() {
       <div className="print-area" style={{ padding: 24 }}>
         {loading ? (
           <div className="no-print" style={{ textAlign: 'center', padding: 60, color: '#888', fontSize: 13 }}>
-            <div style={{ width: 28, height: 28, borderRadius: '50%', border: '3px solid #D8EDE3', borderTopColor: '#1A3C2E', animation: 'sg-spin 0.8s linear infinite', margin: '0 auto 12px' }}/>
+            <div style={{ width: 28, height: 28, borderRadius: '50%', border: '3px solid #E8F0EA', borderTopColor: '#2D5A3D', animation: 'sg-spin 0.8s linear infinite', margin: '0 auto 12px' }}/>
             Cargando etiquetas…
           </div>
         ) : filteredItems.length === 0 ? (
@@ -375,7 +375,7 @@ export default function Etiquetas() {
                     style={{
                       width: layout.cols === 1 ? '16cm' : '9cm',
                       height: layout.previewH,
-                      outline: isSelected ? '2.5px solid #1A3C2E' : '2.5px solid transparent',
+                      outline: isSelected ? '2.5px solid #2D5A3D' : '2.5px solid transparent',
                       outlineOffset: 3,
                       borderRadius: 10,
                       overflow: 'hidden',
@@ -406,7 +406,7 @@ export default function Etiquetas() {
                     className="etiqueta-box"
                     style={{
                       height: '3cm',
-                      outline: isSelected ? '2.5px solid #1A3C2E' : '2.5px solid transparent',
+                      outline: isSelected ? '2.5px solid #2D5A3D' : '2.5px solid transparent',
                       outlineOffset: 3,
                       borderRadius: 8,
                       overflow: 'hidden',

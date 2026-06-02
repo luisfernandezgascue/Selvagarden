@@ -19,10 +19,10 @@ class ErrorBoundary extends Component {
   componentDidCatch(e, i) { console.error('[ErrorBoundary]', e, i); }
   render() {
     if (this.state.error) return (
-      <div style={{ minHeight:'100dvh', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', background:'#F4F6F1', padding:32, textAlign:'center' }}>
-        <p style={{ fontFamily:'serif', fontSize:22, color:'#1A3C2E', marginBottom:12 }}>Selva Garden</p>
+      <div style={{ minHeight:'100dvh', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', background:'#F5F0E8', padding:32, textAlign:'center' }}>
+        <p style={{ fontFamily:'serif', fontSize:22, color:'#2D5A3D', marginBottom:12 }}>Selva Garden</p>
         <p style={{ fontSize:14, color:'#888', marginBottom:20 }}>Algo salió mal. Por favor recarga la página.</p>
-        <button onClick={() => window.location.reload()} style={{ background:'#1A3C2E', color:'#fff', border:'none', borderRadius:22, padding:'12px 24px', fontSize:14, cursor:'pointer' }}>Recargar</button>
+        <button onClick={() => window.location.reload()} style={{ background:'#2D5A3D', color:'#fff', border:'none', borderRadius:22, padding:'12px 24px', fontSize:14, cursor:'pointer' }}>Recargar</button>
         <details style={{ marginTop:24, fontSize:11, color:'#aaa', maxWidth:320 }}>
           <summary style={{ cursor:'pointer' }}>Detalles</summary>
           <pre style={{ marginTop:8, textAlign:'left', whiteSpace:'pre-wrap', wordBreak:'break-all' }}>{this.state.error.message}</pre>
@@ -35,10 +35,10 @@ class ErrorBoundary extends Component {
 
 function LoadingScreen() {
   return (
-    <div style={{ minHeight:'100dvh', display:'flex', alignItems:'center', justifyContent:'center', background:'#F4F6F1' }}>
+    <div style={{ minHeight:'100dvh', display:'flex', alignItems:'center', justifyContent:'center', background:'#F5F0E8' }}>
       <div style={{ textAlign:'center' }}>
-        <div style={{ width:48, height:48, borderRadius:'50%', border:'3px solid #D8EDE3', borderTopColor:'#1A3C2E', animation:'spinSlow 0.8s linear infinite', margin:'0 auto 16px' }}/>
-        <p style={{ fontFamily:'serif', fontSize:16, color:'#1A3C2E', letterSpacing:'0.12em' }}>SELVA GARDEN</p>
+        <div style={{ width:48, height:48, borderRadius:'50%', border:'3px solid #E8F0EA', borderTopColor:'#2D5A3D', animation:'spinSlow 0.8s linear infinite', margin:'0 auto 16px' }}/>
+        <img src="/brand/SelvaGarden_horizontal_claro_512.png" alt="Selva Garden" style={{ height: 22, width: 'auto' }}/>
       </div>
     </div>
   );

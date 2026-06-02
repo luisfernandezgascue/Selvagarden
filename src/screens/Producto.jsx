@@ -66,7 +66,7 @@ export default function Producto({ product: productProp, onBack, onProduct }) {
     return (
       <Phone>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100%' }}>
-          <div style={{ width: 32, height: 32, borderRadius: '50%', border: '3px solid #D8EDE3', borderTopColor: '#1A3C2E', animation: 'spinSlow 0.8s linear infinite' }}/>
+          <div style={{ width: 32, height: 32, borderRadius: '50%', border: '3px solid #E8F0EA', borderTopColor: '#2D5A3D', animation: 'spinSlow 0.8s linear infinite' }}/>
         </div>
       </Phone>
     );
@@ -113,7 +113,7 @@ export default function Producto({ product: productProp, onBack, onProduct }) {
         </div>
 
         {/* Body */}
-        <div style={{ padding: '18px 18px 0', background: '#F4F6F1' }}>
+        <div style={{ padding: '18px 18px 0', background: '#F5F0E8' }}>
           {/* Name + price */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
             <div style={{ flex: 1, minWidth: 0 }}>
@@ -122,21 +122,21 @@ export default function Producto({ product: productProp, onBack, onProduct }) {
             </div>
             <div style={{ textAlign: 'right', marginLeft: 10 }}>
               {discount > 0 && <p style={{ fontSize: 11, color: '#C0C0C0', textDecoration: 'line-through' }}>${product.precio_venta}</p>}
-              <p style={{ fontFamily: 'var(--font-serif)', fontSize: 26, fontWeight: 600, color: '#1A3C2E', lineHeight: 1 }}>${finalPrice.toFixed(2)}</p>
-              {discount > 0 && <p style={{ fontSize: 10, color: '#B5873A', fontWeight: 600, marginTop: 3 }}>−{discount}% {nivelInfo(customer?.nivel_lealtad).label}</p>}
+              <p style={{ fontFamily: 'var(--font-serif)', fontSize: 26, fontWeight: 600, color: '#2D5A3D', lineHeight: 1 }}>${finalPrice.toFixed(2)}</p>
+              {discount > 0 && <p style={{ fontSize: 10, color: '#B8956A', fontWeight: 600, marginTop: 3 }}>−{discount}% {nivelInfo(customer?.nivel_lealtad).label}</p>}
             </div>
           </div>
 
           {/* Mi Selva nudge */}
-          <div style={{ margin: '0 0 14px', background: '#D8EDE3', border: '1px solid rgba(45,106,79,0.2)', borderRadius: 14, padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{ margin: '0 0 14px', background: '#E8F0EA', border: '1px solid rgba(45,106,79,0.2)', borderRadius: 14, padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
             <div className="selva-avatar" style={{ width: 36, height: 36, flexShrink: 0 }}>
               <SelvaLeaf size={18}/>
             </div>
             <div style={{ flex: 1 }}>
-              <p style={{ fontSize: 11, fontWeight: 600, color: '#1A3C2E' }}>¿Ya la tienes en casa?</p>
-              <p style={{ fontSize: 10, color: '#2D6A4F', marginTop: 2 }}>Añádela a Mi Selva para recordatorios</p>
+              <p style={{ fontSize: 11, fontWeight: 600, color: '#2D5A3D' }}>¿Ya la tienes en casa?</p>
+              <p style={{ fontSize: 10, color: '#3D7A55', marginTop: 2 }}>Añádela a Mi Selva para recordatorios</p>
             </div>
-            <button style={{ background: 'transparent', border: '1.5px solid #1A3C2E', color: '#1A3C2E', borderRadius: 18, padding: '5px 12px', fontSize: 11, fontWeight: 600 }}>Añadir</button>
+            <button style={{ background: 'transparent', border: '1.5px solid #2D5A3D', color: '#2D5A3D', borderRadius: 18, padding: '5px 12px', fontSize: 11, fontWeight: 600 }}>Añadir</button>
           </div>
 
           {/* Description */}
@@ -150,7 +150,7 @@ export default function Producto({ product: productProp, onBack, onProduct }) {
           {/* Care infographic */}
           {careData && (
             <div style={{ margin: '16px 0' }}>
-              <h4 style={{ fontSize: 13, fontWeight: 700, color: '#1A3C2E', marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+              <h4 style={{ fontSize: 13, fontWeight: 700, color: '#2D5A3D', marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                 Cuidados
               </h4>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
@@ -163,12 +163,12 @@ export default function Producto({ product: productProp, onBack, onProduct }) {
                   <div key={item.label} style={{ background: '#F0FAF5', borderRadius: 12, padding: '10px 8px', textAlign: 'center' }}>
                     <div style={{ fontSize: 22 }}>{item.icon}</div>
                     <div style={{ fontSize: 9, color: '#888', textTransform: 'uppercase', margin: '3px 0 2px', letterSpacing: '0.06em' }}>{item.label}</div>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: '#1A3C2E' }}>{item.value}</div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: '#2D5A3D' }}>{item.value}</div>
                   </div>
                 ) : null)}
               </div>
               {careData.dificultad && (
-                <div style={{ marginTop: 8, textAlign: 'center', fontSize: 12, color: '#2D6A4F' }}>
+                <div style={{ marginTop: 8, textAlign: 'center', fontSize: 12, color: '#3D7A55' }}>
                   {careData.dificultad === 'Facil'   && '⭐ Fácil'}
                   {careData.dificultad === 'Media'   && '⭐⭐ Nivel medio'}
                   {careData.dificultad === 'Experto' && '⭐⭐⭐ Para expertos'}
@@ -188,7 +188,7 @@ export default function Producto({ product: productProp, onBack, onProduct }) {
           {/* Related products */}
           {related.length > 0 && (
             <div style={{ marginBottom: 16 }}>
-              <p style={{ fontSize: 12, fontWeight: 700, color: '#1A3C2E', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 12 }}>
+              <p style={{ fontSize: 12, fontWeight: 700, color: '#2D5A3D', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 12 }}>
                 También te puede interesar
               </p>
               <div style={{ display: 'flex', gap: 10, overflowX: 'auto', scrollbarWidth: 'none', marginRight: -18 }}>
@@ -211,7 +211,7 @@ export default function Producto({ product: productProp, onBack, onProduct }) {
                       </div>
                       <div style={{ padding: '8px 10px 10px' }}>
                         <p style={{ fontSize: 11, fontWeight: 600, color: '#1A1A1A', lineHeight: 1.3, marginBottom: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.nombre}</p>
-                        <p style={{ fontFamily: 'var(--font-serif)', fontSize: 13, fontWeight: 600, color: '#1A3C2E' }}>${relPrice.toFixed(2)}</p>
+                        <p style={{ fontFamily: 'var(--font-serif)', fontSize: 13, fontWeight: 600, color: '#2D5A3D' }}>${relPrice.toFixed(2)}</p>
                       </div>
                     </button>
                   );
@@ -226,10 +226,10 @@ export default function Producto({ product: productProp, onBack, onProduct }) {
       </div>
 
       {/* Sticky CTA */}
-      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '14px 18px max(22px, env(safe-area-inset-bottom))', background: 'linear-gradient(180deg, transparent 0%, rgba(244,246,241,0.95) 30%, #F4F6F1 100%)' }}>
+      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '14px 18px max(22px, env(safe-area-inset-bottom))', background: 'linear-gradient(180deg, transparent 0%, rgba(245,240,232,0.95) 30%, #F5F0E8 100%)' }}>
         <button
           onClick={handleAddToCart}
-          style={{ background: added ? '#2D6A4F' : '#1A3C2E', color: '#fff', border: 'none', borderRadius: 'var(--r-btn)', padding: '15px', fontSize: 14, fontWeight: 600, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, boxShadow: '0 8px 22px rgba(26,60,46,0.25)', transition: 'background .2s' }}
+          style={{ background: added ? '#3D7A55' : '#2D5A3D', color: '#fff', border: 'none', borderRadius: 'var(--r-btn)', padding: '15px', fontSize: 14, fontWeight: 600, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, boxShadow: '0 8px 22px rgba(45,90,61,0.25)', transition: 'background .2s' }}
         >
           <Icon.Cart size={16}/> {added ? '¡Añadido al carrito!' : `Añadir al carrito · $${finalPrice.toFixed(2)}`}
         </button>

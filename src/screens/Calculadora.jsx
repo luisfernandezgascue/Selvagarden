@@ -24,7 +24,7 @@ function PriceRow({ l, r, bold }) {
   return (
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '9px 0', borderBottom: '1px solid var(--c-line-soft)', fontWeight: bold ? 700 : 400 }}>
       <span style={{ fontSize: bold ? 13 : 12, color: '#1A1A1A' }}>{l}</span>
-      <span style={{ fontFamily: bold ? 'var(--font-serif)' : 'var(--font-sans)', fontSize: bold ? 16 : 12, color: bold ? '#1A3C2E' : '#4A4A4A', fontWeight: bold ? 600 : 500 }}>{r}</span>
+      <span style={{ fontFamily: bold ? 'var(--font-serif)' : 'var(--font-sans)', fontSize: bold ? 16 : 12, color: bold ? '#2D5A3D' : '#4A4A4A', fontWeight: bold ? 600 : 500 }}>{r}</span>
     </div>
   );
 }
@@ -34,9 +34,9 @@ function SliderRow({ label, pct, setPct, max = 100 }) {
     <div style={{ marginBottom: 12 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
         <span style={{ fontSize: 11, color: '#4A4A4A' }}>{label}</span>
-        <span style={{ fontSize: 11, color: '#1A3C2E', fontWeight: 700 }}>{pct}%</span>
+        <span style={{ fontSize: 11, color: '#2D5A3D', fontWeight: 700 }}>{pct}%</span>
       </div>
-      <input type="range" min="0" max={max} value={pct} onChange={e => setPct(+e.target.value)} style={{ width: '100%', accentColor: '#1A3C2E', height: 4 }}/>
+      <input type="range" min="0" max={max} value={pct} onChange={e => setPct(+e.target.value)} style={{ width: '100%', accentColor: '#2D5A3D', height: 4 }}/>
     </div>
   );
 }
@@ -44,7 +44,7 @@ function SliderRow({ label, pct, setPct, max = 100 }) {
 function FieldRow({ label, required, children }) {
   return (
     <div>
-      <p style={{ fontSize: 10.5, color: '#888', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 5 }}>{label}{required && <span style={{ color: '#B5873A' }}> *</span>}</p>
+      <p style={{ fontSize: 10.5, color: '#888', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 5 }}>{label}{required && <span style={{ color: '#B8956A' }}> *</span>}</p>
       {children}
     </div>
   );
@@ -165,7 +165,7 @@ export default function Calculadora({ onBack }) {
             <SelvaLeaf size={20}/>
           </div>
           <div>
-            <p className="eyebrow" style={{ color: '#B5873A' }}>Selva Garden · interna</p>
+            <p className="eyebrow" style={{ color: '#B8956A' }}>Selva Garden · interna</p>
             <h2 className="h-serif" style={{ fontSize: 22, fontWeight: 600, lineHeight: 1.1 }}>
               Calculadora de <span style={{ fontStyle: 'italic' }}>arreglos</span>
             </h2>
@@ -182,13 +182,13 @@ export default function Calculadora({ onBack }) {
 
         {/* Left: flower list + client fields */}
         <div style={{ padding: '22px 28px', overflowY: 'auto', borderRight: '1px solid var(--c-line)' }}>
-          <div style={{ background: '#F5EDD8', border: '1px dashed rgba(181,135,58,0.4)', borderRadius: 12, padding: '12px 14px', marginBottom: 18, display: 'flex', alignItems: 'center', gap: 10 }}>
-            <span style={{ color: '#B5873A' }}><Icon.Sparkle size={18}/></span>
+          <div style={{ background: '#F5EDD8', border: '1px dashed rgba(184,149,106,0.4)', borderRadius: 12, padding: '12px 14px', marginBottom: 18, display: 'flex', alignItems: 'center', gap: 10 }}>
+            <span style={{ color: '#B8956A' }}><Icon.Sparkle size={18}/></span>
             <div style={{ flex: 1 }}>
               <p style={{ fontSize: 12, fontWeight: 600, color: '#6B5A3A' }}>AI detectó 4 tipos de flor en la foto del cliente</p>
               <p style={{ fontSize: 10.5, color: '#8B7A4F', marginTop: 2 }}>Rosas (24), eucalipto, gypsophila, hortensia · ajusta abajo</p>
             </div>
-            <button style={{ background: 'none', border: 'none', color: '#B5873A', fontSize: 11, fontWeight: 600 }}>Ver foto</button>
+            <button style={{ background: 'none', border: 'none', color: '#B8956A', fontSize: 11, fontWeight: 600 }}>Ver foto</button>
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 12 }}>
@@ -210,7 +210,7 @@ export default function Calculadora({ onBack }) {
                   <span style={{ fontSize: 11, color: '#888' }}>$</span>
                   <input type="number" step="0.10" value={f.unit} onChange={e => updateFlower(i, 'unit', +e.target.value || 0)} style={{ ...inp, textAlign: 'right', width: 60 }}/>
                 </div>
-                <span style={{ textAlign: 'right', fontFamily: 'var(--font-serif)', fontSize: 14, fontWeight: 600, color: '#1A3C2E' }}>
+                <span style={{ textAlign: 'right', fontFamily: 'var(--font-serif)', fontSize: 14, fontWeight: 600, color: '#2D5A3D' }}>
                   ${(f.qty * f.unit).toFixed(2)}
                 </span>
                 <button onClick={() => removeFlower(i)} style={{ background: 'none', border: 'none', color: '#C0C0C0', fontSize: 18, lineHeight: 1, cursor: 'pointer' }}>×</button>
@@ -237,7 +237,7 @@ export default function Calculadora({ onBack }) {
                   value={clienteEmail}
                   onChange={e => setClienteEmail(e.target.value)}
                   placeholder="email@ejemplo.com"
-                  style={{ ...fieldStyle, borderColor: !clienteEmail && sendMsg.includes('email') ? '#B5873A' : undefined }}
+                  style={{ ...fieldStyle, borderColor: !clienteEmail && sendMsg.includes('email') ? '#B8956A' : undefined }}
                 />
               </FieldRow>
               <FieldRow label="Teléfono">
@@ -287,8 +287,8 @@ export default function Calculadora({ onBack }) {
           <div style={{ flex: 1 }}/>
 
           {/* Total */}
-          <div style={{ background: 'linear-gradient(135deg, #1A3C2E 0%, #2D6A4F 100%)', color: '#fff', borderRadius: 14, padding: '16px 18px', marginTop: 18, position: 'relative', overflow: 'hidden' }}>
-            <div style={{ position: 'absolute', right: -15, top: -15, width: 80, height: 80, borderRadius: '50%', background: 'radial-gradient(circle, rgba(181,135,58,0.3), transparent 70%)' }}/>
+          <div style={{ background: 'linear-gradient(135deg, #2D5A3D 0%, #3D7A55 100%)', color: '#fff', borderRadius: 14, padding: '16px 18px', marginTop: 18, position: 'relative', overflow: 'hidden' }}>
+            <div style={{ position: 'absolute', right: -15, top: -15, width: 80, height: 80, borderRadius: '50%', background: 'radial-gradient(circle, rgba(184,149,106,0.3), transparent 70%)' }}/>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', position: 'relative' }}>
               <div>
                 <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 600 }}>Total redondeado</p>
@@ -321,7 +321,7 @@ export default function Calculadora({ onBack }) {
             <button
               onClick={handleEnviar}
               disabled={sendStatus === 'loading'}
-              style={{ background: sendStatus === 'ok' ? '#2D6A4F' : '#1A3C2E', color: '#fff', border: 'none', borderRadius: 'var(--r-btn)', padding: '13px', fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 9, cursor: sendStatus === 'loading' ? 'default' : 'pointer', opacity: sendStatus === 'loading' ? 0.75 : 1 }}
+              style={{ background: sendStatus === 'ok' ? '#3D7A55' : '#2D5A3D', color: '#fff', border: 'none', borderRadius: 'var(--r-btn)', padding: '13px', fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 9, cursor: sendStatus === 'loading' ? 'default' : 'pointer', opacity: sendStatus === 'loading' ? 0.75 : 1 }}
             >
               {sendStatus === 'loading'
                 ? <div style={{ width: 15, height: 15, borderRadius: '50%', border: '2px solid rgba(255,255,255,0.35)', borderTopColor: '#fff', animation: 'spinSlow 0.8s linear infinite' }}/>
@@ -331,7 +331,7 @@ export default function Calculadora({ onBack }) {
             </button>
 
             {sendMsg && (
-              <p style={{ fontSize: 11, color: sendStatus === 'error' ? '#B5873A' : '#2D6A4F', textAlign: 'center', lineHeight: 1.4 }}>{sendMsg}</p>
+              <p style={{ fontSize: 11, color: sendStatus === 'error' ? '#B8956A' : '#3D7A55', textAlign: 'center', lineHeight: 1.4 }}>{sendMsg}</p>
             )}
           </div>
         </div>

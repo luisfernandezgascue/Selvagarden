@@ -37,7 +37,7 @@ function InputField({ label, type = 'text', value, onChange, placeholder, autoCo
 }
 
 const primaryBtn = {
-  background: '#1A3C2E', color: '#fff', border: 'none',
+  background: '#2D5A3D', color: '#fff', border: 'none',
   borderRadius: 'var(--r-btn)', padding: '15px', width: '100%',
   fontSize: 14, fontWeight: 600, letterSpacing: '0.02em', cursor: 'pointer',
 };
@@ -72,11 +72,8 @@ export function OnboardWelcome({ onNext, onLogin }) {
         }}/>
       </div>
       <div style={{ position: 'relative', zIndex: 2, flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '24px 28px max(40px, env(safe-area-inset-bottom))', color: '#fff', minHeight: '100dvh' }}>
-        <div style={{ marginTop: 18, display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div className="selva-avatar" style={{ width: 34, height: 34 }}>
-            <SelvaLeaf size={18}/>
-          </div>
-          <span style={{ fontFamily: 'var(--font-serif)', fontSize: 16, letterSpacing: '0.16em', fontWeight: 600 }}>SELVA GARDEN</span>
+        <div style={{ marginTop: 18 }}>
+          <img src="/brand/SelvaGarden_apilado_claro_512.png" alt="Selva Garden" style={{ height: 70, width: 'auto', filter: 'brightness(0) invert(1)' }}/>
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
@@ -93,7 +90,7 @@ export function OnboardWelcome({ onNext, onLogin }) {
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             <button type="button" onClick={onNext} style={{
-              background: '#F5EDD8', color: '#1A3C2E', border: 'none',
+              background: '#F5EDD8', color: '#2D5A3D', border: 'none',
               borderRadius: 'var(--r-btn)', padding: '15px 18px',
               fontSize: 14, fontWeight: 600, letterSpacing: '0.02em', cursor: 'pointer',
             }}>Crear cuenta</button>
@@ -166,7 +163,7 @@ export function OnboardSignup({ onBack, onSignedUp }) {
     return (
       <Phone>
         <div className="scroll" style={{ padding: '10px 24px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flex: 1 }}>
-          <div style={{ width: 64, height: 64, borderRadius: '50%', background: '#D8EDE3', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 18 }}>
+          <div style={{ width: 64, height: 64, borderRadius: '50%', background: '#E8F0EA', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 18 }}>
             <Icon.Bell size={28}/>
           </div>
           <h2 className="h-serif" style={{ fontSize: 26, fontWeight: 500, marginBottom: 10, textAlign: 'center' }}>
@@ -176,7 +173,7 @@ export function OnboardSignup({ onBack, onSignedUp }) {
             Te enviamos un enlace de confirmación a<br/>
             <b style={{ color: '#1A1A1A' }}>{email}</b>
           </p>
-          <button type="button" onClick={onBack} style={{ ...primaryBtn, background: 'transparent', color: '#1A3C2E', border: '1.5px solid #1A3C2E' }}>
+          <button type="button" onClick={onBack} style={{ ...primaryBtn, background: 'transparent', color: '#2D5A3D', border: '1.5px solid #2D5A3D' }}>
             Volver
           </button>
         </div>
@@ -308,7 +305,7 @@ export function OnboardLogin({ onBack }) {
 
         <p style={{ marginTop: 20, fontSize: 12, color: '#888', textAlign: 'center' }}>
           ¿No tienes cuenta?{' '}
-          <button type="button" onClick={onBack} style={{ background: 'none', border: 'none', color: '#1A3C2E', fontWeight: 600, fontSize: 12, cursor: 'pointer', padding: 0 }}>
+          <button type="button" onClick={onBack} style={{ background: 'none', border: 'none', color: '#2D5A3D', fontWeight: 600, fontSize: 12, cursor: 'pointer', padding: 0 }}>
             Crear cuenta
           </button>
         </p>
@@ -328,26 +325,23 @@ export function OnboardCardReady({ onNext, customer }) {
   return (
     <Phone>
       <div className="scroll" style={{ padding: '10px 24px 30px', display: 'flex', flexDirection: 'column' }}>
-        <div style={{ marginTop: 14, marginBottom: 18, display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div className="selva-avatar breathing" style={{ width: 32, height: 32 }}>
-            <SelvaLeaf size={16}/>
-          </div>
-          <span style={{ fontFamily: 'var(--font-serif)', fontSize: 15, letterSpacing: '0.16em', fontWeight: 600 }}>SELVA GARDEN</span>
+        <div style={{ marginTop: 14, marginBottom: 18 }}>
+          <img src="/brand/SelvaGarden_horizontal_claro_512.png" alt="Selva Garden" style={{ height: 28, width: 'auto' }}/>
         </div>
 
         <div style={{
-          background: 'linear-gradient(160deg, #1A3C2E 0%, #2D6A4F 100%)',
+          background: 'linear-gradient(160deg, #2D5A3D 0%, #3D7A55 100%)',
           borderRadius: 20, padding: '26px 22px', color: '#fff',
           position: 'relative', overflow: 'hidden',
-          boxShadow: '0 12px 40px rgba(26,60,46,0.35)',
+          boxShadow: '0 12px 40px rgba(45,90,61,0.35)',
         }}>
-          <div style={{ position: 'absolute', right: -30, top: -30, width: 140, height: 140, borderRadius: '50%', background: 'radial-gradient(circle, rgba(181,135,58,0.35), transparent 70%)' }}/>
+          <div style={{ position: 'absolute', right: -30, top: -30, width: 140, height: 140, borderRadius: '50%', background: 'radial-gradient(circle, rgba(184,149,106,0.35), transparent 70%)' }}/>
           <p className="eyebrow" style={{ color: '#D4AA6B', marginBottom: 10, position: 'relative' }}>Tarjeta Selva Garden</p>
           <h2 className="h-serif" style={{ fontSize: 22, fontWeight: 500, marginBottom: 18, position: 'relative' }}>
             <span style={{ fontStyle: 'italic' }}>{nombre}</span>
           </h2>
           <div style={{ background: '#fff', borderRadius: 14, padding: 14, display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'relative' }}>
-            <QRCode size={180} dark="#1A3C2E" light="#fff"/>
+            <QRCode size={180} dark="#2D5A3D" light="#fff"/>
           </div>
           <p style={{ textAlign: 'center', marginTop: 8, fontSize: 10, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.08em', position: 'relative' }}>{numeroSocio}</p>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 12, alignItems: 'flex-end' }}>
@@ -362,8 +356,8 @@ export function OnboardCardReady({ onNext, customer }) {
           </div>
         </div>
 
-        <div style={{ marginTop: 22, padding: '18px 18px', background: '#F5EDD8', borderRadius: 14, border: '1px solid rgba(181,135,58,0.25)' }}>
-          <p className="eyebrow" style={{ color: '#B5873A', marginBottom: 6 }}>Bienvenida</p>
+        <div style={{ marginTop: 22, padding: '18px 18px', background: '#F5EDD8', borderRadius: 14, border: '1px solid rgba(184,149,106,0.25)' }}>
+          <p className="eyebrow" style={{ color: '#B8956A', marginBottom: 6 }}>Bienvenida</p>
           <h3 className="h-serif" style={{ fontSize: 20, fontWeight: 600, marginBottom: 6 }}>Échale Tierra</h3>
           <p style={{ fontSize: 12, color: '#5A4A2A', lineHeight: 1.5, marginBottom: 14 }}>
             Tu primer pedido lleva <b>10% OFF</b> y una suculenta de regalo.<br/>Válido por 14 días.

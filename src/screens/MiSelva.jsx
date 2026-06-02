@@ -41,19 +41,19 @@ function ReminderSheet({ plant, onClose }) {
 
   return (
     <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', zIndex: 200, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
-      <div onClick={e => e.stopPropagation()} style={{ background: '#F4F6F1', borderRadius: '20px 20px 0 0', padding: '24px 22px 36px', width: '100%', maxWidth: 430 }}>
+      <div onClick={e => e.stopPropagation()} style={{ background: '#F5F0E8', borderRadius: '20px 20px 0 0', padding: '24px 22px 36px', width: '100%', maxWidth: 430 }}>
         <div style={{ width: 36, height: 4, borderRadius: 99, background: '#D0D0D0', margin: '0 auto 20px' }}/>
         <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: 20, fontWeight: 600, marginBottom: 6 }}>Recordatorio de riego</h3>
         <p style={{ fontSize: 13, color: '#666', marginBottom: 20 }}>{plant.nombre}</p>
         <div style={{ display: 'flex', gap: 10, marginBottom: 20 }}>
           {[7, 14, 21].map(d => (
-            <button key={d} onClick={() => setDays(d)} style={{ flex: 1, padding: '12px', borderRadius: 12, border: `2px solid ${days === d ? '#1A3C2E' : 'var(--c-line)'}`, background: days === d ? '#D8EDE3' : '#fff', fontWeight: 600, fontSize: 13, color: days === d ? '#1A3C2E' : '#888' }}>
+            <button key={d} onClick={() => setDays(d)} style={{ flex: 1, padding: '12px', borderRadius: 12, border: `2px solid ${days === d ? '#2D5A3D' : 'var(--c-line)'}`, background: days === d ? '#E8F0EA' : '#fff', fontWeight: 600, fontSize: 13, color: days === d ? '#2D5A3D' : '#888' }}>
               {d} días
             </button>
           ))}
         </div>
         <p style={{ fontSize: 11, color: '#888', marginBottom: 16, textAlign: 'center' }}>Recibirás una notificación de prueba en 5 segundos</p>
-        <button onClick={handleSave} style={{ width: '100%', background: '#1A3C2E', color: '#fff', border: 'none', borderRadius: 'var(--r-btn)', padding: '14px', fontSize: 14, fontWeight: 600, marginBottom: 10 }}>
+        <button onClick={handleSave} style={{ width: '100%', background: '#2D5A3D', color: '#fff', border: 'none', borderRadius: 'var(--r-btn)', padding: '14px', fontSize: 14, fontWeight: 600, marginBottom: 10 }}>
           Activar recordatorio
         </button>
         <button onClick={onClose} style={{ width: '100%', background: 'none', border: 'none', color: '#888', fontSize: 13 }}>Cancelar</button>
@@ -80,13 +80,13 @@ function PlantRow({ item, onViewCare, onReminder }) {
       <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
         <button
           onClick={() => onReminder(item)}
-          style={{ width: 32, height: 32, borderRadius: '50%', background: hasReminder ? '#D8EDE3' : '#F0F0F0', border: 'none', color: hasReminder ? '#1A3C2E' : '#888', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          style={{ width: 32, height: 32, borderRadius: '50%', background: hasReminder ? '#E8F0EA' : '#F0F0F0', border: 'none', color: hasReminder ? '#2D5A3D' : '#888', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
         >
           <Icon.Bell size={14}/>
         </button>
         <button
           onClick={() => onViewCare(item)}
-          style={{ background: '#1A3C2E', color: '#fff', border: 'none', borderRadius: 18, padding: '6px 12px', fontSize: 10, fontWeight: 600 }}
+          style={{ background: '#2D5A3D', color: '#fff', border: 'none', borderRadius: 18, padding: '6px 12px', fontSize: 10, fontWeight: 600 }}
         >
           Cuidados
         </button>
@@ -109,7 +109,7 @@ function CareModal({ plant, onClose }) {
 
   return (
     <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', zIndex: 100, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
-      <div onClick={e => e.stopPropagation()} style={{ background: '#F4F6F1', borderRadius: '20px 20px 0 0', padding: '24px 22px 36px', width: '100%', maxWidth: 430, maxHeight: '80vh', overflowY: 'auto' }}>
+      <div onClick={e => e.stopPropagation()} style={{ background: '#F5F0E8', borderRadius: '20px 20px 0 0', padding: '24px 22px 36px', width: '100%', maxWidth: 430, maxHeight: '80vh', overflowY: 'auto' }}>
         <div style={{ width: 36, height: 4, borderRadius: 99, background: '#D0D0D0', margin: '0 auto 20px' }}/>
         <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: 22, fontWeight: 600, marginBottom: 6 }}>{plant.nombre}</h3>
         {care ? (
@@ -123,7 +123,7 @@ function CareModal({ plant, onClose }) {
             {care.temperatura && <div style={{ background: '#fff', borderRadius: 12, padding: '10px 14px', display: 'flex', gap: 10, alignItems: 'center' }}>
               <Icon.Thermo size={18}/><div><p style={{ fontSize: 12, fontWeight: 600 }}>Temperatura</p><p style={{ fontSize: 11, color: '#888' }}>{care.temperatura}</p></div>
             </div>}
-            {care.notas && <div style={{ background: '#D8EDE3', borderRadius: 12, padding: '10px 14px' }}>
+            {care.notas && <div style={{ background: '#E8F0EA', borderRadius: 12, padding: '10px 14px' }}>
               <p style={{ fontSize: 12, fontWeight: 600, marginBottom: 4 }}>Notas</p>
               <p style={{ fontSize: 11, color: '#4A4A4A', lineHeight: 1.5 }}>{care.notas}</p>
             </div>}
@@ -133,7 +133,7 @@ function CareModal({ plant, onClose }) {
                   <iframe width="100%" height="100%" src={care.video_url.replace('watch?v=', 'embed/')} frameBorder="0" allowFullScreen style={{ display: 'block' }}/>
                 </div>
               ) : (
-                <button onClick={() => setVideoOpen(true)} style={{ background: '#1A3C2E', color: '#fff', border: 'none', borderRadius: 'var(--r-btn)', padding: '12px', fontSize: 12, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                <button onClick={() => setVideoOpen(true)} style={{ background: '#2D5A3D', color: '#fff', border: 'none', borderRadius: 'var(--r-btn)', padding: '12px', fontSize: 12, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
                   <Icon.Play size={14}/> Ver video de cuidados
                 </button>
               )
@@ -176,7 +176,7 @@ function MisPlantasTab() {
     });
   }, [customer?.id]);
 
-  if (loading) return <div style={{ padding: 40, display: 'flex', justifyContent: 'center' }}><div style={{ width: 28, height: 28, borderRadius: '50%', border: '3px solid #D8EDE3', borderTopColor: '#1A3C2E', animation: 'spinSlow 0.8s linear infinite' }}/></div>;
+  if (loading) return <div style={{ padding: 40, display: 'flex', justifyContent: 'center' }}><div style={{ width: 28, height: 28, borderRadius: '50%', border: '3px solid #E8F0EA', borderTopColor: '#2D5A3D', animation: 'spinSlow 0.8s linear infinite' }}/></div>;
 
   if (plants.length === 0) return (
     <div style={{ padding: '40px 18px', textAlign: 'center' }}>
@@ -242,7 +242,7 @@ function DiagnosticarTab() {
   return (
     <div style={{ padding: '12px 14px 24px' }}>
       <div style={{ margin: '0 0 16px', padding: '20px 18px', background: '#fff', border: '1px solid var(--c-line)', borderRadius: 16, textAlign: 'center' }}>
-        <div style={{ width: 56, height: 56, borderRadius: 16, background: '#1A3C2E', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px', color: '#F5EDD8' }}>
+        <div style={{ width: 56, height: 56, borderRadius: 16, background: '#2D5A3D', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px', color: '#F5EDD8' }}>
           <Icon.Camera size={24}/>
         </div>
         <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: 20, fontWeight: 600, marginBottom: 6 }}>Diagnosticar planta</h3>
@@ -250,7 +250,7 @@ function DiagnosticarTab() {
         <input ref={fileRef} type="file" accept="image/*" onChange={handleFile} style={{ display: 'none' }}/>
         <button
           onClick={() => fileRef.current?.click()}
-          style={{ background: '#F0FAF5', color: '#1A3C2E', border: '1.5px dashed #A8D5B5', borderRadius: 12, padding: '14px 24px', fontSize: 13, fontWeight: 600, width: '100%' }}
+          style={{ background: '#F0FAF5', color: '#2D5A3D', border: '1.5px dashed #A8D5B5', borderRadius: 12, padding: '14px 24px', fontSize: 13, fontWeight: 600, width: '100%' }}
         >
           {preview ? 'Cambiar foto' : 'Subir foto de tu planta'}
         </button>
@@ -264,7 +264,7 @@ function DiagnosticarTab() {
           <button
             onClick={handleDiagnose}
             disabled={loading}
-            style={{ width: '100%', background: loading ? '#A8D5B5' : '#1A3C2E', color: '#fff', border: 'none', borderRadius: 'var(--r-btn)', padding: '14px', fontSize: 14, fontWeight: 600 }}
+            style={{ width: '100%', background: loading ? '#A8D5B5' : '#2D5A3D', color: '#fff', border: 'none', borderRadius: 'var(--r-btn)', padding: '14px', fontSize: 14, fontWeight: 600 }}
           >
             {loading ? 'Analizando…' : 'Analizar esta planta'}
           </button>
@@ -279,7 +279,7 @@ function DiagnosticarTab() {
         <div style={{ background: '#fff', border: '1px solid var(--c-line)', borderRadius: 16, padding: '18px 16px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
             <div className="selva-avatar" style={{ width: 36, height: 36, flexShrink: 0 }}><SelvaLeaf size={18}/></div>
-            <p style={{ fontSize: 12, fontWeight: 700, color: '#1A3C2E' }}>Diagnóstico de Selva Garden</p>
+            <p style={{ fontSize: 12, fontWeight: 700, color: '#2D5A3D' }}>Diagnóstico de Selva Garden</p>
           </div>
           <p style={{ fontSize: 13, color: '#333', lineHeight: 1.65, whiteSpace: 'pre-line' }}>{result}</p>
         </div>
@@ -334,7 +334,7 @@ function InspiracionTab() {
   return (
     <div style={{ padding: '12px 14px 24px' }}>
       <div style={{ margin: '0 0 16px', padding: '20px 18px', background: '#fff', border: '1px solid var(--c-line)', borderRadius: 16, textAlign: 'center' }}>
-        <div style={{ width: 56, height: 56, borderRadius: 16, background: '#B5873A', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px', color: '#fff' }}>
+        <div style={{ width: 56, height: 56, borderRadius: 16, background: '#B8956A', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px', color: '#fff' }}>
           <Icon.Sparkle size={24}/>
         </div>
         <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: 20, fontWeight: 600, marginBottom: 6 }}>Inspiración floral</h3>
@@ -342,7 +342,7 @@ function InspiracionTab() {
         <input ref={fileRef} type="file" accept="image/*" onChange={handleFile} style={{ display: 'none' }}/>
         <button
           onClick={() => fileRef.current?.click()}
-          style={{ background: '#FBF6ED', color: '#B5873A', border: '1.5px dashed rgba(181,135,58,0.4)', borderRadius: 12, padding: '14px 24px', fontSize: 13, fontWeight: 600, width: '100%' }}
+          style={{ background: '#FBF6ED', color: '#B8956A', border: '1.5px dashed rgba(184,149,106,0.4)', borderRadius: 12, padding: '14px 24px', fontSize: 13, fontWeight: 600, width: '100%' }}
         >
           {preview ? 'Cambiar foto' : 'Subir foto de inspiración'}
         </button>
@@ -356,7 +356,7 @@ function InspiracionTab() {
           <button
             onClick={handleAnalyze}
             disabled={loading}
-            style={{ width: '100%', background: loading ? '#D4AA6B' : '#B5873A', color: '#fff', border: 'none', borderRadius: 'var(--r-btn)', padding: '14px', fontSize: 14, fontWeight: 600 }}
+            style={{ width: '100%', background: loading ? '#D4AA6B' : '#B8956A', color: '#fff', border: 'none', borderRadius: 'var(--r-btn)', padding: '14px', fontSize: 14, fontWeight: 600 }}
           >
             {loading ? 'Analizando…' : 'Analizar este ramo'}
           </button>
@@ -369,7 +369,7 @@ function InspiracionTab() {
 
       {result && (
         <div style={{ background: '#fff', border: '1px solid var(--c-line)', borderRadius: 16, padding: '18px 16px' }}>
-          <p style={{ fontSize: 12, fontWeight: 700, color: '#B5873A', marginBottom: 10 }}>Análisis floral</p>
+          <p style={{ fontSize: 12, fontWeight: 700, color: '#B8956A', marginBottom: 10 }}>Análisis floral</p>
           <p style={{ fontSize: 13, color: '#333', lineHeight: 1.65, whiteSpace: 'pre-line', marginBottom: 16 }}>{result}</p>
           <a
             href={`https://wa.me/584000000000?text=${whatsappMsg}`}
@@ -417,8 +417,8 @@ function CuidadosTab() {
             <div style={{ padding: '10px 10px 12px' }}>
               <p style={{ fontSize: 11, fontWeight: 600, color: '#1A1A1A', lineHeight: 1.3, marginBottom: 6 }}>{plant.nombre}</p>
               <div style={{ display: 'flex', gap: 4 }}>
-                <span style={{ fontSize: 9, background: '#D8EDE3', color: '#1A3C2E', borderRadius: 6, padding: '2px 6px', fontWeight: 600 }}>{plant.riego}</span>
-                <span style={{ fontSize: 9, background: '#FBF6ED', color: '#B5873A', borderRadius: 6, padding: '2px 6px', fontWeight: 600 }}>{plant.luz}</span>
+                <span style={{ fontSize: 9, background: '#E8F0EA', color: '#2D5A3D', borderRadius: 6, padding: '2px 6px', fontWeight: 600 }}>{plant.riego}</span>
+                <span style={{ fontSize: 9, background: '#FBF6ED', color: '#B8956A', borderRadius: 6, padding: '2px 6px', fontWeight: 600 }}>{plant.luz}</span>
               </div>
             </div>
           </div>
@@ -427,7 +427,7 @@ function CuidadosTab() {
 
       {selected && (
         <div onClick={() => setSelected(null)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', zIndex: 100, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
-          <div onClick={e => e.stopPropagation()} style={{ background: '#F4F6F1', borderRadius: '20px 20px 0 0', padding: '24px 22px 36px', width: '100%', maxWidth: 430 }}>
+          <div onClick={e => e.stopPropagation()} style={{ background: '#F5F0E8', borderRadius: '20px 20px 0 0', padding: '24px 22px 36px', width: '100%', maxWidth: 430 }}>
             <div style={{ width: 36, height: 4, borderRadius: 99, background: '#D0D0D0', margin: '0 auto 20px' }}/>
             <div style={{ height: 160, borderRadius: 14, overflow: 'hidden', marginBottom: 16 }}>
               <img src={selected.img} style={{ width: '100%', height: '100%', objectFit: 'cover' }}/>
@@ -437,7 +437,7 @@ function CuidadosTab() {
               {[['Luz', selected.luz], ['Riego', selected.riego], ['Temperatura', selected.temp]].map(([k, v]) => (
                 <div key={k} style={{ background: '#fff', borderRadius: 10, padding: '10px 12px' }}>
                   <p style={{ fontSize: 10, color: '#888', marginBottom: 2 }}>{k}</p>
-                  <p style={{ fontSize: 12, fontWeight: 700, color: '#1A3C2E' }}>{v}</p>
+                  <p style={{ fontSize: 12, fontWeight: 700, color: '#2D5A3D' }}>{v}</p>
                 </div>
               ))}
             </div>
@@ -452,7 +452,7 @@ function CuidadosTab() {
 // ─── Main component ───────────────────────────────────────────────────────────
 
 const SECTIONS = [
-  { id: 'plantas',      label: 'Mis Plantas',   sub: 'Tu colección personal',    emoji: '🌿', bg: '#D8EDE3' },
+  { id: 'plantas',      label: 'Mis Plantas',   sub: 'Tu colección personal',    emoji: '🌿', bg: '#E8F0EA' },
   { id: 'diagnosticar', label: 'Diagnosticar',  sub: 'Analiza tu planta con IA', emoji: '📸', bg: '#F0FAF5' },
   { id: 'inspiracion',  label: 'Inspirar Ramo', sub: 'Diseña tu ramo ideal',     emoji: '🎨', bg: '#FBF6ED' },
   { id: 'cuidados',     label: 'Cuidados',       sub: 'Guías y videos',           emoji: '📹', bg: '#F5EDD8' },

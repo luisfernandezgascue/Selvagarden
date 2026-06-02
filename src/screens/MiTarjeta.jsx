@@ -14,7 +14,7 @@ function RealQR({ value, size = 200 }) {
     QRCodeLib.toDataURL(value, {
       width: size,
       margin: 2,
-      color: { dark: '#1A3C2E', light: '#ffffff' },
+      color: { dark: '#2D5A3D', light: '#ffffff' },
       errorCorrectionLevel: 'M',
     }).then(setDataUrl).catch(console.error);
   }, [value, size]);
@@ -28,7 +28,7 @@ function RealQR({ value, size = 200 }) {
 
   if (!dataUrl) return (
     <div style={{ width: size, height: size, background: '#F0FAF5', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div style={{ width: 24, height: 24, borderRadius: '50%', border: '3px solid #D8EDE3', borderTopColor: '#1A3C2E', animation: 'spinSlow 0.8s linear infinite' }}/>
+      <div style={{ width: 24, height: 24, borderRadius: '50%', border: '3px solid #E8F0EA', borderTopColor: '#2D5A3D', animation: 'spinSlow 0.8s linear infinite' }}/>
     </div>
   );
 
@@ -39,7 +39,7 @@ function CornerCuts() {
   const s = 18;
   const piece = (orient) => ({
     position: 'absolute', width: s, height: s,
-    borderColor: '#1A3C2E', borderStyle: 'solid', borderWidth: 0,
+    borderColor: '#2D5A3D', borderStyle: 'solid', borderWidth: 0,
     ...(orient.includes('t') ? { top: -6, borderTopWidth: 2.5 } : { bottom: -6, borderBottomWidth: 2.5 }),
     ...(orient.includes('l') ? { left: -6, borderLeftWidth: 2.5 } : { right: -6, borderRightWidth: 2.5 }),
   });
@@ -54,7 +54,7 @@ function CornerCuts() {
 function Benefit({ text }) {
   return (
     <div style={{ background: '#fff', border: '1px solid var(--c-line)', borderRadius: 12, padding: '11px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
-      <span style={{ color: '#B5873A' }}><Icon.Sparkle size={16}/></span>
+      <span style={{ color: '#B8956A' }}><Icon.Sparkle size={16}/></span>
       <span style={{ fontSize: 12, color: '#1A1A1A' }}>{text}</span>
     </div>
   );
@@ -67,7 +67,7 @@ function Tx({ date, desc, pts, positive }) {
         <p style={{ fontSize: 11, color: '#888', marginBottom: 2 }}>{date}</p>
         <p style={{ fontSize: 12, color: '#1A1A1A' }}>{desc}</p>
       </div>
-      <span style={{ fontFamily: 'var(--font-serif)', fontSize: 16, fontWeight: 600, color: positive ? '#1A3C2E' : '#B5873A' }}>{pts}</span>
+      <span style={{ fontFamily: 'var(--font-serif)', fontSize: 16, fontWeight: 600, color: positive ? '#2D5A3D' : '#B8956A' }}>{pts}</span>
     </div>
   );
 }
@@ -93,10 +93,10 @@ function WalletModal({ onClose }) {
 
   return (
     <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', zIndex: 100, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
-      <div onClick={e => e.stopPropagation()} style={{ background: '#F4F6F1', borderRadius: '20px 20px 0 0', padding: '24px 22px 36px', width: '100%', maxWidth: 430 }}>
+      <div onClick={e => e.stopPropagation()} style={{ background: '#F5F0E8', borderRadius: '20px 20px 0 0', padding: '24px 22px 36px', width: '100%', maxWidth: 430 }}>
         <div style={{ width: 36, height: 4, borderRadius: 99, background: '#D0D0D0', margin: '0 auto 20px' }}/>
 
-        <div style={{ width: 52, height: 52, borderRadius: 14, background: '#1A3C2E', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 14 }}>
+        <div style={{ width: 52, height: 52, borderRadius: 14, background: '#2D5A3D', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 14 }}>
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
             <path d="M12 3.2 C 9.2 5.6, 7.8 8.8, 7.8 12.4 L 12 13 L 16.2 12.4 C 16.2 8.8, 14.8 5.6, 12 3.2 Z" fill="#A8D5B5"/>
             <path d="M12 13 L 12 21" stroke="#A8D5B5" strokeWidth="1.4" strokeLinecap="round"/>
@@ -107,8 +107,8 @@ function WalletModal({ onClose }) {
         <p style={{ fontSize: 13, color: '#666', lineHeight: 1.6, marginBottom: 20 }}>Añade Selva Garden a tu pantalla de inicio para acceder a tu tarjeta y QR sin internet.</p>
 
         {installed ? (
-          <div style={{ background: '#D8EDE3', borderRadius: 12, padding: '14px 16px', marginBottom: 16, textAlign: 'center' }}>
-            <p style={{ fontSize: 14, fontWeight: 600, color: '#1A3C2E' }}>¡Listo! Ya está en tu pantalla de inicio</p>
+          <div style={{ background: '#E8F0EA', borderRadius: 12, padding: '14px 16px', marginBottom: 16, textAlign: 'center' }}>
+            <p style={{ fontSize: 14, fontWeight: 600, color: '#2D5A3D' }}>¡Listo! Ya está en tu pantalla de inicio</p>
           </div>
         ) : isIOS ? (
           <div style={{ background: '#fff', border: '1px solid var(--c-line)', borderRadius: 14, padding: '16px', marginBottom: 16 }}>
@@ -119,7 +119,7 @@ function WalletModal({ onClose }) {
               ['3.', "Toca 'Añadir'"],
             ].map(([n, t]) => (
               <div key={n} style={{ display: 'flex', gap: 10, marginBottom: 10, alignItems: 'flex-start' }}>
-                <span style={{ fontSize: 12, fontWeight: 700, color: '#1A3C2E', minWidth: 18 }}>{n}</span>
+                <span style={{ fontSize: 12, fontWeight: 700, color: '#2D5A3D', minWidth: 18 }}>{n}</span>
                 <span style={{ fontSize: 12, color: '#4A4A4A', lineHeight: 1.5 }}>{t}</span>
               </div>
             ))}
@@ -128,7 +128,7 @@ function WalletModal({ onClose }) {
         ) : deferredPrompt ? (
           <button
             onClick={handleAndroidInstall}
-            style={{ width: '100%', background: '#1A3C2E', color: '#fff', border: 'none', borderRadius: 'var(--r-btn)', padding: '14px', fontSize: 14, fontWeight: 600, marginBottom: 16 }}
+            style={{ width: '100%', background: '#2D5A3D', color: '#fff', border: 'none', borderRadius: 'var(--r-btn)', padding: '14px', fontSize: 14, fontWeight: 600, marginBottom: 16 }}
           >
             Añadir a pantalla de inicio
           </button>
@@ -196,21 +196,21 @@ export default function MiTarjeta({ onTab }) {
 
         {/* QR card — store mode shows large QR for cashier scanning */}
         {storeMode && isAdmin(customer) ? (
-          <div style={{ margin: '0 14px', padding: '28px 18px 24px', background: '#fff', borderRadius: 20, border: '2.5px solid #1A3C2E', boxShadow: '0 6px 30px rgba(26,60,46,0.15)', textAlign: 'center' }}>
+          <div style={{ margin: '0 14px', padding: '28px 18px 24px', background: '#fff', borderRadius: 20, border: '2.5px solid #2D5A3D', boxShadow: '0 6px 30px rgba(45,90,61,0.15)', textAlign: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 18 }}>
               <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#4CAF50', display: 'inline-block', animation: 'storePulse 1.5s ease-in-out infinite' }}/>
-              <span style={{ fontSize: 10, color: '#1A3C2E', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase' }}>Modo Tienda — Escanear</span>
+              <span style={{ fontSize: 10, color: '#2D5A3D', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase' }}>Modo Tienda — Escanear</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'center', position: 'relative', marginBottom: 16 }}>
               <RealQR value={numeroSocio} size={290}/>
               <CornerCuts/>
             </div>
-            <p style={{ fontFamily: 'var(--font-serif)', fontSize: 22, fontWeight: 600, color: '#1A3C2E', marginBottom: 4 }}>{nombre}</p>
+            <p style={{ fontFamily: 'var(--font-serif)', fontSize: 22, fontWeight: 600, color: '#2D5A3D', marginBottom: 4 }}>{nombre}</p>
             <p style={{ fontSize: 13, color: '#888', marginBottom: 6 }}>{info.emoji} {info.label}</p>
-            <p style={{ fontFamily: 'var(--font-serif)', fontSize: 18, fontWeight: 600, color: '#B5873A' }}>{puntos} pts</p>
+            <p style={{ fontFamily: 'var(--font-serif)', fontSize: 18, fontWeight: 600, color: '#B8956A' }}>{puntos} pts</p>
           </div>
         ) : (
-          <div style={{ margin: '0 14px', padding: '20px 18px', background: '#fff', borderRadius: 20, border: '1px solid var(--c-line)', boxShadow: '0 6px 30px rgba(26,60,46,0.08)' }}>
+          <div style={{ margin: '0 14px', padding: '20px 18px', background: '#fff', borderRadius: 20, border: '1px solid var(--c-line)', boxShadow: '0 6px 30px rgba(45,90,61,0.08)' }}>
             <div style={{ display: 'flex', justifyContent: 'center', position: 'relative' }}>
               <RealQR value={numeroSocio} size={220}/>
               <CornerCuts/>
@@ -221,7 +221,7 @@ export default function MiTarjeta({ onTab }) {
         )}
 
         {/* Points & progress */}
-        <div style={{ margin: '18px 14px 0', padding: '16px 18px', background: 'linear-gradient(135deg, #1A3C2E, #2D6A4F)', borderRadius: 16, color: '#fff' }}>
+        <div style={{ margin: '18px 14px 0', padding: '16px 18px', background: 'linear-gradient(135deg, #2D5A3D, #3D7A55)', borderRadius: 16, color: '#fff' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
             <div>
               <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.55)', letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 600, marginBottom: 4 }}>Puntos acumulados</p>
@@ -234,7 +234,7 @@ export default function MiTarjeta({ onTab }) {
             </div>
           </div>
           <div style={{ height: 5, background: 'rgba(255,255,255,0.15)', borderRadius: 99, marginTop: 14, overflow: 'hidden' }}>
-            <div style={{ height: '100%', width: `${Math.round(prog.pct * 100)}%`, background: 'linear-gradient(90deg, #A8D5B5, #B5873A)', borderRadius: 99, transition: 'width 1s ease' }}/>
+            <div style={{ height: '100%', width: `${Math.round(prog.pct * 100)}%`, background: 'linear-gradient(90deg, #A8D5B5, #B8956A)', borderRadius: 99, transition: 'width 1s ease' }}/>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6 }}>
             <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)' }}>{Math.round(prog.pct * 100)}% del camino</span>
@@ -252,7 +252,7 @@ export default function MiTarjeta({ onTab }) {
 
         <button
           onClick={() => setWalletOpen(true)}
-          style={{ margin: '18px 18px 0', background: '#1A3C2E', color: '#fff', border: 'none', borderRadius: 'var(--r-btn)', padding: '13px', fontSize: 13, fontWeight: 600, width: 'calc(100% - 36px)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+          style={{ margin: '18px 18px 0', background: '#2D5A3D', color: '#fff', border: 'none', borderRadius: 'var(--r-btn)', padding: '13px', fontSize: 13, fontWeight: 600, width: 'calc(100% - 36px)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
         >
           <Icon.Share size={16}/> Añadir a pantalla de inicio
         </button>

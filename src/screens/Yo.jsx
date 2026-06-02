@@ -9,7 +9,7 @@ import { isAdmin as checkAdmin } from '../lib/admin';
 function Stat({ n, lbl, gold }) {
   return (
     <div>
-      <p style={{ fontFamily: 'var(--font-serif)', fontSize: 22, fontWeight: 600, color: gold ? '#B5873A' : '#1A3C2E', lineHeight: 1 }}>{n}</p>
+      <p style={{ fontFamily: 'var(--font-serif)', fontSize: 22, fontWeight: 600, color: gold ? '#B8956A' : '#2D5A3D', lineHeight: 1 }}>{n}</p>
       <p style={{ fontSize: 10, color: '#6B5A3A', marginTop: 4, letterSpacing: '0.04em' }}>{lbl}</p>
     </div>
   );
@@ -18,7 +18,7 @@ function Stat({ n, lbl, gold }) {
 function MenuRow({ icon, text, sub, onClick }) {
   return (
     <button onClick={onClick} style={{ background: '#fff', border: '1px solid var(--c-line)', borderRadius: 12, padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 11, textAlign: 'left', width: '100%' }}>
-      <div style={{ width: 34, height: 34, borderRadius: 10, background: '#D8EDE3', color: '#1A3C2E', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{icon}</div>
+      <div style={{ width: 34, height: 34, borderRadius: 10, background: '#E8F0EA', color: '#2D5A3D', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{icon}</div>
       <div style={{ flex: 1 }}>
         <p style={{ fontSize: 13, fontWeight: 600 }}>{text}</p>
         {sub && <p style={{ fontSize: 10, color: '#888', marginTop: 1 }}>{sub}</p>}
@@ -31,7 +31,7 @@ function MenuRow({ icon, text, sub, onClick }) {
 function OrdersModal({ orders, onClose }) {
   return (
     <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', zIndex: 100, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
-      <div onClick={e => e.stopPropagation()} style={{ background: '#F4F6F1', borderRadius: '20px 20px 0 0', padding: '24px 22px 36px', width: '100%', maxWidth: 430, maxHeight: '80vh', overflowY: 'auto' }}>
+      <div onClick={e => e.stopPropagation()} style={{ background: '#F5F0E8', borderRadius: '20px 20px 0 0', padding: '24px 22px 36px', width: '100%', maxWidth: 430, maxHeight: '80vh', overflowY: 'auto' }}>
         <div style={{ width: 36, height: 4, borderRadius: 99, background: '#D0D0D0', margin: '0 auto 20px' }}/>
         <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: 22, fontWeight: 600, marginBottom: 16 }}>Mis pedidos</h3>
         {orders.length === 0 ? (
@@ -42,10 +42,10 @@ function OrdersModal({ orders, onClose }) {
               <div key={order.id} style={{ background: '#fff', borderRadius: 12, padding: '12px 14px', border: '1px solid var(--c-line)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
                   <span style={{ fontSize: 12, fontWeight: 600 }}>Pedido #{order.id?.slice(-6)?.toUpperCase()}</span>
-                  <span style={{ fontSize: 11, color: order.estado === 'confirmado' ? '#2D6A4F' : '#B5873A', fontWeight: 600 }}>{order.estado}</span>
+                  <span style={{ fontSize: 11, color: order.estado === 'confirmado' ? '#3D7A55' : '#B8956A', fontWeight: 600 }}>{order.estado}</span>
                 </div>
                 <p style={{ fontSize: 11, color: '#888', marginBottom: 4 }}>{new Date(order.created_at).toLocaleDateString('es-VE', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
-                <p style={{ fontFamily: 'var(--font-serif)', fontSize: 16, fontWeight: 600, color: '#1A3C2E' }}>${order.total?.toFixed(2)}</p>
+                <p style={{ fontFamily: 'var(--font-serif)', fontSize: 16, fontWeight: 600, color: '#2D5A3D' }}>${order.total?.toFixed(2)}</p>
               </div>
             ))}
           </div>
@@ -96,7 +96,7 @@ function SyncButton() {
     }
   }
 
-  const bg = status === 'ok' ? '#2D6A4F' : status === 'error' ? '#B5873A' : '#1A3C2E';
+  const bg = status === 'ok' ? '#3D7A55' : status === 'error' ? '#B8956A' : '#2D5A3D';
   const label = status === 'loading' ? 'Sincronizando…' : status === 'ok' ? '¡Sincronizado!' : status === 'error' ? 'Error — reintentar' : 'Sincronizar con Square';
 
   return (
@@ -113,7 +113,7 @@ function SyncButton() {
         {label}
       </button>
       {detail && (
-        <pre style={{ fontSize: 10, color: status === 'error' ? '#B5873A' : '#2D6A4F', marginTop: 6, lineHeight: 1.7, whiteSpace: 'pre-wrap', fontFamily: 'var(--font-sans)' }}>{detail}</pre>
+        <pre style={{ fontSize: 10, color: status === 'error' ? '#B8956A' : '#3D7A55', marginTop: 6, lineHeight: 1.7, whiteSpace: 'pre-wrap', fontFamily: 'var(--font-sans)' }}>{detail}</pre>
       )}
     </div>
   );
@@ -171,10 +171,10 @@ export default function Yo({ onTab }) {
 
         {/* Profile */}
         <div style={{ padding: '18px 18px 8px', display: 'flex', alignItems: 'center', gap: 14 }}>
-          <div style={{ width: 64, height: 64, borderRadius: '50%', overflow: 'hidden', background: '#D8EDE3', border: '2px solid #fff', boxShadow: '0 4px 14px rgba(26,60,46,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ width: 64, height: 64, borderRadius: '50%', overflow: 'hidden', background: '#E8F0EA', border: '2px solid #fff', boxShadow: '0 4px 14px rgba(45,90,61,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             {customer?.avatar_url
               ? <img src={customer.avatar_url} style={{ width: '100%', height: '100%', objectFit: 'cover' }}/>
-              : <span style={{ fontFamily: 'var(--font-serif)', fontSize: 26, fontWeight: 600, color: '#1A3C2E' }}>{nombre[0]}</span>
+              : <span style={{ fontFamily: 'var(--font-serif)', fontSize: 26, fontWeight: 600, color: '#2D5A3D' }}>{nombre[0]}</span>
             }
           </div>
           <div style={{ flex: 1 }}>
@@ -186,9 +186,9 @@ export default function Yo({ onTab }) {
 
         {/* Échale Tierra — only if has orders */}
         {orders.length > 0 ? (
-          <div style={{ margin: '14px 14px 0', padding: '20px 18px', background: 'linear-gradient(135deg, #F5EDD8 0%, #FBF6ED 70%)', border: '1px solid rgba(181,135,58,0.2)', borderRadius: 18, position: 'relative', overflow: 'hidden' }}>
-            <div style={{ position: 'absolute', right: -25, top: -25, width: 120, height: 120, borderRadius: '50%', background: 'radial-gradient(circle, rgba(181,135,58,0.22), transparent 70%)' }}/>
-            <p className="eyebrow" style={{ color: '#B5873A', marginBottom: 6, position: 'relative' }}>Programa de referidos</p>
+          <div style={{ margin: '14px 14px 0', padding: '20px 18px', background: 'linear-gradient(135deg, #F5EDD8 0%, #FBF6ED 70%)', border: '1px solid rgba(184,149,106,0.2)', borderRadius: 18, position: 'relative', overflow: 'hidden' }}>
+            <div style={{ position: 'absolute', right: -25, top: -25, width: 120, height: 120, borderRadius: '50%', background: 'radial-gradient(circle, rgba(184,149,106,0.22), transparent 70%)' }}/>
+            <p className="eyebrow" style={{ color: '#B8956A', marginBottom: 6, position: 'relative' }}>Programa de referidos</p>
             <h3 className="h-serif" style={{ fontSize: 24, fontWeight: 600, marginBottom: 6, position: 'relative' }}>
               <span style={{ fontStyle: 'italic' }}>Échale Tierra</span>
             </h3>
@@ -200,18 +200,18 @@ export default function Yo({ onTab }) {
               <Stat n={conversionCount} lbl="Conversiones"/>
               <Stat n={`$${comision}`} lbl="Comisión" gold/>
             </div>
-            <div style={{ display: 'flex', gap: 6, alignItems: 'center', background: 'rgba(255,255,255,0.7)', borderRadius: 12, padding: '9px 12px', border: '1px dashed rgba(181,135,58,0.3)', position: 'relative' }}>
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: '#1A3C2E', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{shareLink}</span>
-              <button onClick={handleShare} style={{ background: '#1A3C2E', color: '#F5EDD8', border: 'none', borderRadius: 18, padding: '6px 12px', fontSize: 11, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 5 }}>
+            <div style={{ display: 'flex', gap: 6, alignItems: 'center', background: 'rgba(255,255,255,0.7)', borderRadius: 12, padding: '9px 12px', border: '1px dashed rgba(184,149,106,0.3)', position: 'relative' }}>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: '#2D5A3D', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{shareLink}</span>
+              <button onClick={handleShare} style={{ background: '#2D5A3D', color: '#F5EDD8', border: 'none', borderRadius: 18, padding: '6px 12px', fontSize: 11, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 5 }}>
                 <Icon.Share size={12}/> Compartir
               </button>
             </div>
           </div>
         ) : (
           <div style={{ margin: '14px 14px 0', padding: '16px 18px', background: '#F0FAF5', border: '1px solid rgba(45,106,79,0.15)', borderRadius: 16 }}>
-            <p className="eyebrow" style={{ color: '#2D6A4F', marginBottom: 6 }}>Programa de referidos</p>
+            <p className="eyebrow" style={{ color: '#3D7A55', marginBottom: 6 }}>Programa de referidos</p>
             <p style={{ fontSize: 12, color: '#4A4A4A', lineHeight: 1.5, marginBottom: 12 }}>Haz tu primera compra para desbloquear el programa de referidos y ganar comisiones.</p>
-            <button onClick={() => onTab?.('shop')} style={{ background: '#1A3C2E', color: '#fff', border: 'none', borderRadius: 'var(--r-btn)', padding: '10px 18px', fontSize: 12, fontWeight: 600 }}>Ver tienda →</button>
+            <button onClick={() => onTab?.('shop')} style={{ background: '#2D5A3D', color: '#fff', border: 'none', borderRadius: 'var(--r-btn)', padding: '10px 18px', fontSize: 12, fontWeight: 600 }}>Ver tienda →</button>
           </div>
         )}
 
@@ -237,7 +237,7 @@ export default function Yo({ onTab }) {
                 onClick={() => window.open('/etiquetas', '_blank')}
                 style={{ width: '100%', background: '#fff', border: '1px solid var(--c-line)', borderRadius: 12, padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 11, textAlign: 'left' }}
               >
-                <div style={{ width: 34, height: 34, borderRadius: 10, background: '#FBF6ED', color: '#B5873A', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>🏷️</div>
+                <div style={{ width: 34, height: 34, borderRadius: 10, background: '#FBF6ED', color: '#B8956A', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>🏷️</div>
                 <div style={{ flex: 1 }}>
                   <p style={{ fontSize: 13, fontWeight: 600 }}>Ver etiquetas</p>
                   <p style={{ fontSize: 10, color: '#888', marginTop: 1 }}>Habladores y etiquetas de anaquel</p>
@@ -248,7 +248,7 @@ export default function Yo({ onTab }) {
                 onClick={() => window.open('/presupuestos', '_blank')}
                 style={{ width: '100%', background: '#fff', border: '1px solid var(--c-line)', borderRadius: 12, padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 11, textAlign: 'left' }}
               >
-                <div style={{ width: 34, height: 34, borderRadius: 10, background: '#D8EDE3', color: '#1A3C2E', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>📋</div>
+                <div style={{ width: 34, height: 34, borderRadius: 10, background: '#E8F0EA', color: '#2D5A3D', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>📋</div>
                 <div style={{ flex: 1 }}>
                   <p style={{ fontSize: 13, fontWeight: 600 }}>Ver presupuestos</p>
                   <p style={{ fontSize: 10, color: '#888', marginTop: 1 }}>Cotizaciones enviadas a clientes</p>
@@ -262,9 +262,9 @@ export default function Yo({ onTab }) {
               <button
                 onClick={toggleStoreMode}
                 style={{
-                  width: '100%', border: storeMode ? 'none' : '1px solid #1A3C2E',
-                  background: storeMode ? '#1A3C2E' : '#fff',
-                  color: storeMode ? '#fff' : '#1A3C2E',
+                  width: '100%', border: storeMode ? 'none' : '1px solid #2D5A3D',
+                  background: storeMode ? '#2D5A3D' : '#fff',
+                  color: storeMode ? '#fff' : '#2D5A3D',
                   borderRadius: 12, padding: '12px 16px',
                   fontSize: 13, fontWeight: 600,
                   display: 'flex', alignItems: 'center', gap: 10,
@@ -288,7 +288,7 @@ export default function Yo({ onTab }) {
         )}
 
         <div style={{ padding: '22px 18px 24px', textAlign: 'center' }}>
-          <button onClick={signOut} style={{ background: 'none', border: 'none', color: '#B5873A', fontSize: 12, fontWeight: 600 }}>Cerrar sesión</button>
+          <button onClick={signOut} style={{ background: 'none', border: 'none', color: '#B8956A', fontSize: 12, fontWeight: 600 }}>Cerrar sesión</button>
           <p style={{ fontSize: 10, color: '#BBB', marginTop: 14 }}>Selva Garden · v2.5.0</p>
         </div>
       </div>
