@@ -9,9 +9,9 @@
   "background_color": "#2D5A3D",
   "icons": [
     {
-      "src": "/brand/SelvaGarden_pictograma_claro_512.png",
-      "sizes": "512x512",
-      "type": "image/png",
+      "src": "/brand/icon-green.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
       "purpose": "any"
     },
     {
