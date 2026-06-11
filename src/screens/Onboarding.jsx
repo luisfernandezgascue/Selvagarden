@@ -73,7 +73,9 @@ export function OnboardWelcome({ onNext, onLogin }) {
       </div>
       <div style={{ position: 'relative', zIndex: 2, flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '24px 28px max(40px, env(safe-area-inset-bottom))', color: '#fff', minHeight: '100dvh' }}>
         <div style={{ marginTop: 18 }}>
-          <img src="/brand/SelvaGarden_apilado_claro_512.png" alt="Selva Garden" style={{ height: 70, width: 'auto', filter: 'brightness(0) invert(1)' }}/>
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', paddingTop: '60px', paddingBottom: '20px' }}>
+            <img src="/brand/SelvaGarden_apilado_claro_512.png" alt="Selva Garden" className="onboarding-logo" style={{ height: '120px', width: 'auto', display: 'block' }}/>
+          </div>
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>

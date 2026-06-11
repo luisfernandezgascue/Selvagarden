@@ -6,7 +6,7 @@
   "display": "standalone",
   "orientation": "portrait",
   "theme_color": "#2D5A3D",
-  "background_color": "#F5F0E8",
+  "background_color": "#2D5A3D",
   "icons": [
     {
       "src": "/brand/SelvaGarden_pictograma_claro_512.png",
