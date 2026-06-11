@@ -214,14 +214,14 @@ a { text-decoration: none; }
 }
 
 .header-logo {
-  height: 38px !important;
+  height: 72px !important;
   width: auto !important;
   display: block !important;
   flex-shrink: 0 !important;
 }
 
 .loading-logo {
-  height: 52px !important;
+  height: 90px !important;
   width: auto !important;
   display: block !important;
 }
