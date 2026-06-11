@@ -214,11 +214,15 @@ a { text-decoration: none; }
 }
 
 .header-logo {
-  height: 44px !important;
+  height: 38px !important;
   width: auto !important;
-  min-width: 140px;
-  max-width: 200px;
-  object-fit: contain;
-  display: block;
+  display: block !important;
+  flex-shrink: 0 !important;
+}
+
+.loading-logo {
+  height: 52px !important;
+  width: auto !important;
+  display: block !important;
 }
 
