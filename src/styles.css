@@ -214,12 +214,10 @@ a { text-decoration: none; }
 }
 
 .header-logo {
-  height: 72px !important;
+  height: 44px !important;
   width: auto !important;
   display: block !important;
   flex-shrink: 0 !important;
-  margin-left: 0 !important;
-  padding-left: 0 !important;
 }
 
 .loading-logo {
