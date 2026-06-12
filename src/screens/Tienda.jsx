@@ -12,6 +12,27 @@ const CATEGORY_LABELS = {
   materos: 'Materos', jardin: 'Jardin', otros: 'Otros',
 };
 
+const SUBFAMILY_CHIPS = {
+  flores:   ['todas', 'rosas', 'orquideas', 'girasoles', 'follaje'],
+  plantas:  ['todas', 'interior', 'exterior', 'suculentas', 'aromaticas'],
+  arreglos: ['todas', 'ramos', 'boxes', 'centros-mesa', 'ramilletes', 'funerarios'],
+  materos:  ['todas', 'herstera', 'barro', 'cestas', 'plastico'],
+  jardin:   ['todas', 'sustratos', 'vitaminas', 'riego', 'fumigacion', 'herramientas'],
+  otros:    ['todas', 'aromaterapia', 'mascotas', 'packaging'],
+};
+
+const SUBFAMILY_LABELS = {
+  todas: 'Todas', rosas: 'Rosas', orquideas: 'Orquídeas', girasoles: 'Girasoles',
+  follaje: 'Follaje', interior: 'Interior', exterior: 'Exterior',
+  suculentas: 'Suculentas', aromaticas: 'Aromáticas', ramos: 'Ramos',
+  boxes: 'Boxes', 'centros-mesa': 'Centros Mesa', ramilletes: 'Ramilletes',
+  funerarios: 'Funerarios', herstera: 'Herstera', barro: 'Barro',
+  cestas: 'Cestas', plastico: 'Plástico', sustratos: 'Sustratos',
+  vitaminas: 'Vitaminas', riego: 'Riego', fumigacion: 'Fumigación',
+  herramientas: 'Herramientas', aromaterapia: 'Aromaterapia',
+  mascotas: 'Mascotas', packaging: 'Packaging',
+};
+
 function displayName(p) {
   return p.nombre.charAt(0).toUpperCase() + p.nombre.slice(1).toLowerCase();
 }
@@ -61,6 +82,7 @@ export default function Tienda({ onTab, onProduct }) {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [cat, setCat] = useState('todos');
+  const [subcat, setSubcat] = useState('todas');
   const [search, setSearch] = useState('');
   const [searchOpen, setSearchOpen] = useState(false);
   const [addedId, setAddedId] = useState(null);
@@ -76,6 +98,7 @@ export default function Tienda({ onTab, onProduct }) {
 
   function openSearch() { setSearchOpen(true); }
   function closeSearch() { setSearchOpen(false); setSearch(''); }
+  function selectCat(slug) { setCat(slug); setSubcat('todas'); }
 
   // Build sorted category list from products
   const familyMap = {};
@@ -94,8 +117,9 @@ export default function Tienda({ onTab, onProduct }) {
 
   const filtered = products.filter(p => {
     const matchesCat = cat === 'todos' || p.subfamily?.family?.slug === cat;
+    const matchesSubcat = subcat === 'todas' || p.subfamily?.slug === subcat;
     const matchesSearch = !search || p.nombre?.toLowerCase().includes(search.toLowerCase());
-    return matchesCat && matchesSearch;
+    return matchesCat && matchesSubcat && matchesSearch;
   });
 
   function handleAddToCart(product) {
@@ -142,10 +166,10 @@ export default function Tienda({ onTab, onProduct }) {
       </div>
 
       <div className="scroll">
-        {/* Category tabs */}
+        {/* Category tabs — row 1 */}
         {sortedFamilies.length > 0 && (
           <div style={{ display: 'flex', gap: 0, overflowX: 'auto', padding: '0 18px', borderBottom: '1px solid var(--c-line-soft)', scrollbarWidth: 'none' }}>
-            <button onClick={() => setCat('todos')} style={{
+            <button onClick={() => selectCat('todos')} style={{
               background: 'none', border: 'none', padding: '10px 14px 10px 0',
               fontSize: 11, letterSpacing: '0.12em', fontWeight: cat === 'todos' ? 700 : 500,
               color: cat === 'todos' ? '#1A1A1A' : '#888',
@@ -153,7 +177,7 @@ export default function Tienda({ onTab, onProduct }) {
               whiteSpace: 'nowrap', flexShrink: 0,
             }}>TODOS</button>
             {sortedFamilies.map(f => (
-              <button key={f.slug} onClick={() => setCat(f.slug)} style={{
+              <button key={f.slug} onClick={() => selectCat(f.slug)} style={{
                 background: 'none', border: 'none', padding: '10px 14px',
                 fontSize: 11, letterSpacing: '0.12em', fontWeight: cat === f.slug ? 700 : 500,
                 color: cat === f.slug ? '#1A1A1A' : '#888',
@@ -161,6 +185,25 @@ export default function Tienda({ onTab, onProduct }) {
                 whiteSpace: 'nowrap', flexShrink: 0,
               }}>{(CATEGORY_LABELS[f.slug] || f.nombre)?.toUpperCase()}</button>
             ))}
+          </div>
+        )}
+
+        {/* Subfamily chips — row 2 */}
+        {cat !== 'todos' && SUBFAMILY_CHIPS[cat] && (
+          <div style={{ display: 'flex', gap: 8, overflowX: 'auto', padding: '8px 18px', scrollbarWidth: 'none' }}>
+            {SUBFAMILY_CHIPS[cat].map(slug => {
+              const active = subcat === slug;
+              return (
+                <button key={slug} onClick={() => setSubcat(slug)} style={{
+                  flexShrink: 0, border: `1px solid ${active ? '#2D5A3D' : '#E8F0EA'}`,
+                  borderRadius: 20, padding: '6px 14px', fontSize: 12,
+                  fontFamily: 'var(--font-sans)', fontWeight: active ? 600 : 400,
+                  background: active ? '#2D5A3D' : '#F0FAF5',
+                  color: active ? '#fff' : '#2D5A3D',
+                  cursor: 'pointer',
+                }}>{SUBFAMILY_LABELS[slug] || slug}</button>
+              );
+            })}
           </div>
         )}
 
@@ -173,7 +216,7 @@ export default function Tienda({ onTab, onProduct }) {
 
         <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 18px', alignItems: 'center' }}>
           <span style={{ fontSize: 11, color: '#888' }}>{loading ? 'Cargando…' : `${filtered.length} producto${filtered.length !== 1 ? 's' : ''}`}</span>
-          {cat !== 'todos' && <button onClick={() => setCat('todos')} style={{ background: 'none', border: 'none', fontSize: 11, color: '#888' }}>Ver todos</button>}
+          {cat !== 'todos' && <button onClick={() => selectCat('todos')} style={{ background: 'none', border: 'none', fontSize: 11, color: '#888' }}>Ver todos</button>}
         </div>
 
         {loading ? (
