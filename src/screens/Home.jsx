@@ -4,6 +4,16 @@ import { Icon } from '../icons';
 import { useCustomer, nivelInfo, levelProgress } from '../context/CustomerContext';
 import { fetchEvents, fetchFeaturedProduct } from '../lib/db';
 import { isAdmin } from '../lib/admin';
+import { supabase } from '../lib/supabase';
+
+// TODO: replace with Shopify featured collection API
+const FEATURED_SKUS = [
+  '1-FL-1003-BL-2V',
+  '1-FL-1001-RO-ST',
+  '1-FO-1007-VE-ST',
+  '4-LU-4002-GR-P17',
+  '4-LU-4003-BL-P27',
+];
 
 const NOTIF_SEEN_KEY = 'selva_notif_seen';
 
@@ -126,6 +136,7 @@ export default function Home({ onTab, onProduct }) {
   const { customer, storeMode } = useCustomer();
   const [events, setEvents] = useState([]);
   const [hero, setHero] = useState(null);
+  const [featured, setFeatured] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [videoOpen, setVideoOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
@@ -137,10 +148,24 @@ export default function Home({ onTab, onProduct }) {
   const consumo = customer?.consumo_anual || 0;
   const info = nivelInfo(nivel);
   const prog = levelProgress(consumo);
+  const discount = info.descuento;
 
   useEffect(() => {
     fetchEvents().then(setEvents);
     fetchFeaturedProduct().then(setHero);
+    if (supabase) {
+      supabase
+        .from('products')
+        .select('id, sku, nombre, precio_venta, imagen_url, color, talla')
+        .in('sku', FEATURED_SKUS)
+        .eq('activo', true)
+        .then(({ data }) => {
+          if (data?.length) {
+            const ordered = FEATURED_SKUS.map(s => data.find(p => p.sku === s)).filter(Boolean);
+            setFeatured(ordered);
+          }
+        });
+    }
   }, []);
 
   function openNotif() {
@@ -254,19 +279,42 @@ export default function Home({ onTab, onProduct }) {
           </div>
         )}
 
-        {/* Esta semana */}
+        {/* Productos destacados */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '0 18px', margin: '22px 0 12px' }}>
-          <h3 className="h-serif" style={{ fontSize: 22, fontWeight: 600 }}>Esta semana</h3>
-          <button onClick={() => onTab?.('shop')} style={{ background: 'none', border: 'none', fontSize: 12, color: 'var(--c-green)', fontWeight: 600 }}>Ver tienda →</button>
+          <h3 className="h-serif" style={{ fontSize: 22, fontWeight: 600 }}>Productos destacados</h3>
+          <button onClick={() => onTab?.('shop')} style={{ background: 'none', border: 'none', fontSize: 12, color: 'var(--c-green)', fontWeight: 600 }}>Ver todo →</button>
         </div>
-        <div style={{ display: 'flex', gap: 10, overflowX: 'auto', padding: '0 18px 4px', scrollbarWidth: 'none' }}>
-          {[
-            { name: 'Orquídea Phalaenopsis', img: 'https://images.pexels.com/photos/931177/pexels-photo-931177.jpeg?auto=compress&w=400', price: 54, old: 60, tag: 'FLORES' },
-            { name: 'Pothos Marble Queen', img: 'https://images.pexels.com/photos/6913404/pexels-photo-6913404.jpeg?auto=compress&w=400', price: 18, old: 20, tag: 'PLANTA' },
-            { name: 'Matero Herstera Lino 24', img: 'https://images.pexels.com/photos/1084188/pexels-photo-1084188.jpeg?auto=compress&w=400', price: 32, old: 36, tag: 'MATERO' },
-            { name: 'Sansevieria Zeylanica', img: 'https://images.pexels.com/photos/2123482/pexels-photo-2123482.jpeg?auto=compress&w=400', price: 27, old: 30, tag: 'PLANTA' },
-          ].map((p, i) => (
-            <ProductCardSmall key={i} {...p} onClick={() => onTab?.('shop')}/>
+        <div style={{ display: 'flex', gap: 12, overflowX: 'auto', padding: '0 18px 4px', scrollbarWidth: 'none' }}>
+          {featured.map(p => {
+            const nombre = p.nombre.charAt(0).toUpperCase() + p.nombre.slice(1).toLowerCase();
+            const precio = p.precio_venta || 0;
+            const precioDesc = discount > 0 ? precio * (1 - discount / 100) : null;
+            return (
+              <div key={p.id} onClick={() => onProduct?.(p)} style={{ width: 110, flexShrink: 0, cursor: 'pointer' }}>
+                <div style={{ width: 110, height: 140, borderRadius: 12, overflow: 'hidden', background: '#EDEBE3', marginBottom: 7 }}>
+                  {p.imagen_url
+                    ? <img src={p.imagen_url} alt={nombre} style={{ width: '100%', height: '100%', objectFit: 'cover' }}/>
+                    : <div className="photo-placeholder" style={{ width: '100%', height: '100%' }}/>
+                  }
+                </div>
+                <p style={{ fontSize: 12, color: '#1A1A1A', fontWeight: 500, lineHeight: 1.35, marginBottom: 4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{nombre}</p>
+                {precioDesc ? (
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: '#2D5A3D' }}>${precioDesc.toFixed(0)}</span>
+                    <span style={{ fontSize: 10, color: '#C0C0C0', textDecoration: 'line-through' }}>${precio.toFixed(0)}</span>
+                  </div>
+                ) : (
+                  <span style={{ fontSize: 13, fontWeight: 700, color: '#2D5A3D' }}>${precio.toFixed(0)}</span>
+                )}
+              </div>
+            );
+          })}
+          {featured.length === 0 && [0,1,2,3].map(i => (
+            <div key={i} style={{ width: 110, flexShrink: 0 }}>
+              <div style={{ width: 110, height: 140, borderRadius: 12, background: '#E8E5DC' }}/>
+              <div style={{ height: 12, background: '#E8E5DC', borderRadius: 6, margin: '7px 0 4px', width: '80%' }}/>
+              <div style={{ height: 12, background: '#E8E5DC', borderRadius: 6, width: '50%' }}/>
+            </div>
           ))}
         </div>
 
