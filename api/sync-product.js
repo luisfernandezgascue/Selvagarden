@@ -1,14 +1,13 @@
 export const config = { runtime: 'edge' };
 
 const SHOPIFY_STORE   = process.env.SHOPIFY_STORE_DOMAIN;   // 3vhr9z-ni.myshopify.com
-const SHOPIFY_TOKEN   = process.env.SHOPIFY_ACCESS_TOKEN;   // atkn_5b80...
-const WEBHOOK_SECRET  = process.env.WEBHOOK_SECRET;         // clave que tú eliges
+const SHOPIFY_TOKEN   = process.env.SHOPIFY_ACCESS_TOKEN;   // shpss_...
+const WEBHOOK_SECRET  = process.env.WEBHOOK_SECRET;         // selva2026secret
 const SUPABASE_URL    = process.env.SUPABASE_URL;           // https://pjckvtkqzujczwkewgmq.supabase.co
 const SUPABASE_KEY    = process.env.SUPABASE_SERVICE_KEY;   // service_role key
 
 const SHOPIFY_API = `https://${SHOPIFY_STORE}/admin/api/2024-10/graphql.json`;
 
-// Mapa subfamilia slug → Shopify Collection GID
 const COLLECTION_MAP = {
   'flores-temporada':  'gid://shopify/Collection/699841511756',
   'follaje-verde':     'gid://shopify/Collection/699841544524',
@@ -27,15 +26,11 @@ export default async function handler(req) {
     return new Response('Method Not Allowed', { status: 405 });
   }
 
-  // Validar secreto
   const secret = req.headers.get('x-webhook-secret');
   if (secret !== WEBHOOK_SECRET) {
     return new Response('Unauthorized', { status: 401 });
   }
-  // DEBUG temporal - borrar después
-  console.log('TOKEN exists:', !!SHOPIFY_TOKEN);
-  console.log('TOKEN prefix:', SHOPIFY_TOKEN?.substring(0, 10));
-  console.log('STORE:', SHOPIFY_STORE);
+
   let body;
   try {
     body = await req.json();
@@ -68,7 +63,6 @@ export default async function handler(req) {
   }
 }
 
-// ─── Shopify GraphQL helper ────────────────────────────────────────────────
 async function shopifyGql(query, variables = {}) {
   const res = await fetch(SHOPIFY_API, {
     method: 'POST',
@@ -83,7 +77,6 @@ async function shopifyGql(query, variables = {}) {
   return json.data;
 }
 
-// ─── Construir input de producto ──────────────────────────────────────────
 function buildProductInput(record) {
   const collectionsToJoin = [];
   if (record.subfamilia && COLLECTION_MAP[record.subfamilia]) {
@@ -106,7 +99,6 @@ function buildProductInput(record) {
   };
 }
 
-// ─── Crear producto nuevo ─────────────────────────────────────────────────
 async function createProduct(record) {
   const input = buildProductInput(record);
 
@@ -125,7 +117,6 @@ async function createProduct(record) {
 
   const shopifyId = data?.productCreate?.product?.legacyResourceId;
   if (shopifyId && SUPABASE_URL && SUPABASE_KEY) {
-    // Escribir shopify_product_id de vuelta a Supabase
     await fetch(`${SUPABASE_URL}/rest/v1/products?sku=eq.${encodeURIComponent(record.sku)}`, {
       method: 'PATCH',
       headers: {
@@ -139,7 +130,6 @@ async function createProduct(record) {
   }
 }
 
-// ─── Actualizar producto existente ────────────────────────────────────────
 async function updateProduct(record) {
   const productGid = `gid://shopify/Product/${record.shopify_product_id}`;
   const input = buildProductInput(record);
