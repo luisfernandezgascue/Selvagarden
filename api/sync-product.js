@@ -32,7 +32,10 @@ export default async function handler(req) {
   if (secret !== WEBHOOK_SECRET) {
     return new Response('Unauthorized', { status: 401 });
   }
-
+  // DEBUG temporal - borrar después
+  console.log('TOKEN exists:', !!SHOPIFY_TOKEN);
+  console.log('TOKEN prefix:', SHOPIFY_TOKEN?.substring(0, 10));
+  console.log('STORE:', SHOPIFY_STORE);
   let body;
   try {
     body = await req.json();
