@@ -145,9 +145,11 @@ function assertNoUserErrors(label, userErrors) {
 function buildProductInput(record) {
   const input = {
     title: record.nombre,
-    descriptionHtml: record.descripcion_editorial || '',
     status: record.activo ? 'ACTIVE' : 'DRAFT',
   };
+
+  // Si Supabase no tiene descripción, no se pisa la que ya exista en Shopify
+  if (record.descripcion_editorial) input.descriptionHtml = record.descripcion_editorial;
 
   // Solo se une a colecciones; nunca se saca de ninguna (sync no destructivo)
   const collection = record.subfamilia && COLLECTION_MAP[record.subfamilia];
@@ -157,7 +159,7 @@ function buildProductInput(record) {
 }
 
 // ─── Precio y SKU de la variante (Shopify crea una variante por defecto) ──
-async function setVariant(productId, variantId, record) {
+async function setVariant(productId, variantId, record, isNew) {
   const data = await shopifyGql(
     `mutation variantUpdate($productId: ID!, $variants: [ProductVariantsBulkInput!]!) {
       productVariantsBulkUpdate(productId: $productId, variants: $variants) {
@@ -169,8 +171,9 @@ async function setVariant(productId, variantId, record) {
       variants: [{
         id: variantId,
         price: String(record.precio_venta ?? '0'),
-        // tracked:false => se puede comprar sin stock sincronizado (sync de stock = siguiente fase)
-        inventoryItem: { sku: record.sku, tracked: false },
+        // Al crear: tracked=false => se puede comprar sin stock sincronizado (sync de stock = siguiente fase).
+        // Al actualizar: solo el SKU; no se toca el seguimiento de inventario existente.
+        inventoryItem: isNew ? { sku: record.sku, tracked: false } : { sku: record.sku },
       }],
     },
   );
@@ -214,7 +217,7 @@ async function createProduct(record) {
   const product = data.productCreate.product;
   const variantId = product.variants.nodes[0]?.id;
 
-  if (variantId) await setVariant(product.id, variantId, record);
+  if (variantId) await setVariant(product.id, variantId, record, true);
   if (record.activo) await publish(product.id);
 
   // Guardar el ID de Shopify en Supabase para que los próximos cambios sean UPDATE
@@ -227,18 +230,25 @@ async function createProduct(record) {
         Authorization: `Bearer ${SUPABASE_KEY}`,
         Prefer: 'return=minimal',
       },
-      body: JSON.stringify({ shopify_product_id: product.legacyResourceId }),
+      // Mismo formato que ya tiene la tabla: GID completo (gid://shopify/Product/123...)
+      body: JSON.stringify({ shopify_product_id: product.id }),
     });
     if (!res.ok) throw new Error(`Supabase writeback failed (${res.status}): ${await res.text()}`);
   }
 
-  return { action: 'created', shopify_product_id: product.legacyResourceId };
+  return { action: 'created', shopify_product_id: product.id };
+}
+
+// Acepta tanto el GID completo como solo el número
+function toProductGid(id) {
+  const s = String(id);
+  return s.startsWith('gid://') ? s : `gid://shopify/Product/${s}`;
 }
 
 // ─── Actualizar producto existente ────────────────────────────────────────
 // Las imágenes solo se envían al crear, para no duplicarlas en cada UPDATE.
 async function updateProduct(record) {
-  const productId = `gid://shopify/Product/${record.shopify_product_id}`;
+  const productId = toProductGid(record.shopify_product_id);
 
   const data = await shopifyGql(
     `mutation productUpdate($product: ProductUpdateInput!) {
@@ -255,7 +265,7 @@ async function updateProduct(record) {
   assertNoUserErrors('productUpdate', data.productUpdate.userErrors);
 
   const variantId = data.productUpdate.product.variants.nodes[0]?.id;
-  if (variantId) await setVariant(productId, variantId, record);
+  if (variantId) await setVariant(productId, variantId, record, false);
   if (record.activo) await publish(productId);
 
   return { action: 'updated', shopify_product_id: record.shopify_product_id };
