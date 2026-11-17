@@ -180,7 +180,7 @@ export default function Producto({ product: productProp, onBack, onProduct }) {
 
           {/* Delivery */}
           <div style={{ background: '#fff', borderRadius: 14, border: '1px solid var(--c-line)', padding: '4px 14px', marginBottom: 16 }}>
-            <SpecRow l="Entrega" r="2–3 días en Caracas" last/>
+            <SpecRow l="Entrega" r="2–3 días en España" last/>
           </div>
 
           {/* Related products */}

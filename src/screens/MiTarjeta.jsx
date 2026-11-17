@@ -148,7 +148,7 @@ function WalletModal({ onClose }) {
 const BENEFITS = {
   sin_nivel:  [`10% en tu primer pedido online con código BIENV-[socio]`, 'Acumula puntos en cada compra'],
   alhambra:   ['5% descuento en toda la tienda', 'Acceso anticipado a nuevas plantas', '1 taller al año incluido'],
-  versailles: ['10% descuento en toda la tienda', 'Envío gratis en Caracas', 'Invitación a cenas botánicas'],
+  versailles: ['10% descuento en toda la tienda', 'Envío gratis en España', 'Invitación a cenas botánicas'],
   babilonia:  ['15% descuento en toda la tienda', 'Asesoría personalizada', 'Acceso VIP a eventos', 'Regalo de cumpleaños'],
 };
 

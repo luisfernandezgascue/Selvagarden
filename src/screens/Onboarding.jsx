@@ -80,7 +80,7 @@ export function OnboardWelcome({ onNext, onLogin }) {
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
           <div>
-            <p className="eyebrow" style={{ color: '#D4AA6B', marginBottom: 14 }}>Caracas · Est. 2025</p>
+            <p className="eyebrow" style={{ color: '#D4AA6B', marginBottom: 14 }}>España · Est. 2026</p>
             <h1 className="h-serif" style={{ fontSize: 46, lineHeight: 1, fontWeight: 500, marginBottom: 14 }}>
               Bienvenido a<br/>
               <span style={{ fontStyle: 'italic', fontWeight: 400 }}>Selva</span> Garden

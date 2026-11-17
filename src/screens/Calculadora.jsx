@@ -86,7 +86,7 @@ export default function Calculadora({ onBack }) {
   const addFlower = () => setFlowers(f => [...f, { name: 'Nueva flor', qty: 1, unit: 1.00 }]);
   const removeFlower = (i) => setFlowers(f => f.filter((_, idx) => idx !== i));
 
-  const waMsg = `🌿 *Cotización Selva Garden*\n\n${flowers.map(f => `${f.qty}× ${f.name} — $${(f.qty * f.unit).toFixed(2)}`).join('\n')}\n\nMateriales: $${materials.toFixed(2)}\nServicio (${servicePct}%): $${service.toFixed(2)}\nSubtotal: $${beforeMargin.toFixed(2)}\n\n*Total: $${rounded}*\n\nEntrega Caracas 24h.`;
+  const waMsg = `🌿 *Cotización Selva Garden*\n\n${flowers.map(f => `${f.qty}× ${f.name} — $${(f.qty * f.unit).toFixed(2)}`).join('\n')}\n\nMateriales: $${materials.toFixed(2)}\nServicio (${servicePct}%): $${service.toFixed(2)}\nSubtotal: $${beforeMargin.toFixed(2)}\n\n*Total: $${rounded}*\n\nEntrega España 24h.`;
   const waUrl = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(waMsg)}`;
 
   async function handleEnviar() {
